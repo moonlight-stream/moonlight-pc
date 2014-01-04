@@ -78,7 +78,7 @@ public class LibraryHelper {
 			str.append("win");
 		}
 		else if (osName.contains("Linux")) {
-			str.append("osx");
+			str.append("lin");
 		}
 		else {
 			return null;
