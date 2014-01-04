@@ -91,6 +91,34 @@ public class Limelight implements NvConnectionListener {
 		main.build();
 		limeFrame = main.getLimeFrame();
 	}
+	
+	/**
+	 * Load native libraries for this platform or show an error dialog
+	 * @return Error message or null for success
+	 */
+	public static String loadNativeLibraries() {
+		String errorMessage;
+		
+		try {
+			String libraryPlatform = LibraryHelper.getLibraryPlatformString();
+			String jrePlatform = LibraryHelper.getRunningPlatformString();
+
+			if (libraryPlatform.equals(jrePlatform)) {
+				// Success path
+				LibraryHelper.prepareNativeLibraries();
+				NativeGamepad.addListener(GamepadListener.getInstance());
+				NativeGamepad.start();
+				return null;
+			}
+			else {
+				errorMessage = "This is not the correct JAR for your platform. Please download the \""+jrePlatform+"\" JAR.";
+			}
+		} catch (IOException e) {
+			errorMessage = "The JAR is malformed or an invalid native library path was specified.";
+		}
+		
+		return errorMessage;
+	}
 
 	/**
 	 * Creates a new instance and starts the stream.
@@ -137,17 +165,24 @@ public class Limelight implements NvConnectionListener {
 				System.exit(2);
 			}
 		}
-
-		LibraryHelper.prepareNativeLibraries();
-
-		NativeGamepad.addListener(GamepadListener.getInstance());
-		NativeGamepad.start();
+		
+		String libraryError = loadNativeLibraries();
 		
 		// launching with command line arguments
 		if (args.length > 0) {
-			parseCommandLine(args);
+			if (libraryError == null) {
+				parseCommandLine(args);
+			}
+			else {
+				// Print the error to stderr if running from command line
+				System.err.println(libraryError);
+			}
 		} else {
-			createFrame();
+			if (libraryError == null) {
+				createFrame();
+			} else {
+				JOptionPane.showMessageDialog(null, libraryError, "Wrong JAR platform", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	

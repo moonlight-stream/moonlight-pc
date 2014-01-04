@@ -1,10 +1,13 @@
 package com.limelight.binding;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 
 public class LibraryHelper {
@@ -58,6 +61,66 @@ public class LibraryHelper {
 		}
 		
 		librariesExtracted = true;
+	}
+	
+	public static String getRunningPlatformString() {
+		String osName = System.getProperty("os.name", "");
+		String jreArch = System.getProperty("os.arch", "");
+		StringBuilder str = new StringBuilder();
+		
+		// OS X is a single-arch platform
+		if (osName.contains("Mac OS X")) {
+			return "osx";
+		}
+		
+		// Windows and Linux are dual-arch
+		if (osName.contains("Windows")) {
+			str.append("win");
+		}
+		else if (osName.contains("Linux")) {
+			str.append("osx");
+		}
+		else {
+			return null;
+		}
+		
+		// Check OS arch
+		if (jreArch.equalsIgnoreCase("x86")) {
+			str.append("32");
+		}
+		else {
+			str.append("64");
+		}
+		
+		return str.toString();
+	}
+	
+	public static String getLibraryPlatformString() throws IOException {
+		BufferedReader reader;
+		
+		if (isRunningFromJar()) {
+			reader = getPlatformInJar();
+		}
+		else {
+			reader = getPlatformUnpackaged();
+		}
+		
+		return reader.readLine();
+	}
+	
+	private static BufferedReader getPlatformUnpackaged() throws FileNotFoundException {
+		String platformPath = System.getProperty("java.library.path", "") + File.separator + "platform";
+		InputStream inStream = new FileInputStream(new File(platformPath));
+		return new BufferedReader(new InputStreamReader(inStream));
+	}
+	
+	private static BufferedReader getPlatformInJar() throws FileNotFoundException {
+		InputStream platformFile = new Object().getClass().getResourceAsStream("/binlib/platform");
+		if (platformFile == null) {
+			throw new FileNotFoundException("Unable to find platform designation in JAR");
+		}
+		
+		return new BufferedReader(new InputStreamReader(platformFile));
 	}
 	
 	private static void extractNativeLibrary(String libraryName) throws IOException {
