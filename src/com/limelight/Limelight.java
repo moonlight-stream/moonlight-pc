@@ -38,6 +38,7 @@ public class Limelight implements NvConnectionListener {
 	private NvConnection conn;
 	private boolean connectionTerminating;
 	private static JFrame limeFrame;
+	private Gamepad gamepad;
 
 	/**
 	 * Constructs a new instance based on the given host
@@ -59,8 +60,6 @@ public class Limelight implements NvConnectionListener {
 				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
 				PlatformBinding.getAudioRenderer(),
 				PlatformBinding.getVideoDecoderRenderer());
-		
-		GamepadListener.getInstance().addDeviceListener(new Gamepad(conn));
 	}
 	
 	/*
@@ -166,6 +165,8 @@ public class Limelight implements NvConnectionListener {
 			}
 		}
 		
+		GamepadListener.getInstance().addDeviceListener(new Gamepad());
+		
 		String libraryError = loadNativeLibraries();
 		
 		// launching with command line arguments
@@ -244,7 +245,17 @@ public class Limelight implements NvConnectionListener {
 	
 	public void stop() {
 		connectionTerminating = true;
+
+		// Kill the connection to the target
 		conn.stop();
+		
+		// Remove the gamepad listener
+		if (gamepad != null) {
+			GamepadListener.getInstance().removeListener(gamepad);
+		}
+		
+		// Close the stream frame
+		streamFrame.dispose();
 	}
 
 	/**
@@ -272,8 +283,7 @@ public class Limelight implements NvConnectionListener {
 	 */
 	@Override
 	public void stageFailed(Stage stage) {
-		streamFrame.dispose();
-		conn.stop();
+		stop();
 		displayError("Connection Error", "Starting " + stage.getName() + " failed");
 	}
 
@@ -283,6 +293,9 @@ public class Limelight implements NvConnectionListener {
 	@Override
 	public void connectionStarted() {
 		streamFrame.hideSpinner();
+		
+		gamepad = new Gamepad(conn);
+		GamepadListener.getInstance().addDeviceListener(gamepad);
 	}
 
 	/**
@@ -296,10 +309,7 @@ public class Limelight implements NvConnectionListener {
 			e.printStackTrace();
 		}
 		if (!connectionTerminating) {
-			connectionTerminating = true;
-
-			// Kill the connection to the target
-			conn.stop();
+			stop();
 
 			// Spin off a new thread to update the UI since
 			// this thread has been interrupted and will terminate
