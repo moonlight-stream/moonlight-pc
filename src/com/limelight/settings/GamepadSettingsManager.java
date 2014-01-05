@@ -24,7 +24,11 @@ public abstract class GamepadSettingsManager {
 		}
 		if (cachedSettings == null) {
 			System.out.println("Unable to get gamepad settings. Using default mapping instead.");
-			cachedSettings = GamepadMapping.getDefaultMapping();
+			if (System.getProperty("os.name").contains("Windows")) {
+				cachedSettings = GamepadMapping.getWindowsDefaultMapping();
+			} else {
+				cachedSettings = new GamepadMapping();
+			}
 			writeSettings(cachedSettings);
 		}
 		return cachedSettings;

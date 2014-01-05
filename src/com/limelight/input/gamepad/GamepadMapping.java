@@ -118,7 +118,7 @@ public class GamepadMapping implements Serializable {
 	 * Generates a default mapping using the Windows XInput bindings
 	 * @return a default mapping
 	 */
-	public static GamepadMapping getDefaultMapping() {
+	public static GamepadMapping getWindowsDefaultMapping() {
 		GamepadMapping defaultMap = new GamepadMapping();
 		
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_A, false, false), new SourceComponent(Type.BUTTON, 10));
