@@ -23,8 +23,8 @@ public abstract class GamepadSettingsManager {
 			cachedSettings = savedMapping;
 		}
 		if (cachedSettings == null) {
-			System.out.println("Unable to get gamepad settings. Using an empty mapping instead.");
-			cachedSettings = new GamepadMapping();
+			System.out.println("Unable to get gamepad settings. Using default mapping instead.");
+			cachedSettings = GamepadMapping.getDefaultMapping();
 			writeSettings(cachedSettings);
 		}
 		return cachedSettings;
