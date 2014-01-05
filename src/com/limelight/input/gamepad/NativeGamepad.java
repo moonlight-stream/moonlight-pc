@@ -54,6 +54,7 @@ public class NativeGamepad {
 	}
 	
 	public static void start() {
+		System.out.println("Native Gamepad starting up...");
 		if (!initialized) {
 			NativeGamepad.init();
 			initialized = true;
@@ -151,12 +152,14 @@ public class NativeGamepad {
 	}
 	
 	public static void deviceAttachCallback(int deviceId, int numButtons, int numAxes) {
+		System.out.println(deviceId + " has attached.");
 		for (NativeGamepadListener listener : listenerList) {
 			listener.deviceAttached(deviceId, numButtons, numAxes);
 		}
 	}
 	
 	public static void deviceRemoveCallback(int deviceId) {
+		System.out.println(deviceId + " has detached.");
 		for (NativeGamepadListener listener : listenerList) {
 			listener.deviceRemoved(deviceId);
 		}
