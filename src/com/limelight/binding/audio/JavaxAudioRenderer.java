@@ -1,12 +1,14 @@
 package com.limelight.binding.audio;
 
+import java.nio.ByteOrder;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-import com.limelight.nvstream.av.ShortBufferDescriptor;
+import com.limelight.nvstream.av.ByteBufferDescriptor;
 import com.limelight.nvstream.av.audio.AudioRenderer;
 
 /**
@@ -33,10 +35,10 @@ public class JavaxAudioRenderer implements AudioRenderer {
 	 * @param length the length of data to be rendered
 	 */
 	@Override
-	public void playDecodedAudio(short[] pcmData, int offset, int length) {
+	public void playDecodedAudio(byte[] pcmData, int offset, int length) {
 		if (soundLine != null) {
 			// Queue the decoded samples into the staging sound buffer
-			soundBuffer.queue(new ShortBufferDescriptor(pcmData, offset, length));
+			soundBuffer.queue(new ByteBufferDescriptor(pcmData, offset, length));
 			
 			int available = soundLine.available();
 			if (reallocateLines) {
@@ -80,7 +82,7 @@ public class JavaxAudioRenderer implements AudioRenderer {
 	}
 
 	private void createSoundLine(int bufferSize) {
-		AudioFormat audioFormat = new AudioFormat(sampleRate, 16, channelCount, true, true);
+		AudioFormat audioFormat = new AudioFormat(sampleRate, 16, channelCount, true, ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
 		
 		DataLine.Info info;
 		
