@@ -1,22 +1,21 @@
 package com.limelight.binding.audio;
 
 import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 import java.util.LinkedList;
 
-import com.limelight.nvstream.av.ShortBufferDescriptor;
+import com.limelight.nvstream.av.ByteBufferDescriptor;
 
 public class SoundBuffer {
 	
-	private LinkedList<ShortBufferDescriptor> bufferList;
+	private LinkedList<ByteBufferDescriptor> bufferList;
 	private int maxBuffers;
 	
 	public SoundBuffer(int maxBuffers) {
-		this.bufferList = new LinkedList<ShortBufferDescriptor>();
+		this.bufferList = new LinkedList<ByteBufferDescriptor>();
 		this.maxBuffers = maxBuffers;
 	}
 	
-	public void queue(ShortBufferDescriptor buff) {
+	public void queue(ByteBufferDescriptor buff) {
 		if (bufferList.size() > maxBuffers) {
 			bufferList.removeFirst();
 		}
@@ -26,7 +25,7 @@ public class SoundBuffer {
 	
 	public int size() {
 		int size = 0;
-		for (ShortBufferDescriptor desc : bufferList) {
+		for (ByteBufferDescriptor desc : bufferList) {
 			size += desc.length;
 		}
 		return size;
@@ -35,27 +34,22 @@ public class SoundBuffer {
 	public int fill(byte[] data, int offset, int length) {
 		int filled = 0;
 		
-		// Convert offset and length to be relative to shorts
-		offset /= 2;
-		length /= 2;
-		
-		ShortBuffer sb = ByteBuffer.wrap(data).asShortBuffer();
-		sb.position(offset);
+		ByteBuffer bb = ByteBuffer.wrap(data);
+		bb.position(offset);
 		while (length > 0 && !bufferList.isEmpty()) {
-			ShortBufferDescriptor buff = bufferList.getFirst();
+			ByteBufferDescriptor buff = bufferList.getFirst();
 			
 			if (buff.length > length) {
 				break;
 			}
 			
-			sb.put(buff.data, buff.offset, buff.length);
+			bb.put(buff.data, buff.offset, buff.length);
 			length -= buff.length;
 			filled += buff.length;
 			
 			bufferList.removeFirst();
 		}
 		
-		// Return bytes instead of shorts
-		return filled * 2;
+		return filled;
 	}
 }

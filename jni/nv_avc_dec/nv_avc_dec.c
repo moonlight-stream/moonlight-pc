@@ -42,11 +42,11 @@ pthread_mutex_t mutex;
 AVFrame* rgb_frame;
 char* rgb_frame_buf;
 struct SwsContext* scaler_ctx;
+int render_pix_fmt;
 #ifdef __ANDROID_API__
 ANativeWindow* window;
 #endif
 
-#define RENDER_PIX_FMT AV_PIX_FMT_RGBA
 #define BYTES_PER_PIXEL 4
 
 // Disables the deblocking filter at the cost of image quality
@@ -63,6 +63,14 @@ ANativeWindow* window;
 #define FAST_BILINEAR_FILTERING 0x20
 // Disables color conversion (output is NV21)
 #define NO_COLOR_CONVERSION     0x40
+// Native color format: RGB0
+#define NATIVE_COLOR_RGB0       0x80
+// Native color format: 0RGB
+#define NATIVE_COLOR_0RGB       0x100
+// Native color format: ARGB
+#define NATIVE_COLOR_ARGB       0x200
+// Native color format: RGBA
+#define NATIVE_COLOR_RGBA       0x400
 
 // This function must be called before
 // any other decoding functions
@@ -118,6 +126,24 @@ int nv_avc_init(int width, int height, int perf_lvl, int thread_count) {
 	decoder_ctx->height = height;
 	decoder_ctx->pix_fmt = PIX_FMT_YUV420P;
 
+	// Little-endian makes the AV_PIX_FMT constants look wierd
+	if (perf_lvl & NATIVE_COLOR_RGB0) {
+		render_pix_fmt = AV_PIX_FMT_0BGR;
+	}
+	else if (perf_lvl & NATIVE_COLOR_0RGB) {
+		render_pix_fmt = AV_PIX_FMT_BGR0;
+	}
+	else if (perf_lvl & NATIVE_COLOR_RGBA) {
+		render_pix_fmt = AV_PIX_FMT_ABGR;
+	}
+	else if (perf_lvl & NATIVE_COLOR_ARGB) {
+		render_pix_fmt = AV_PIX_FMT_BGRA;
+	}
+	else {
+		// Default
+		render_pix_fmt = AV_PIX_FMT_ABGR;
+	}
+
 	err = avcodec_open2(decoder_ctx, decoder, NULL);
 	if (err < 0) {
 		__android_log_write(ANDROID_LOG_ERROR, "NVAVCDEC",
@@ -149,7 +175,7 @@ int nv_avc_init(int width, int height, int perf_lvl, int thread_count) {
 
 		err = avpicture_fill((AVPicture*)rgb_frame,
 			rgb_frame_buf,
-			RENDER_PIX_FMT,
+			render_pix_fmt,
 			decoder_ctx->width,
 			decoder_ctx->height);
 		if (err < 0) {
@@ -173,7 +199,7 @@ int nv_avc_init(int width, int height, int perf_lvl, int thread_count) {
 			decoder_ctx->pix_fmt,
 			decoder_ctx->width,
 			decoder_ctx->height,
-			RENDER_PIX_FMT,
+			render_pix_fmt,
 			filtering,
 			NULL, NULL, NULL);
 		if (scaler_ctx == NULL) {
@@ -275,7 +301,7 @@ static int render_rgb_to_buffer(char* buffer, int size) {
 
 	// Draw the frame to the buffer
 	err = avpicture_layout((AVPicture*)rgb_frame,
-		RENDER_PIX_FMT,
+		render_pix_fmt,
 		decoder_ctx->width,
 		decoder_ctx->height,
 		buffer,
