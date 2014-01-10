@@ -33,6 +33,14 @@ public class AvcDecoder {
 	public static final int FAST_BILINEAR_FILTERING = 0x20;
 	/** Disables color conversion (output is NV21) */
 	public static final int NO_COLOR_CONVERSION = 0x40;
+	/** Native color format: RGB0 */
+	public static final int NATIVE_COLOR_RGB0 = 0x80;
+	/** Native color format: RGB0 */
+	public static final int NATIVE_COLOR_0RGB = 0x100;
+	/** Native color format: ARGB */
+	public static final int NATIVE_COLOR_ARGB = 0x200;
+	/** Native color format: RGBA */
+	public static final int NATIVE_COLOR_RGBA = 0x400;
 	
 	public static native int init(int width, int height, int perflvl, int threadcount);
 	public static native void destroy();

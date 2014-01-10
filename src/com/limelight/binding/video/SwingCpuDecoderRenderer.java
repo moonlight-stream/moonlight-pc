@@ -1,7 +1,11 @@
 package com.limelight.binding.video;
 
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
 
@@ -32,6 +36,8 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	// Only sleep if the difference is above this value
 	private static final int WAIT_CEILING_MS = 8;
 	
+	private static final int REFERENCE_PIXEL = 0x01020304;
+	
 	/**
 	 * Sets up the decoder and renderer to render video at the specified dimensions
 	 * @param width the width of the video to render
@@ -48,6 +54,42 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		// Single threaded low latency decode is ideal
 		int avcFlags = AvcDecoder.LOW_LATENCY_DECODE;
 		int threadCount = 1;
+		
+		GraphicsConfiguration graphicsConfiguration = GraphicsEnvironment.
+				getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+		
+		// Attempt to use an optimized buffered image to avoid an additional
+		// color space conversion on each redraw.
+		BufferedImage optimalImage = graphicsConfiguration.createCompatibleImage(width, height, Transparency.OPAQUE);
+		ColorModel optimalCm = optimalImage.getColorModel();
+		int redIndex = optimalCm.getRed(REFERENCE_PIXEL);
+		int greenIndex = optimalCm.getGreen(REFERENCE_PIXEL);
+		int blueIndex = optimalCm.getBlue(REFERENCE_PIXEL);
+		if (optimalCm.hasAlpha()) {
+			int alphaIndex = optimalCm.getAlpha(REFERENCE_PIXEL);
+			if (alphaIndex == 1 && redIndex == 2 && greenIndex == 3 && blueIndex == 4) {
+				System.out.println("Using optimal color space (ARGB)");
+				avcFlags |= AvcDecoder.NATIVE_COLOR_ARGB;
+				image = optimalImage;
+			}
+			else if (redIndex == 1 && greenIndex == 2 && blueIndex == 3 && alphaIndex == 4) {
+				System.out.println("Using optimal color space (RGBA)");
+				avcFlags |= AvcDecoder.NATIVE_COLOR_RGBA;
+				image = optimalImage;
+			}
+		}
+		else {
+			if (redIndex == 1 && greenIndex == 2 && blueIndex == 3) {
+				System.out.println("Using optimal color space (RGB0)");
+				avcFlags |= AvcDecoder.NATIVE_COLOR_RGB0;
+				image = optimalImage;
+			}
+			else if (redIndex == 2 && greenIndex == 3 && blueIndex == 4) {
+				System.out.println("Using optimal color space (0RGB)");
+				avcFlags |= AvcDecoder.NATIVE_COLOR_0RGB;
+				image = optimalImage;
+			}
+		}
 
 		int err = AvcDecoder.init(width, height, avcFlags, threadCount);
 		if (err != 0) {
@@ -57,8 +99,11 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		frame = (JFrame)renderTarget;
 		graphics = frame.getGraphics();
 
-		image = new BufferedImage(width, height,
-	            BufferedImage.TYPE_INT_BGR);
+		if (image == null) {
+			// The decoder renders to an RGB color model by default
+			image = new BufferedImage(width, height,
+	            BufferedImage.TYPE_INT_RGB);
+		}
 		
 		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
 		
