@@ -20,6 +20,7 @@ import com.limelight.nvstream.NvConnectionListener;
 import com.limelight.nvstream.StreamConfiguration;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.settings.PreferencesManager;
+import com.limelight.settings.SettingsManager;
 import com.limelight.settings.PreferencesManager.Preferences;
 import com.limelight.settings.PreferencesManager.Preferences.Resolution;
 
@@ -141,8 +142,8 @@ public class Limelight implements NvConnectionListener {
 		// Redirect logging to a file if we're running from a JAR
 		if (LibraryHelper.isRunningFromJar()) {
 			try {
-				System.setErr(new PrintStream(new File("error.log")));
-				System.setOut(new PrintStream(new File("output.log")));
+				System.setErr(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "error.log")));
+				System.setOut(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "output.log")));
 			} catch (IOException e) {
 			}
 		}
