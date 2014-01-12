@@ -30,7 +30,7 @@ public abstract class PreferencesManager {
 		if (cachedPreferences == null) {
 			System.out.println("Reading Preferences");
 			File prefFile = SettingsManager.getInstance().getSettingsFile();
-			Preferences savedPref = (Preferences)SettingsManager.readSettings(prefFile);
+			Preferences savedPref = (Preferences)SettingsManager.readSettings(prefFile, Preferences.class);
 			cachedPreferences = savedPref;
 		}
 		if (cachedPreferences == null) {

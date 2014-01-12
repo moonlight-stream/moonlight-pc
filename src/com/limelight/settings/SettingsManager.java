@@ -1,13 +1,15 @@
 package com.limelight.settings;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Manages the settings files
@@ -31,8 +33,8 @@ public class SettingsManager {
 	 * Constructs a manager that initializes the settings files
 	 */
 	private SettingsManager() {
-		settingsFile = new File(SETTINGS_DIR + File.separator + "settings.lime");
-		gamepadFile = new File(SETTINGS_DIR + File.separator + "gamepad.lime");
+		settingsFile = new File(SETTINGS_DIR + File.separator + "settings.json");
+		gamepadFile = new File(SETTINGS_DIR + File.separator + "gamepad.json");
 		settingsDir = new File(SETTINGS_DIR);
 	}
 	
@@ -92,32 +94,24 @@ public class SettingsManager {
 	/**
 	 * Reads the specified file as a settings file and returns the result.
 	 * <br>A settings file must be a java serialized object
+	 * @param <T>
 	 * @param file the file to read in
 	 * @return the settings represented in this file
 	 */
-	public static Object readSettings(File file) {
-		ObjectInputStream ois = null;
-		Object settings = null;
+	public static <T> Object readSettings(File file, Class<T> klass) {
+		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		T settings = null;
+		BufferedReader br = null;
 		try {
-			ois = new ObjectInputStream(new FileInputStream(file));
-			Object savedSettings = ois.readObject();
-			settings = savedSettings;
-		} catch (ClassNotFoundException e) {
-			System.out.println("Saved file is not of the correct type. It might have been modified externally.");
-
+			br = new BufferedReader(new FileReader(file));
+			settings = gson.fromJson(br, klass);
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not find " + file.getName() + " settings file");
 			e.printStackTrace();
-
-		} catch (IOException e) {
-			System.out.println("Could not read " + file.getName() + " settings file");
-			e.printStackTrace();
-
 		} finally {
-			if (ois != null) {
+			if (br != null) {
 				try {
-					ois.close();
-
+					br.close();
 				} catch (IOException e) {
 					System.out.println("Could not close gamepad settings file");
 					e.printStackTrace();
@@ -129,16 +123,18 @@ public class SettingsManager {
 	
 	/**
 	 * Writes the specified settings to the desired file
+	 * @param <T>
 	 * @param file the file to write the settings to 
 	 * @param settings the settings to be written out
 	 */
-	public static void writeSettings(File file, Serializable settings) {
-		ObjectOutputStream ous = null;
+	public static <T extends Serializable> void writeSettings(File file, T settings) {
+		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		FileWriter writer = null;
 
 		try {
-			ous = new ObjectOutputStream(new FileOutputStream(file));
-			ous.writeObject(settings);
-
+			String json = gson.toJson(settings);
+			writer = new FileWriter(file);
+			writer.write(json);
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not find " + file.getName() + " settings file");
 			e.printStackTrace();
@@ -148,9 +144,9 @@ public class SettingsManager {
 			e.printStackTrace();
 
 		} finally {
-			if (ous != null) {
+			if (writer != null) {
 				try {
-					ous.close();
+					writer.close();
 				} catch (IOException e) {
 					System.out.println("Unable to close " + file.getName() + " settings file");
 					e.printStackTrace();
