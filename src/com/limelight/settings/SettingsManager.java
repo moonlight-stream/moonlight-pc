@@ -99,7 +99,8 @@ public class SettingsManager {
 	 * @return the settings represented in this file
 	 */
 	public static <T> Object readSettings(File file, Class<T> klass) {
-		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		Gson gson = new GsonBuilder()
+          .setPrettyPrinting().enableComplexMapKeySerialization().create();
 		T settings = null;
 		BufferedReader br = null;
 		try {
