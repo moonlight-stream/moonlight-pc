@@ -3,6 +3,7 @@ package com.limelight.input;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import com.limelight.LimeLog;
 import com.limelight.gui.StreamFrame;
 import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.input.KeyboardPacket;
@@ -52,7 +53,7 @@ public class KeyboardHandler implements KeyListener {
 				(modifiers & KeyEvent.ALT_DOWN_MASK) != 0 &&
 				(modifiers & KeyEvent.CTRL_DOWN_MASK) != 0 &&
 				event.getKeyCode() == KeyEvent.VK_Q) {
-			System.out.println("quitting");
+			LimeLog.info("quitting");
 			parent.close();
 		} else if (
 				(modifiers & KeyEvent.SHIFT_DOWN_MASK) != 0 &&

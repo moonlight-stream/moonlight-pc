@@ -143,7 +143,7 @@ public class Limelight implements NvConnectionListener {
 		if (LibraryHelper.isRunningFromJar()) {
 			try {
 				System.setErr(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "error.log")));
-				System.setOut(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "output.log")));
+				LimeLog.setFileHandler(SettingsManager.SETTINGS_DIR + File.separator + "limelight.log");
 			} catch (IOException e) {
 			}
 		}
@@ -265,7 +265,7 @@ public class Limelight implements NvConnectionListener {
 	 */
 	@Override
 	public void stageStarting(Stage stage) {
-		System.out.println("Starting "+stage.getName());
+		LimeLog.info("Starting "+stage.getName());
 		streamFrame.showSpinner(stage);
 	}
 

@@ -3,6 +3,8 @@ package com.limelight.settings;
 import java.io.File;
 import java.io.Serializable;
 
+import com.limelight.LimeLog;
+
 /**
  * Manages user preferences
  * @author Diego Waxemberg
@@ -15,7 +17,7 @@ public abstract class PreferencesManager {
 	 * @param prefs the preferences to be written out
 	 */
 	public static void writePreferences(Preferences prefs) {
-		System.out.println("Writing Preferences");
+		LimeLog.info("Writing Preferences");
 		File prefFile = SettingsManager.getInstance().getSettingsFile();
 		
 		SettingsManager.writeSettings(prefFile, prefs);
@@ -28,13 +30,13 @@ public abstract class PreferencesManager {
 	 */
 	public static Preferences getPreferences() {
 		if (cachedPreferences == null) {
-			System.out.println("Reading Preferences");
+			LimeLog.info("Reading Preferences");
 			File prefFile = SettingsManager.getInstance().getSettingsFile();
 			Preferences savedPref = (Preferences)SettingsManager.readSettings(prefFile, Preferences.class);
 			cachedPreferences = savedPref;
 		}
 		if (cachedPreferences == null) {
-			System.out.println("Unabled to get preferences, using default");
+			LimeLog.warning("Unabled to get preferences, using default");
 			cachedPreferences = new Preferences();
 			writePreferences(cachedPreferences);
 		}

@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import com.limelight.LimeLog;
 import com.limelight.input.Device;
 import com.limelight.input.DeviceListener;
 import com.limelight.input.gamepad.GamepadComponent;
@@ -49,7 +50,7 @@ public class GamepadConfigFrame extends JFrame {
 	 */
 	public GamepadConfigFrame() {
 		super("Gamepad Settings");
-		System.out.println("Creating Settings Frame");
+		LimeLog.info("Creating Settings Frame");
 		this.setSize(850, 550);
 		this.setResizable(false);
 		this.setAlwaysOnTop(true);
@@ -331,8 +332,8 @@ public class GamepadConfigFrame extends JFrame {
 				mapping.invert = value;
 				break;
 			default:
-				System.out.println("You did something terrible and should feel terrible.");
-				System.out.println("Fix it or the checkbox gods will smite you!");
+				LimeLog.severe("You did something terrible and should feel terrible.");
+				LimeLog.severe("Fix it or the checkbox gods will smite you!");
 				break;
 			}
 		}

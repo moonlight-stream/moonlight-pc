@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import com.limelight.LimeLog;
 import com.limelight.Limelight;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.nvstream.NvConnection;
@@ -186,7 +187,7 @@ public class MainFrame {
 						}
 						
 						if (macAddress == null) {
-							System.out.println("Couldn't find a MAC address");
+							LimeLog.severe("Couldn't find a MAC address");
 							return;
 						}
 						

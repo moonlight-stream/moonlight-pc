@@ -2,6 +2,8 @@ package com.limelight.input.gamepad;
 
 import java.util.ArrayList;
 
+import com.limelight.LimeLog;
+
 public class NativeGamepad {
 	public static final int DEFAULT_DEVICE_POLLING_INTERVAL = 1000;
 	public static final int DEFAULT_EVENT_POLLING_INTERVAL = 20;
@@ -54,7 +56,7 @@ public class NativeGamepad {
 	}
 	
 	public static void start() {
-		System.out.println("Native Gamepad starting up...");
+		LimeLog.info("Native Gamepad starting up...");
 		if (!initialized) {
 			NativeGamepad.init();
 			initialized = true;
@@ -152,14 +154,14 @@ public class NativeGamepad {
 	}
 	
 	public static void deviceAttachCallback(int deviceId, int numButtons, int numAxes) {
-		System.out.println(deviceId + " has attached.");
+		LimeLog.info(deviceId + " has attached.");
 		for (NativeGamepadListener listener : listenerList) {
 			listener.deviceAttached(deviceId, numButtons, numAxes);
 		}
 	}
 	
 	public static void deviceRemoveCallback(int deviceId) {
-		System.out.println(deviceId + " has detached.");
+		LimeLog.info(deviceId + " has detached.");
 		for (NativeGamepadListener listener : listenerList) {
 			listener.deviceRemoved(deviceId);
 		}

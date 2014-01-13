@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 
 import javax.swing.JFrame;
 
+import com.limelight.LimeLog;
 import com.limelight.nvstream.av.ByteBufferDescriptor;
 import com.limelight.nvstream.av.DecodeUnit;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
@@ -68,24 +69,24 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		if (optimalCm.hasAlpha()) {
 			int alphaIndex = optimalCm.getAlpha(REFERENCE_PIXEL);
 			if (alphaIndex == 1 && redIndex == 2 && greenIndex == 3 && blueIndex == 4) {
-				System.out.println("Using optimal color space (ARGB)");
+				LimeLog.info("Using optimal color space (ARGB)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_ARGB;
 				image = optimalImage;
 			}
 			else if (redIndex == 1 && greenIndex == 2 && blueIndex == 3 && alphaIndex == 4) {
-				System.out.println("Using optimal color space (RGBA)");
+				LimeLog.info("Using optimal color space (RGBA)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_RGBA;
 				image = optimalImage;
 			}
 		}
 		else {
 			if (redIndex == 1 && greenIndex == 2 && blueIndex == 3) {
-				System.out.println("Using optimal color space (RGB0)");
+				LimeLog.info("Using optimal color space (RGB0)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_RGB0;
 				image = optimalImage;
 			}
 			else if (redIndex == 2 && greenIndex == 3 && blueIndex == 4) {
-				System.out.println("Using optimal color space (0RGB)");
+				LimeLog.info("Using optimal color space (0RGB)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_0RGB;
 				image = optimalImage;
 			}
@@ -107,7 +108,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		
 		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
 		
-		System.out.println("Using software decoding");
+		LimeLog.info("Using software decoding");
 	}
 
 	/**

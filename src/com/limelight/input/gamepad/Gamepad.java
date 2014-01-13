@@ -1,5 +1,6 @@
 package com.limelight.input.gamepad;
 
+import com.limelight.LimeLog;
 import com.limelight.input.Device;
 import com.limelight.input.DeviceListener;
 import com.limelight.input.gamepad.GamepadMapping.Mapping;
@@ -42,7 +43,7 @@ public class Gamepad implements DeviceListener {
 		
 		Mapping mapped = mapping.get(new SourceComponent(Type.BUTTON, buttonId));
 		if (mapped == null) {
-			System.out.println("Unmapped button pressed: " + buttonId);
+			LimeLog.info("Unmapped button pressed: " + buttonId);
 			return;
 		}
 		
@@ -61,7 +62,7 @@ public class Gamepad implements DeviceListener {
 		
 		Mapping mapped = mapping.get(new SourceComponent(Type.AXIS, axisId));
 		if (mapped == null) {
-			System.out.println("Unmapped axis moved: " + axisId);
+			LimeLog.info("Unmapped axis moved: " + axisId);
 			return;
 		}
 		
@@ -116,7 +117,7 @@ public class Gamepad implements DeviceListener {
 			rightTrigger = (byte)Math.round(value * 0xFF);
 			break;
 		default:
-			System.out.println("A mapping error has occured. Ignoring: " + padComp.name());
+			LimeLog.warning("A mapping error has occured. Ignoring: " + padComp.name());
 			break;
 		}
 		if (conn != null) {
@@ -173,7 +174,7 @@ public class Gamepad implements DeviceListener {
 			toggle(ControllerPacket.SPECIAL_BUTTON_FLAG, pressed);
 			break;
 		default:
-			System.out.println("A mapping error has occured. Ignoring: " + mapped.padComp.name());
+			LimeLog.warning("A mapping error has occured. Ignoring: " + mapped.padComp.name());
 			return;
 		}
 		if (conn != null) {
@@ -205,7 +206,7 @@ public class Gamepad implements DeviceListener {
 		builder.append("mapped to: " + padComp + " ");
 		builder.append("changed to ");
 
-		System.out.println(builder.toString());
+		LimeLog.info(builder.toString());
 	}
 
 	/*
