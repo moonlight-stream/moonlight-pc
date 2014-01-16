@@ -54,7 +54,6 @@ public class GamepadConfigFrame extends JFrame {
 		this.setResizable(false);
 		this.setAlwaysOnTop(true);
 		config = GamepadSettingsManager.getSettings();
-
 	}
 
 	/**
@@ -75,7 +74,6 @@ public class GamepadConfigFrame extends JFrame {
 			Mapping mapping = config.get(components[i]);
 			if (mapping == null) {
 				mapping = config.new Mapping(components[i], false, false);
-				config.insertMapping(mapping, null);
 			}
 			Box componentBox = createComponentBox(mapping);
 

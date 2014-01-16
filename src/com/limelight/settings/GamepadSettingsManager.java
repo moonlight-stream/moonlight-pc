@@ -19,7 +19,7 @@ public abstract class GamepadSettingsManager {
 		if (cachedSettings == null) {
 			System.out.println("Reading Gamepad Settings");
 			File gamepadFile = SettingsManager.getInstance().getGamepadFile();
-			GamepadMapping savedMapping = (GamepadMapping)SettingsManager.readSettings(gamepadFile);
+			GamepadMapping savedMapping = (GamepadMapping)SettingsManager.readSettings(gamepadFile, GamepadMapping.class);
 			cachedSettings = savedMapping;
 		}
 		if (cachedSettings == null) {
@@ -43,7 +43,6 @@ public abstract class GamepadSettingsManager {
 		System.out.println("Writing Gamepad Settings");
 		
 		File gamepadFile = SettingsManager.getInstance().getGamepadFile();
-		
 		SettingsManager.writeSettings(gamepadFile, settings);
 	}
 
