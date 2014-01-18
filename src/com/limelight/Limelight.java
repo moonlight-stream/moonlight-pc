@@ -158,9 +158,9 @@ public class Limelight implements NvConnectionListener {
 
 		} else {
 			try {
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (Exception e) {
-				System.out.println("Unable to set cross platform look and feel.");
+				System.out.println("Unable to set system platform look and feel.");
 				e.printStackTrace();
 				System.exit(2);
 			}
