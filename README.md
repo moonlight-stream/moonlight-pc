@@ -1,17 +1,14 @@
 #Limelight
 
-[Limelight](https://github.com/limelight-stream) is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield,
-but built for Linux/OSX/Windows.
+[Limelight](https://github.com/limelight-stream) is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux/OS X/Windows.
 
-Limelight-pc allows you to stream your full collection of Steam games from
-your powerful desktop to another PC or laptop running Linux/OS X/Windows.
+Limelight-pc allows you to stream your full collection of Steam games from your powerful desktop to another PC or laptop running Linux/OS X/Windows.
 
-Limelight also has an [Android implementation](https://github.com/limelight-stream/limelight-android). 
+Limelight also has an [Android implementation](https://github.com/limelight-stream/limelight-android). Versions for [iOS](https://github.com/limelight-stream/limelight-ios) and [Windows Phone](https://github.com/limelight-stream/limelight-wp) are currently in development.
 
 ##Features
 
-* Streams Steam and all of your games from your PC to your Linux/OSX/Windows
-  machine
+* Streams Steam and all of your games from your PC to your Linux/OS X/Windows machine
 * Keyboard and Mouse support
 * Full support for Xbox 360 controllers, PS3 and PS4 controllers, and other HID gamepads
 * Full Windows, OS X, and Linux Support
@@ -19,7 +16,7 @@ Limelight also has an [Android implementation](https://github.com/limelight-stre
 ##Features to come
 
 * Use mDNS to scan for compatible GeForce Experience (GFE) machines on the network
-* Choose from the list of available games instead of just launching Steam
+* Choose from your list of available games instead of just launching Steam
 
 ##Installation
 
@@ -28,7 +25,7 @@ Limelight also has an [Android implementation](https://github.com/limelight-stre
 
 ##Requirements
 
-* [GFE compatible](http://shield.nvidia.com/play-pc-games/) computer with GTX 600/700 series GPU (for the PC you're streaming from)
+* [GFE compatible](http://shield.nvidia.com/play-pc-games/) computer with GTX 600/700 series GPU (for the PC from which you're streaming)
 * High-end wireless router (802.11n dual-band recommended) or wired network
 
 ##Usage
