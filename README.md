@@ -1,25 +1,24 @@
 #Limelight
 
-Limelight is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield,
+[Limelight](https://github.com/limelight-stream) is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield,
 but built for Linux/OSX/Windows.
 
 Limelight-pc allows you to stream your full collection of Steam games from
-your powerful Windows desktop to another PC or laptop running Linux/OSX/Windows.
+your powerful desktop to another PC or laptop running Linux/OS X/Windows.
 
-[Limelight](https://github.com/limelight-stream/limelight) also has an Android
-implementation.
+Limelight also has an [Android implementation](https://github.com/limelight-stream/limelight-android). 
 
 ##Features
 
 * Streams Steam and all of your games from your PC to your Linux/OSX/Windows
-  machine.
+  machine
 * Keyboard and Mouse support
-* Full support for XBOX 360 controllers, PS3 and PS4 controllers, and other HID gamepads
+* Full support for Xbox 360 controllers, PS3 and PS4 controllers, and other HID gamepads
 * Full Windows, OS X, and Linux Support
 
 ##Features to come
 
-* Use mDNS to scan for compatible GFE machines on the network
+* Use mDNS to scan for compatible GeForce Experience (GFE) machines on the network
 * Choose from the list of available games instead of just launching Steam
 
 ##Installation
@@ -30,7 +29,7 @@ implementation.
 ##Requirements
 
 * [GFE compatible](http://shield.nvidia.com/play-pc-games/) computer with GTX 600/700 series GPU (for the PC you're streaming from)
-* High-end wireless router (802.11n dual-band recommended) or Wired network
+* High-end wireless router (802.11n dual-band recommended) or wired network
 
 ##Usage
 
@@ -44,11 +43,13 @@ implementation.
 
 ##Contribute
 
-This project is being actively developed at [XDA](http://forum.xda-developers.com/showthread.php?t=2505510)
+This project is being actively developed at [XDA Developers](http://forum.xda-developers.com/showthread.php?t=2505510)
 
 1. Fork us
 2. Write code
 3. Send Pull Requests
+
+Check out our [website](http://limelight-stream.com) for project links and information.
 
 ##Authors
 
@@ -59,3 +60,4 @@ This project is being actively developed at [XDA](http://forum.xda-developers.co
 
 Limelight is the work of students at [Case Western](http://case.edu) and was
 started as a project at [MHacks](http://mhacks.org).
+
