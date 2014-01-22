@@ -46,17 +46,14 @@ public class GamepadListener implements NativeGamepadListener {
 		listeners.remove(listener);
 	}
 	
-	@Override
 	public void deviceAttached(int deviceId, int numButtons, int numAxes) {
 		devices.put(deviceId, new Device(deviceId, numButtons, numAxes));
 	}
 
-	@Override
 	public void deviceRemoved(int deviceId) {
 		devices.remove(deviceId);
 	}
 
-	@Override
 	public void buttonDown(int deviceId, int buttonId) {
 		Device dev = devices.get(deviceId);
 		for (DeviceListener listener : listeners) {
@@ -64,7 +61,6 @@ public class GamepadListener implements NativeGamepadListener {
 		}
 	}
 
-	@Override
 	public void buttonUp(int deviceId, int buttonId) {
 		Device dev = devices.get(deviceId);
 		for (DeviceListener listener : listeners) {
@@ -72,7 +68,6 @@ public class GamepadListener implements NativeGamepadListener {
 		}
 	}
 
-	@Override
 	public void axisMoved(int deviceId, int axisId, float value, float lastValue) {
 		Device dev = devices.get(deviceId);
 		for (DeviceListener listener : listeners) {

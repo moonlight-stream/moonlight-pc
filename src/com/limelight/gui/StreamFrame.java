@@ -131,7 +131,6 @@ public class StreamFrame extends JFrame {
 		
 		// Sort by display size
 		Collections.sort(aspectMatchingConfigs, new Comparator<DisplayMode>() {
-			@Override
 			public int compare(DisplayMode o1, DisplayMode o2) {
 				if (o1.getWidth()*o1.getHeight() > o2.getWidth()*o2.getHeight()) {
 					return -1;

@@ -66,7 +66,6 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * <br>The event is not sent to the host
 	 * @param e click event used to know that the cursor should now be hidden
 	 */
-	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (captureMouse) {
 			parent.hideCursor();
@@ -77,7 +76,6 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * Unimplemented
 	 * @param e Unused
 	 */
-	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 
@@ -86,7 +84,6 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * <br>If this happens when we are capturing the mouse, the mouse is moved back to the center of the frame.
 	 * @param e the event created by the mouse leaving the frame
 	 */
-	@Override
 	public void mouseExited(MouseEvent e) {
 		if (captureMouse) {
 			checkBoundaries(e);
@@ -98,7 +95,6 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * <br>The button pressed is sent to the host if we are capturing the mouse.
 	 * @param e event containing the mouse button that was pressed
 	 */
-	@Override
 	public void mousePressed(MouseEvent e) {
 		if (captureMouse) {
 			byte mouseButton = 0x0;
@@ -126,7 +122,6 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * <br>The button released is sent to the host if we are capturing the mouse.
 	 * @param e event containing the mouse button that was released
 	 */
-	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (captureMouse) {
 			byte mouseButton = 0x0;
@@ -154,7 +149,6 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * <br>This method simply calls the <code>mouseMoved()</code> method because GFE handles movements all the same
 	 * when a button is held down or not.
 	 */
-	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (captureMouse) {
 			mouseMoved(e);
@@ -168,7 +162,6 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * the illusion that they are controlling the mouse they see rather than their own.
 	 * @param e the mouse move event containing the new location of the mouse
 	 */
-	@Override
 	public void mouseMoved(MouseEvent e) {
 		if (captureMouse) {
 			Point mouse = e.getLocationOnScreen();
