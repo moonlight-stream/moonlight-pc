@@ -36,7 +36,6 @@ public class Gamepad implements DeviceListener {
 		this.conn = conn;
 	}
 	
-	@Override
 	public void handleButton(Device device, int buttonId, boolean pressed) {
 		GamepadMapping mapping = GamepadSettingsManager.getSettings();
 		
@@ -55,7 +54,6 @@ public class Gamepad implements DeviceListener {
 		//printInfo(device, new SourceComponent(Type.BUTTON, buttonId), mapped.padComp, pressed ? 1F : 0F);
 	}
 	
-	@Override
 	public void handleAxis(Device device, int axisId, float newValue, float lastValue) {
 		GamepadMapping mapping = GamepadSettingsManager.getSettings();
 		

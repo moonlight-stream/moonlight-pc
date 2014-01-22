@@ -143,7 +143,6 @@ public class GamepadConfigFrame extends JFrame {
 	 */
 	private ActionListener createCheckboxListener() {
 		return new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				JCheckBox clicked = (JCheckBox)e.getSource();
 				GamepadComponent padComp = GamepadComponent.valueOf(clicked.getName());
@@ -183,7 +182,6 @@ public class GamepadConfigFrame extends JFrame {
 	 */
 	private ActionListener createMapListener() {
 		return new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				Box toMap = (Box)((JButton)e.getSource()).getParent();
 
@@ -295,14 +293,12 @@ public class GamepadConfigFrame extends JFrame {
 
 		}
 
-		@Override
 		public void handleButton(Device device, int buttonId, boolean pressed) {
 			if (pressed) {
 				newMapping = new SourceComponent(SourceComponent.Type.BUTTON, buttonId);
 			}
 		}
 
-		@Override
 		public void handleAxis(Device device, int axisId, float newValue,
 				float lastValue) {
 			if (Math.abs(newValue) > 0.75) {

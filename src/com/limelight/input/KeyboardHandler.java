@@ -31,7 +31,6 @@ public class KeyboardHandler implements KeyListener {
 	 * Invoked when a key is pressed and will send that key-down event to the host
 	 * @param event the key-down event
 	 */
-	@Override
 	public void keyPressed(KeyEvent event) {
 		short keyMap = translator.translate(event.getKeyCode());
 
@@ -71,7 +70,6 @@ public class KeyboardHandler implements KeyListener {
 	 * Invoked when a key is released and will send that key-up event to the host
 	 * @param event the key-up event
 	 */
-	@Override
 	public void keyReleased(KeyEvent event) {
 		int modifiers = event.getModifiersEx();
 		
@@ -102,7 +100,6 @@ public class KeyboardHandler implements KeyListener {
 	 * Unimplemented
 	 * @param event unused
 	 */
-	@Override
 	public void keyTyped(KeyEvent event) {
 	}
 
