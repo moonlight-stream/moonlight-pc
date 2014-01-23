@@ -38,6 +38,17 @@ Limelight also has an [Android implementation](https://github.com/limelight-stre
 * In Limelight, click "Start Streaming"
 * Play games!
 
+To launch Limelight from a command line:
+* `java -jar limelight-[os].jar -host address [options]`
+* `-host` [address] the address to connect to. This can be a hostname or ip
+  address.
+* `-fs` launch in full screen
+* `-720` use 1280x720 resolution
+* `-1080` use 1920x1080 resolution
+* `-30fps` use 30 fps stream
+* `-60fps` use 60 fps stream
+The default launch will be 1280x720 30fps non-full screen.
+
 ##Contribute
 
 This project is being actively developed at [XDA Developers](http://forum.xda-developers.com/showthread.php?t=2505510)
