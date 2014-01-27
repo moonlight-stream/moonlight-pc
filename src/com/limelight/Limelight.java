@@ -25,16 +25,18 @@ import com.limelight.settings.PreferencesManager.Preferences;
 import com.limelight.settings.PreferencesManager.Preferences.Resolution;
 
 /**
- * Main class for Limelight-pc contains methods for starting the application as well
- * as the stream to the host pc.
+ * Main class for Limelight-pc contains methods for starting the application as
+ * well as the stream to the host pc.
+ * 
  * @author Diego Waxemberg<br>
- * Cameron Gutman
+ *         Cameron Gutman
  */
 public class Limelight implements NvConnectionListener {
 	public static final double VERSION = 1.0;
 	public static boolean COMMAND_LINE_LAUNCH = false;
-	
+
 	private String host;
+	private static String lastHost;
 	private StreamFrame streamFrame;
 	private NvConnection conn;
 	private boolean connectionTerminating;
@@ -43,7 +45,9 @@ public class Limelight implements NvConnectionListener {
 
 	/**
 	 * Constructs a new instance based on the given host
-	 * @param host can be hostname or IP address.
+	 * 
+	 * @param host
+	 *        can be hostname or IP address.
 	 */
 	public Limelight(String host) {
 		this.host = host;
@@ -53,22 +57,20 @@ public class Limelight implements NvConnectionListener {
 	 * Creates a connection to the host and starts up the stream.
 	 */
 	private void startUp(StreamConfiguration streamConfig, boolean fullscreen) {
-		streamFrame = new StreamFrame();
-		
+		streamFrame = new StreamFrame("Stream");
+
 		conn = new NvConnection(host, this, streamConfig);
 		streamFrame.build(this, conn, streamConfig, fullscreen);
-		conn.start(PlatformBinding.getDeviceName(), streamFrame,
-				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
-				PlatformBinding.getAudioRenderer(),
-				PlatformBinding.getVideoDecoderRenderer());
+		conn.start(PlatformBinding.getDeviceName(), streamFrame, VideoDecoderRenderer.FLAG_PREFER_QUALITY,
+				PlatformBinding.getAudioRenderer(), PlatformBinding.getVideoDecoderRenderer());
 	}
-	
+
 	/*
-	 * Creates a StreamConfiguration given a Resolution. 
-	 * Used to specify what kind of stream will be used.
+	 * Creates a StreamConfiguration given a Resolution. Used to specify what
+	 * kind of stream will be used.
 	 */
 	private static StreamConfiguration createConfiguration(Resolution res) {
-		switch(res) {
+		switch (res) {
 		case RES_720_30:
 			return new StreamConfiguration(1280, 720, 30);
 		case RES_720_60:
@@ -77,12 +79,15 @@ public class Limelight implements NvConnectionListener {
 			return new StreamConfiguration(1920, 1080, 30);
 		case RES_1080_60:
 			return new StreamConfiguration(1920, 1080, 60);
+		case RES_900_60:
+			return new StreamConfiguration(1440, 900, 60);
 		default:
-			// this should never happen, if it does we want the NPE to occur so we know something is wrong
+			// this should never happen, if it does we want the NPE to occur so
+			// we know something is wrong
 			return null;
 		}
 	}
-	
+
 	/*
 	 * Creates the main frame for the application.
 	 */
@@ -91,14 +96,15 @@ public class Limelight implements NvConnectionListener {
 		main.build();
 		limeFrame = main.getLimeFrame();
 	}
-	
+
 	/**
 	 * Load native libraries for this platform or show an error dialog
+	 * 
 	 * @return Error message or null for success
 	 */
 	public static String loadNativeLibraries() {
 		String errorMessage;
-		
+
 		try {
 			String libraryPlatform = LibraryHelper.getLibraryPlatformString();
 			String jrePlatform = LibraryHelper.getRunningPlatformString();
@@ -109,46 +115,52 @@ public class Limelight implements NvConnectionListener {
 				NativeGamepad.addListener(GamepadListener.getInstance());
 				NativeGamepad.start();
 				return null;
-			}
-			else {
-				errorMessage = "This is not the correct JAR for your platform. Please download the \""+jrePlatform+"\" JAR.";
+			} else {
+				errorMessage = "This is not the correct JAR for your platform. Please download the \""
+						+ jrePlatform + "\" JAR.";
 			}
 		} catch (IOException e) {
 			errorMessage = "The JAR is malformed or an invalid native library path was specified.";
 		}
-		
+
 		return errorMessage;
 	}
 
 	/**
 	 * Creates a new instance and starts the stream.
-	 * @param host the host pc to connect to. Can be a hostname or IP address.
+	 * 
+	 * @param host
+	 *        the host pc to connect to. Can be a hostname or IP address.
 	 */
 	public static void createInstance(String host) {
+		lastHost = host;
 		Limelight limelight = new Limelight(host);
-		
+
 		Preferences prefs = PreferencesManager.getPreferences();
 		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution());
-	
+
 		limelight.startUp(streamConfig, prefs.getFullscreen());
 	}
 
 	/**
 	 * The entry point for the application. <br>
 	 * Does some initializations and then creates the main frame.
-	 * @param args unused.
+	 * 
+	 * @param args
+	 *        unused.
 	 */
 	public static void main(String args[]) {
 		// Redirect logging to a file if we're running from a JAR
 		if (LibraryHelper.isRunningFromJar()) {
 			try {
-				System.setErr(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "error.log")));
-				System.setOut(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "output.log")));
-			} catch (IOException e) {
-			}
+				System.setErr(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator
+						+ "error.log")));
+				System.setOut(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator
+						+ "output.log")));
+			} catch (IOException e) {}
 		}
-		
-		//fix the menu bar if we are running in osx
+
+		// fix the menu bar if we are running in osx
 		if (System.getProperty("os.name").contains("Mac OS X")) {
 			// take the menu bar off the jframe
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -165,17 +177,16 @@ public class Limelight implements NvConnectionListener {
 				System.exit(2);
 			}
 		}
-		
+
 		GamepadListener.getInstance().addDeviceListener(new Gamepad());
-		
+
 		String libraryError = loadNativeLibraries();
-		
+
 		// launching with command line arguments
 		if (args.length > 0) {
 			if (libraryError == null) {
 				parseCommandLine(args);
-			}
-			else {
+			} else {
 				// Print the error to stderr if running from command line
 				System.err.println(libraryError);
 			}
@@ -183,22 +194,23 @@ public class Limelight implements NvConnectionListener {
 			if (libraryError == null) {
 				createFrame();
 			} else {
-				JOptionPane.showMessageDialog(null, libraryError, "Wrong JAR platform", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, libraryError, "Wrong JAR platform",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
-	
-	//TODO: make this less jank
+
+	// TODO: make this less jank
 	private static void parseCommandLine(String[] args) {
 		String host = null;
 		boolean fullscreen = false;
 		int resolution = 720;
 		int refresh = 30;
-		
+
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-host")) {
 				if (i + 1 < args.length) {
-					host = args[i+1];
+					host = args[i + 1];
 					i++;
 				} else {
 					System.out.println("Syntax error: hostname or ip address expected after -host");
@@ -218,14 +230,15 @@ public class Limelight implements NvConnectionListener {
 				System.out.println("Syntax Error: Unrecognized argument: " + args[i]);
 			}
 		}
-		
+
 		if (host == null) {
-			System.out.println("Syntax Error: You must include a host. Use -host to specifiy a hostname or ip address.");
+			System.out
+					.println("Syntax Error: You must include a host. Use -host to specifiy a hostname or ip address.");
 			System.exit(5);
 		}
-		
+
 		Resolution streamRes = null;
-		
+
 		if (resolution == 720 && refresh == 30) {
 			streamRes = Resolution.RES_720_30;
 		} else if (resolution == 720 && refresh == 60) {
@@ -235,54 +248,61 @@ public class Limelight implements NvConnectionListener {
 		} else if (resolution == 1080 && refresh == 60) {
 			streamRes = Resolution.RES_1080_60;
 		}
-		
+
 		StreamConfiguration streamConfig = createConfiguration(streamRes);
-		
+
 		Limelight limelight = new Limelight(host);
 		limelight.startUp(streamConfig, fullscreen);
 		COMMAND_LINE_LAUNCH = true;
 	}
-	
-	
+
 	public void stop() {
 		connectionTerminating = true;
 
 		// Kill the connection to the target
 		conn.stop();
-		
+
 		// Remove the gamepad listener
 		if (gamepad != null) {
 			GamepadListener.getInstance().removeListener(gamepad);
 		}
-		
+
 		// Close the stream frame
 		streamFrame.dispose();
 	}
 
 	/**
 	 * Callback to specify which stage is starting. Used to update UI.
-	 * @param stage the Stage that is starting
+	 * 
+	 * @param stage
+	 *        the Stage that is starting
 	 */
 	public void stageStarting(Stage stage) {
-		System.out.println("Starting "+stage.getName());
+		System.out.println("Starting " + stage.getName());
 		streamFrame.showSpinner(stage);
 	}
 
 	/**
-	 * Callback that a stage has finished loading.
-	 * <br><b>NOTE: Currently unimplemented.</b>
-	 * @param stage the Stage that has finished.
+	 * Callback that a stage has finished loading. <br>
+	 * <b>NOTE: Currently unimplemented.</b>
+	 * 
+	 * @param stage
+	 *        the Stage that has finished.
 	 */
-	public void stageComplete(Stage stage) {
-	}
+	public void stageComplete(Stage stage) {}
 
 	/**
-	 * Callback that a stage has failed. Used to inform user that an error occurred.
-	 * @param stage the Stage that was loading when the error occurred
+	 * Callback that a stage has failed. Used to inform user that an error
+	 * occurred.
+	 * 
+	 * @param stage
+	 *        the Stage that was loading when the error occurred
 	 */
 	public void stageFailed(Stage stage) {
 		stop();
-		displayError("Connection Error", "Starting " + stage.getName() + " failed");
+		resumeSession();
+		
+		//displayError("Connection Error", "Starting " + stage.getName() + " failed");
 	}
 
 	/**
@@ -290,15 +310,17 @@ public class Limelight implements NvConnectionListener {
 	 */
 	public void connectionStarted() {
 		streamFrame.hideSpinner();
-		
+
 		gamepad = new Gamepad(conn);
 		GamepadListener.getInstance().addDeviceListener(gamepad);
 	}
 
 	/**
-	 * Callback that the connection has been terminated for some reason.
-	 * <br>This is were the stream shutdown procedure takes place.
-	 * @param e the Exception that was thrown- probable cause of termination.
+	 * Callback that the connection has been terminated for some reason. <br>
+	 * This is were the stream shutdown procedure takes place.
+	 * 
+	 * @param e
+	 *        the Exception that was thrown- probable cause of termination.
 	 */
 	public void connectionTerminated(Exception e) {
 		if (!(e instanceof InterruptedException)) {
@@ -313,27 +335,41 @@ public class Limelight implements NvConnectionListener {
 			new Thread(new Runnable() {
 				public void run() {
 					streamFrame.dispose();
-					displayError("Connection Terminated", "The connection failed unexpectedly");
+					resumeSession();
+					// displayError("Connection Terminated", "The connection failed unexpectedly");
+
 				}
 			}).start();
 		}
 	}
+	
+	private void resumeSession() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+		createInstance(lastHost);
+	}
 
 	/**
 	 * Displays a message to the user in the form of an info dialog.
-	 * @param message the message to show the user
+	 * 
+	 * @param message
+	 *        the message to show the user
 	 */
 	public void displayMessage(String message) {
 		JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
-	}	
+	}
 
 	/**
 	 * Displays an error to the user in the form of an error dialog
-	 * @param title the title for the dialog frame
-	 * @param message the message to show the user
+	 * 
+	 * @param title
+	 *        the title for the dialog frame
+	 * @param message
+	 *        the message to show the user
 	 */
 	public void displayError(String title, String message) {
 		JOptionPane.showMessageDialog(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 }
-

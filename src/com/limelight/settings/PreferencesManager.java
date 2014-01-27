@@ -52,7 +52,7 @@ public abstract class PreferencesManager {
 		 * The possible resolutions for the stream
 		 */
 		public enum Resolution { RES_720_30("1280x720 (30Hz)"), RES_720_60("1280x720 (60Hz)"), 
-			RES_1080_30("1920x1080 (30Hz)"), RES_1080_60("1920x1080 (60Hz)");
+			RES_1080_30("1920x1080 (30Hz)"), RES_1080_60("1920x1080 (60Hz)"), RES_900_60("1440x900 (60 Hz)");
 			public String name;
 			
 			/*
@@ -74,13 +74,14 @@ public abstract class PreferencesManager {
 		
 		private Resolution res;
 		private boolean fullscreen;
+		private boolean readonly;
 		private String host;
 		
 		/**
 		 * constructs default preferences: 720p 30Hz fullscreen
 		 */
 		public Preferences() {
-			this(Resolution.RES_720_30, true);
+			this(Resolution.RES_720_30, true, true);
 		}
 		
 		/**
@@ -88,10 +89,11 @@ public abstract class PreferencesManager {
 		 * @param res the <code>Resolution</code> to use
 		 * @param fullscreen whether to start the stream in fullscreen
 		 */
-		public Preferences(Resolution res, boolean fullscreen) {
+		public Preferences(Resolution res, boolean fullscreen, boolean readonly) {
 			this.res = res;
 			this.fullscreen = fullscreen;
-			this.host = "GeForce PC host";
+			this.readonly = readonly;
+			this.host = "192.168.224.150";
 		}
 		
 		/**
@@ -127,6 +129,14 @@ public abstract class PreferencesManager {
 		}
 		
 		/**
+		 * Gets whether to use readonly
+		 * @return the stored readonly mode
+		 */
+		public boolean getReadonly() {
+			return readonly;
+		}
+		
+		/**
 		 * Sets the resolution in this preference
 		 * @param res the resolution to save
 		 */
@@ -140,6 +150,14 @@ public abstract class PreferencesManager {
 		 */
 		public void setFullscreen(boolean fullscreen) {
 			this.fullscreen = fullscreen;
+		}
+		
+		/**
+		 * Sets the readonly mode of this preference
+		 * @param readonly whether to use readonly
+		 */
+		public void setReadonly(boolean readonly) {
+			this.readonly = readonly;
 		}
 	}
 }
