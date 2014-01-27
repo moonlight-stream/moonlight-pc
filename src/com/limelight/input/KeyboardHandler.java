@@ -6,6 +6,7 @@ import java.awt.event.KeyListener;
 import com.limelight.gui.StreamFrame;
 import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.input.KeyboardPacket;
+import com.limelight.settings.PreferencesManager;
 
 /**
  * Class that handles keyboard input
@@ -32,7 +33,7 @@ public class KeyboardHandler implements KeyListener {
 	 * @param event the key-down event
 	 */
 	public void keyPressed(KeyEvent event) {
-		if (true == true) return;
+		if (PreferencesManager.getPreferences().getReadonly()) return;
 		short keyMap = translator.translate(event.getKeyCode());
 
 		byte modifier = 0x0;
@@ -72,7 +73,7 @@ public class KeyboardHandler implements KeyListener {
 	 * @param event the key-up event
 	 */
 	public void keyReleased(KeyEvent event) {
-		if (true == true) return;
+		if (PreferencesManager.getPreferences().getReadonly()) return;
 		int modifiers = event.getModifiersEx();
 		
 		if ((modifiers & KeyEvent.SHIFT_DOWN_MASK) != 0 ||
