@@ -56,6 +56,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * Starts capturing mouse events and limits its motion
 	 */
 	public void capture() {
+		if (true == true) return;
 		moveMouse((int)parent.getLocationOnScreen().getX() + (size.width/2),
 				(int)parent.getLocationOnScreen().getY() + (size.height/2));
 		captureMouse = true;
@@ -67,6 +68,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e click event used to know that the cursor should now be hidden
 	 */
 	public void mouseClicked(MouseEvent e) {
+		if (true == true) return;
 		if (captureMouse) {
 			parent.hideCursor();
 		}
@@ -85,6 +87,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e the event created by the mouse leaving the frame
 	 */
 	public void mouseExited(MouseEvent e) {
+		if (true == true) return;
 		if (captureMouse) {
 			checkBoundaries(e);
 		}
@@ -96,6 +99,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e event containing the mouse button that was pressed
 	 */
 	public void mousePressed(MouseEvent e) {
+		if (true == true) return;
 		if (captureMouse) {
 			byte mouseButton = 0x0;
 
@@ -123,6 +127,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e event containing the mouse button that was released
 	 */
 	public void mouseReleased(MouseEvent e) {
+		if (true == true) return;
 		if (captureMouse) {
 			byte mouseButton = 0x0;
 
@@ -150,6 +155,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * when a button is held down or not.
 	 */
 	public void mouseDragged(MouseEvent e) {
+		if (true == true) return;
 		if (captureMouse) {
 			mouseMoved(e);
 		}
@@ -163,6 +169,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e the mouse move event containing the new location of the mouse
 	 */
 	public void mouseMoved(MouseEvent e) {
+		if (true == true) return;
 		if (captureMouse) {
 			Point mouse = e.getLocationOnScreen();
 			int x = (int)mouse.getX();
@@ -180,6 +187,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * If so, the mouse is moved back to the center.
 	 */
 	private void checkBoundaries(MouseEvent e) {
+		if (true == true) return;
 		parent.getSize(size);
 		
 		int leftEdge = (int) parent.getLocationOnScreen().getX();
@@ -214,6 +222,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * Moves the mouse to the specified coordinates on-screen
 	 */
 	private void moveMouse(int x, int y) {
+		if (true == true) return;
 		robot.mouseMove(x, y);
 		lastX = x;
 		lastY = y;

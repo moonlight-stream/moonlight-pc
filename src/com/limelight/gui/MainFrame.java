@@ -54,7 +54,7 @@ public class MainFrame {
 	 * Builds all components of the frame, including the frame itself and displays it to the user.
 	 */
 	public void build() {
-		limeFrame = new JFrame("Limelight");
+		limeFrame = new JFrame("Limelight - Tobias");
 		limeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container mainPane = limeFrame.getContentPane();
 		
