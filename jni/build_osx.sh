@@ -9,8 +9,8 @@ echo "Building NV AVC Decoder"
 echo "Building NV OPUS Decoder"
 (cd nv_opus_dec && sh buildosx.sh)
 
-echo "Linking to jni/"
+echo "Copying to libs/osx/"
 
-ln -s gamepad_jni/libgamepad_jni.dylib libgamepad_jni.dylib 
-ln -s nv_avc_dec/libnv_avc_dec.dylib libnv_avc_dec.dylib
-ln -s nv_opus_dec/libnv_opus_dec.dylib libnv_opus_dec.dylib 
+cp gamepad_jni/libgamepad_jni.dylib ../libs/osx/libgamepad_jni.dylib 
+cp nv_avc_dec/libnv_avc_dec.dylib ../libs/osx/libnv_avc_dec.dylib
+cp nv_opus_dec/libnv_opus_dec.dylib ../libs/osx/libnv_opus_dec.dylib 

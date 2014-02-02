@@ -22,15 +22,12 @@ To automatically build the 3 native libraries, run
 
 from the `jni` directory.
 
-This will build the osx versions each of the libraries, and then symlink them conveniently into the top level directory. 
+This will build the osx versions each of the libraries, and then copy them conveniently into the top level directory. 
 
 ## Including the Binaries
 
-First, create a file called `platform` in `jni`, and make its first line `osx`.
-If you aren't sure how best to that, try `echo osx > platform`.
+In your Java build environment (e.g. IDE), add the JVM flag:
 
-Then, in your Java build environment (e.g. IDE), add the JVM flag:
-
-    -Djava.library.path=[limelight-pc]/jni
+    -Djava.library.path=[limelight-pc]/libs/osx
 
 
