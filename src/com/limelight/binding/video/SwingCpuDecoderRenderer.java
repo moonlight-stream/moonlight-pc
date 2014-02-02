@@ -26,8 +26,8 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	protected JFrame frame;
 	protected BufferedImage image;
 
-	private static final int DECODER_BUFFER_SIZE = 92*1024;
-	private ByteBuffer decoderBuffer;
+	protected static final int DECODER_BUFFER_SIZE = 92*1024;
+	protected ByteBuffer decoderBuffer;
 
 	// Only sleep if the difference is above this value
 	public static final int WAIT_CEILING_MS = 8;

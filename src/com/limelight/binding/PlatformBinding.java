@@ -1,8 +1,8 @@
 package com.limelight.binding;
 
 import com.limelight.binding.audio.JavaxAudioRenderer;
+import com.limelight.binding.video.GLDecoderRenderer;
 import com.limelight.binding.video.SwingCpuDecoderRenderer;
-import com.limelight.binding.video.debug.DebugCpuDecoderRenderer;
 import com.limelight.nvstream.av.audio.AudioRenderer;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 
@@ -25,7 +25,7 @@ public class PlatformBinding {
     public static VideoDecoderRenderer getVideoDecoderRenderer() {
         if (DEBUG) {
             System.out.println("Using Debug Renderer");
-            return new DebugCpuDecoderRenderer();
+            return new GLDecoderRenderer(); // DebugCpuDecoderRenderer();
         }
         return new SwingCpuDecoderRenderer();
     }
