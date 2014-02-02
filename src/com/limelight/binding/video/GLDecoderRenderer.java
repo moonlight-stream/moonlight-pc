@@ -120,28 +120,19 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
 
     @Override
     public void display(GLAutoDrawable glautodrawable) {
-        long decodeStart = System.currentTimeMillis();
-        // Render the frame into the buffered image
-        boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-        long decodeTime = System.currentTimeMillis() - decodeStart;
 
-        long renderStart = System.currentTimeMillis();
+        //long decodeStart = System.currentTimeMillis();
+
+        // Decode the image
+        boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
+
+        // long decodeTime = System.currentTimeMillis() - decodeStart;
+        // long renderStart = System.currentTimeMillis();
 
         GL2 gl = glautodrawable.getGL().getGL2();
-        int width = glautodrawable.getWidth();
-        int height = glautodrawable.getHeight();
 
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
-
-//        BufferedImage compatible = new BufferedImage(imageWidth, imageHeight, image.getType());
-//        Graphics2D g = compatible.createGraphics();
-//        AffineTransform gt = new AffineTransform();
-//        gt.translate(0, imageHeight);
-//        gt.scale(1, -1d);
-//        g.transform(gt);
-//        g.drawImage(image, null, null);
-//        g.dispose();
 
         DataBufferInt buffer =
                 (DataBufferInt) image.getRaster().getDataBuffer();
@@ -181,34 +172,19 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         texture.disable(gl);
         texture.destroy(gl);
 
-//        gl.glTexImage2D(gl.GL_TEXTURE_2D,
-//                        0,
-//                        4,
-//                        imageWidth,
-//                        imageHeight,
-//                        0,
-//                        gl.GL_BGRA,
-//                        gl.GL_UNSIGNED_INT_8_8_8_8_REV,
-//                        bufferRGB);
-
-
-//        gl.glDrawPixels(imageWidth, imageHeight,
-//                        gl.GL_BGRA, gl.GL_UNSIGNED_INT_8_8_8_8_REV,
-//                        bufferRGB);
-
-        long renderTime = System.currentTimeMillis() - renderStart;
+//        long renderTime = System.currentTimeMillis() - renderStart;
         long refreshTime = System.currentTimeMillis() - lastRender;
 
-        System.out.println("Render: "
-                           + refreshTime
-                           + "("
-                           + decodeTime
-                           + " + "
-                           + renderTime
-                           + ") ms | "
-                           + (1000.0
-                              / refreshTime)
-                           + " fps");
+//        System.out.println("Render: "
+//                           + refreshTime
+//                           + "("
+//                           + decodeTime
+//                           + " + "
+//                           + renderTime
+//                           + ") ms | "
+//                           + (1000.0
+//                              / refreshTime)
+//                           + " fps");
 
         lastRender = System.currentTimeMillis();
     }
