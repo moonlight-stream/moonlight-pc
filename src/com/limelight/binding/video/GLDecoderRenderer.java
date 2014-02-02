@@ -4,10 +4,11 @@ package com.limelight.binding.video;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 import javax.media.opengl.*;
-import javax.media.opengl.awt.GLJPanel;
+import javax.media.opengl.awt.GLCanvas;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
@@ -21,15 +22,17 @@ import java.nio.IntBuffer;
  */
 public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEventListener {
 
+    private long lastRender = System.currentTimeMillis();
+
     private final GLProfile      glprofile;
     private final GLCapabilities glcapabilities;
-    private final GLJPanel       glcanvas;
+    private final GLCanvas       glcanvas;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
         glprofile = GLProfile.getDefault();
         glcapabilities = new GLCapabilities(glprofile);
-        glcanvas = new GLJPanel(glcapabilities);
+        glcanvas = new GLCanvas(glcapabilities);
     }
 
     @Override public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
@@ -41,33 +44,37 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         int avcFlags = AvcDecoder.BILINEAR_FILTERING;
         int threadCount = 2;
 
-        GraphicsConfiguration graphicsConfiguration = GraphicsEnvironment.
-                getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-
-        // Attempt to use an optimized buffered image to avoid an additional
-        // color space conversion on each redraw.
-
-        frame = (JFrame)renderTarget;
+        frame = (JFrame) renderTarget;
         graphics = frame.getGraphics();
 
-
-        // Force the renderer
+        // Force the renderer to use a buffered image that's friendly with OpenGL
         avcFlags |= AvcDecoder.NATIVE_COLOR_ARGB;
         image = new BufferedImage(width, height,
                                   BufferedImage.TYPE_INT_ARGB);
 
         int err = AvcDecoder.init(width, height, avcFlags, threadCount);
         if (err != 0) {
-            throw new IllegalStateException("AVC decoder initialization failure: "+err);
+            throw new IllegalStateException("AVC decoder initialization failure: " + err);
         }
 
         decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
         System.out.println("Using software decoding");
 
-
         // Add canvas to the frame
         glcanvas.setSize(width, height);
         glcanvas.addGLEventListener(this);
+
+        for (MouseListener m : frame.getMouseListeners()) {
+            glcanvas.addMouseListener(m);
+        }
+
+        for (KeyListener k : frame.getKeyListeners()) {
+            glcanvas.addKeyListener(k);
+        }
+
+        for (MouseMotionListener m : frame.getMouseMotionListeners()) {
+            glcanvas.addMouseMotionListener(m);
+        }
 
         frame.setLayout(null);
         frame.add(glcanvas, 0, 0);
@@ -75,10 +82,11 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
 
 
     @Override protected void renderFrame(int[] imageBuffer) {
-        //long decodeStart = System.currentTimeMillis();
+        long decodeStart = System.currentTimeMillis();
         // Render the frame into the buffered image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-        // long decodeTime = System.currentTimeMillis() - decodeStart;
+        long decodeTime = System.currentTimeMillis() - decodeStart;
+        System.out.println("Decode: " + decodeTime + "ms");
 
         // Request a repaint
         if (decoded) {
@@ -110,41 +118,44 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-//        WritableRaster raster =
-//                Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
-//                                               imageWidth,
-//                                               imageHeight,
-//                                               4,
-//                                               null);
-//        ComponentColorModel colorModel =
-//                new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),
-//                                        new int[]{8, 8, 8, 8},
-//                                        true,
-//                                        false,
-//                                        ComponentColorModel.OPAQUE,
-//                                        DataBuffer.TYPE_BYTE);
-
-        BufferedImage compatible = new BufferedImage(imageWidth, imageHeight, image.getType());
-
-        Graphics2D g = compatible.createGraphics();
-        AffineTransform gt = new AffineTransform();
-        gt.translate(0, imageHeight);
-        gt.scale(1, -1d);
-        g.transform(gt);
-        g.drawImage(image, null, null);
-        g.dispose();
+//        BufferedImage compatible = new BufferedImage(imageWidth, imageHeight, image.getType());
+//        Graphics2D g = compatible.createGraphics();
+//        AffineTransform gt = new AffineTransform();
+//        gt.translate(0, imageHeight);
+//        gt.scale(1, -1d);
+//        g.transform(gt);
+//        g.drawImage(image, null, null);
+//        g.dispose();
 
         DataBufferInt buffer =
-                (DataBufferInt) compatible.getRaster().getDataBuffer();
+                (DataBufferInt) image.getRaster().getDataBuffer();
         IntBuffer bufferRGB = IntBuffer.wrap(buffer.getData());
 
-        gl.glDrawPixels(imageWidth, imageHeight,
-                        gl.GL_BGRA, gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+        //gl.glMatrixMode(gl.GL_TEXTURE);
+        gl.glLoadIdentity();
+        gl.glScalef(1.0f, -1.0f, 1.0f);
+        gl.glTexImage2D(gl.GL_TEXTURE_2D,
+                        0,
+                        4,
+                        imageWidth,
+                        imageHeight,
+                        0,
+                        gl.GL_BGRA,
+                        gl.GL_UNSIGNED_INT_8_8_8_8_REV,
                         bufferRGB);
 
+        //gl.glMatrixMode(gl.GL_MODELVIEW);
+
+//        gl.glDrawPixels(imageWidth, imageHeight,
+//                        gl.GL_BGRA, gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+//                        bufferRGB);
+
         long renderTime = System.currentTimeMillis() - renderStart;
-        // graphics.setColor(Color.white);
-        System.out.println("Render: " + renderTime + "ms");
+        long refreshTime = System.currentTimeMillis() - lastRender;
+
+        System.out.println("Render: " + refreshTime + "(" + renderTime + ") ms");
+
+        lastRender = System.currentTimeMillis();
     }
 
 }
