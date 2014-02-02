@@ -4,7 +4,7 @@ package com.limelight.binding.video;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 import javax.media.opengl.*;
-import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.awt.GLJPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -23,13 +23,13 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
 
     private final GLProfile      glprofile;
     private final GLCapabilities glcapabilities;
-    private final GLCanvas       glcanvas;
+    private final GLJPanel       glcanvas;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
         glprofile = GLProfile.getDefault();
         glcapabilities = new GLCapabilities(glprofile);
-        glcanvas = new GLCanvas(glcapabilities);
+        glcanvas = new GLJPanel(glcapabilities);
     }
 
     @Override public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
