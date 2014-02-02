@@ -1,14 +1,17 @@
 package com.limelight.binding.video;
 
 
+import com.jogamp.opengl.util.Animator;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
@@ -78,6 +81,9 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
 
         frame.setLayout(null);
         frame.add(glcanvas, 0, 0);
+
+        Animator anim = new Animator(glcanvas);
+        anim.start();
     }
 
 
@@ -86,12 +92,12 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         // Render the frame into the buffered image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         long decodeTime = System.currentTimeMillis() - decodeStart;
-        System.out.println("Decode: " + decodeTime + "ms");
+        // System.out.println("Decode: " + decodeTime + "ms");
 
         // Request a repaint
         if (decoded) {
             // Canvas draw
-            glcanvas.repaint();
+            // glcanvas.repaint();
         }
     }
 
@@ -118,22 +124,22 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-//        BufferedImage compatible = new BufferedImage(imageWidth, imageHeight, image.getType());
-//        Graphics2D g = compatible.createGraphics();
-//        AffineTransform gt = new AffineTransform();
-//        gt.translate(0, imageHeight);
-//        gt.scale(1, -1d);
-//        g.transform(gt);
-//        g.drawImage(image, null, null);
-//        g.dispose();
+        BufferedImage compatible = new BufferedImage(imageWidth, imageHeight, image.getType());
+        Graphics2D g = compatible.createGraphics();
+        AffineTransform gt = new AffineTransform();
+        gt.translate(0, imageHeight);
+        gt.scale(1, -1d);
+        g.transform(gt);
+        g.drawImage(image, null, null);
+        g.dispose();
 
         DataBufferInt buffer =
-                (DataBufferInt) image.getRaster().getDataBuffer();
+                (DataBufferInt) compatible.getRaster().getDataBuffer();
         IntBuffer bufferRGB = IntBuffer.wrap(buffer.getData());
 
         //gl.glMatrixMode(gl.GL_TEXTURE);
-        gl.glLoadIdentity();
-        gl.glScalef(1.0f, -1.0f, 1.0f);
+//        gl.glLoadIdentity();
+//        gl.glScalef(1.0f, -1.0f, 1.0f);
         gl.glTexImage2D(gl.GL_TEXTURE_2D,
                         0,
                         4,
@@ -153,7 +159,7 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         long renderTime = System.currentTimeMillis() - renderStart;
         long refreshTime = System.currentTimeMillis() - lastRender;
 
-        System.out.println("Render: " + refreshTime + "(" + renderTime + ") ms");
+        System.out.println("Render: " + refreshTime + "(" + renderTime + ") ms | "+(1000.0 / refreshTime)+" fps");
 
         lastRender = System.currentTimeMillis();
     }
