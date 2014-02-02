@@ -77,7 +77,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         }
 
         decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
-        System.out.println("Using software decoding");
+        System.out.println("Using OpenGL rendering");
 
         // Add canvas to the frame
         glcanvas.setSize(width, height);
