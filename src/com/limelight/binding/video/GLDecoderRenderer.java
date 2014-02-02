@@ -2,6 +2,9 @@ package com.limelight.binding.video;
 
 
 import com.jogamp.opengl.util.Animator;
+import com.limelight.nvstream.av.ByteBufferDescriptor;
+import com.limelight.nvstream.av.DecodeUnit;
+import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 import javax.media.opengl.*;
@@ -11,7 +14,6 @@ import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
@@ -23,13 +25,24 @@ import java.nio.IntBuffer;
  * Date: 2/1/14
  * Time: 11:42 PM.
  */
-public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEventListener {
+public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener {
+    protected int targetFps;
+    protected int width, height;
+
+    protected Graphics      graphics;
+    protected JFrame        frame;
+    protected BufferedImage image;
+    protected int[]         imageBuffer;
+
+    protected static final int DECODER_BUFFER_SIZE = 92 * 1024;
+    protected ByteBuffer decoderBuffer;
 
     private long lastRender = System.currentTimeMillis();
 
     private final GLProfile      glprofile;
     private final GLCapabilities glcapabilities;
     private final GLCanvas       glcanvas;
+    private       Animator       animator;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -54,6 +67,7 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         avcFlags |= AvcDecoder.NATIVE_COLOR_ARGB;
         image = new BufferedImage(width, height,
                                   BufferedImage.TYPE_INT_ARGB);
+        imageBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
         int err = AvcDecoder.init(width, height, avcFlags, threadCount);
         if (err != 0) {
@@ -82,24 +96,13 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         frame.setLayout(null);
         frame.add(glcanvas, 0, 0);
 
-        Animator anim = new Animator(glcanvas);
-        anim.start();
+        animator = new Animator(glcanvas);
     }
 
-
-    @Override protected void renderFrame(int[] imageBuffer) {
-        long decodeStart = System.currentTimeMillis();
-        // Render the frame into the buffered image
-        boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-        long decodeTime = System.currentTimeMillis() - decodeStart;
-        // System.out.println("Decode: " + decodeTime + "ms");
-
-        // Request a repaint
-        if (decoded) {
-            // Canvas draw
-            // glcanvas.repaint();
-        }
+    @Override public void start() {
+        animator.start();
     }
+
 
     @Override
     public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
@@ -115,6 +118,11 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
 
     @Override
     public void display(GLAutoDrawable glautodrawable) {
+        long decodeStart = System.currentTimeMillis();
+        // Render the frame into the buffered image
+        boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
+        long decodeTime = System.currentTimeMillis() - decodeStart;
+
         long renderStart = System.currentTimeMillis();
 
         GL2 gl = glautodrawable.getGL().getGL2();
@@ -124,22 +132,22 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        BufferedImage compatible = new BufferedImage(imageWidth, imageHeight, image.getType());
-        Graphics2D g = compatible.createGraphics();
-        AffineTransform gt = new AffineTransform();
-        gt.translate(0, imageHeight);
-        gt.scale(1, -1d);
-        g.transform(gt);
-        g.drawImage(image, null, null);
-        g.dispose();
+//        BufferedImage compatible = new BufferedImage(imageWidth, imageHeight, image.getType());
+//        Graphics2D g = compatible.createGraphics();
+//        AffineTransform gt = new AffineTransform();
+//        gt.translate(0, imageHeight);
+//        gt.scale(1, -1d);
+//        g.transform(gt);
+//        g.drawImage(image, null, null);
+//        g.dispose();
 
         DataBufferInt buffer =
-                (DataBufferInt) compatible.getRaster().getDataBuffer();
+                (DataBufferInt) image.getRaster().getDataBuffer();
         IntBuffer bufferRGB = IntBuffer.wrap(buffer.getData());
 
-        //gl.glMatrixMode(gl.GL_TEXTURE);
-//        gl.glLoadIdentity();
-//        gl.glScalef(1.0f, -1.0f, 1.0f);
+        gl.glMatrixMode(gl.GL_TEXTURE);
+
+
         gl.glTexImage2D(gl.GL_TEXTURE_2D,
                         0,
                         4,
@@ -150,7 +158,6 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
                         gl.GL_UNSIGNED_INT_8_8_8_8_REV,
                         bufferRGB);
 
-        //gl.glMatrixMode(gl.GL_MODELVIEW);
 
 //        gl.glDrawPixels(imageWidth, imageHeight,
 //                        gl.GL_BGRA, gl.GL_UNSIGNED_INT_8_8_8_8_REV,
@@ -159,10 +166,64 @@ public class GLDecoderRenderer extends SwingCpuDecoderRenderer implements GLEven
         long renderTime = System.currentTimeMillis() - renderStart;
         long refreshTime = System.currentTimeMillis() - lastRender;
 
-        System.out.println("Render: " + refreshTime + "(" + renderTime + ") ms | "+(1000.0 / refreshTime)+" fps");
+        System.out.println("Render: "
+                           + refreshTime
+                           + "("
+                           + decodeTime
+                           + " + "
+                           + renderTime
+                           + ") ms | "
+                           + (1000.0
+                              / refreshTime)
+                           + " fps");
 
         lastRender = System.currentTimeMillis();
     }
 
+    /**
+     * Releases resources held by the decoder.
+     */
+    @Override public void release() {
+        AvcDecoder.destroy();
+    }
+
+
+    /**
+     * Give a unit to be decoded to the decoder.
+     *
+     * @param decodeUnit the unit to be decoded
+     * @return true if the unit was decoded successfully, false otherwise
+     */
+    @Override public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
+        byte[] data;
+
+        // Use the reserved decoder buffer if this decode unit will fit
+        if (decodeUnit.getDataLength() <= DECODER_BUFFER_SIZE) {
+            decoderBuffer.clear();
+
+            for (ByteBufferDescriptor bbd : decodeUnit.getBufferList()) {
+                decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
+            }
+
+            data = decoderBuffer.array();
+        } else {
+            data = new byte[decodeUnit.getDataLength() + AvcDecoder.getInputPaddingSize()];
+
+            int offset = 0;
+            for (ByteBufferDescriptor bbd : decodeUnit.getBufferList()) {
+                System.arraycopy(bbd.data, bbd.offset, data, offset, bbd.length);
+                offset += bbd.length;
+            }
+        }
+
+        return (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
+    }
+
+    /**
+     * Stops the decoding and rendering of the video stream.
+     */
+    @Override public void stop() {
+        animator.stop();
+    }
 }
 
