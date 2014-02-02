@@ -2,7 +2,6 @@ package com.limelight.binding;
 
 import com.limelight.binding.audio.JavaxAudioRenderer;
 import com.limelight.binding.video.GLDecoderRenderer;
-import com.limelight.binding.video.SwingCpuDecoderRenderer;
 import com.limelight.nvstream.av.audio.AudioRenderer;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 
@@ -15,7 +14,6 @@ import java.net.UnknownHostException;
  * @author Cameron Gutman
  */
 public class PlatformBinding {
-    private static final boolean DEBUG = true;
 
     /**
      * Gets an instance of a video decoder/renderer.
@@ -23,11 +21,7 @@ public class PlatformBinding {
      * @return a video decoder and renderer
      */
     public static VideoDecoderRenderer getVideoDecoderRenderer() {
-        if (DEBUG) {
-            System.out.println("Using Debug Renderer");
-            return new GLDecoderRenderer(); // DebugCpuDecoderRenderer();
-        }
-        return new SwingCpuDecoderRenderer();
+        return new GLDecoderRenderer();
     }
 
     /**
