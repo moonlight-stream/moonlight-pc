@@ -39,11 +39,11 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     protected static final int DECODER_BUFFER_SIZE = 92 * 1024;
     protected ByteBuffer decoderBuffer;
 
-    private long lastRender = System.currentTimeMillis();
+    protected long lastRender = System.currentTimeMillis();
 
-    private final GLProfile      glprofile;
-    private final GLCapabilities glcapabilities;
-    private final GLCanvas       glcanvas;
+    protected final GLProfile      glprofile;
+    protected final GLCapabilities glcapabilities;
+    protected final GLCanvas       glcanvas;
     private       Animator       animator;
 
     public GLDecoderRenderer() {
@@ -120,30 +120,20 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
 
     @Override
     public void display(GLAutoDrawable glautodrawable) {
-
-        //long decodeStart = System.currentTimeMillis();
-
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
 
-        // long decodeTime = System.currentTimeMillis() - decodeStart;
-        // long renderStart = System.currentTimeMillis();
-
         GL2 gl = glautodrawable.getGL().getGL2();
 
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-
-        DataBufferInt buffer =
-                (DataBufferInt) image.getRaster().getDataBuffer();
-        IntBuffer bufferRGB = IntBuffer.wrap(buffer.getData());
-
+        IntBuffer bufferRGB = IntBuffer.wrap(imageBuffer);
         gl.glEnable(gl.GL_TEXTURE_2D);
+        // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
+        // So we instruct it to read the packed RGB values in the appropriate (REV) order
         Texture texture = new Texture(gl,
                                       new TextureData(glprofile,
                                                       4,
-                                                      imageWidth,
-                                                      imageHeight,
+                                                      width,
+                                                      height,
                                                       0,
                                                       gl.GL_BGRA,
                                                       gl.GL_UNSIGNED_INT_8_8_8_8_REV,
@@ -156,6 +146,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         texture.bind(gl);
 
         gl.glBegin(gl.GL_QUADS);
+        // This flips the texture as it draws it, as the opengl coordinate system is different
         gl.glTexCoord2f(0.0f, 0.0f);
         gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
 
@@ -172,20 +163,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         texture.disable(gl);
         texture.destroy(gl);
 
-//        long renderTime = System.currentTimeMillis() - renderStart;
         long refreshTime = System.currentTimeMillis() - lastRender;
-
-//        System.out.println("Render: "
-//                           + refreshTime
-//                           + "("
-//                           + decodeTime
-//                           + " + "
-//                           + renderTime
-//                           + ") ms | "
-//                           + (1000.0
-//                              / refreshTime)
-//                           + " fps");
-
         lastRender = System.currentTimeMillis();
     }
 
