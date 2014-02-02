@@ -2,6 +2,8 @@ package com.limelight.binding.video;
 
 
 import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureData;
 import com.limelight.nvstream.av.ByteBufferDescriptor;
 import com.limelight.nvstream.av.DecodeUnit;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
@@ -145,18 +147,49 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
                 (DataBufferInt) image.getRaster().getDataBuffer();
         IntBuffer bufferRGB = IntBuffer.wrap(buffer.getData());
 
-        gl.glMatrixMode(gl.GL_TEXTURE);
+        gl.glEnable(gl.GL_TEXTURE_2D);
+        Texture texture = new Texture(gl,
+                                      new TextureData(glprofile,
+                                                      4,
+                                                      imageWidth,
+                                                      imageHeight,
+                                                      0,
+                                                      gl.GL_BGRA,
+                                                      gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+                                                      false,
+                                                      false,
+                                                      true,
+                                                      bufferRGB,
+                                                      null));
+        texture.enable(gl);
+        texture.bind(gl);
 
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
 
-        gl.glTexImage2D(gl.GL_TEXTURE_2D,
-                        0,
-                        4,
-                        imageWidth,
-                        imageHeight,
-                        0,
-                        gl.GL_BGRA,
-                        gl.GL_UNSIGNED_INT_8_8_8_8_REV,
-                        bufferRGB);
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex3f(1.0f, 1.0f, 1.0f); // Bottom Right Of The Texture and Quad
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex3f(1.0f, -1.0f, 1.0f); // Top Right Of The Texture and Quad
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+
+        gl.glEnd();
+        texture.disable(gl);
+        texture.destroy(gl);
+
+//        gl.glTexImage2D(gl.GL_TEXTURE_2D,
+//                        0,
+//                        4,
+//                        imageWidth,
+//                        imageHeight,
+//                        0,
+//                        gl.GL_BGRA,
+//                        gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+//                        bufferRGB);
 
 
 //        gl.glDrawPixels(imageWidth, imageHeight,
