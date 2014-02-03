@@ -1,35 +1,20 @@
 package com.limelight.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import com.limelight.binding.PlatformBinding;
+import com.limelight.nvstream.NvConnection;
+import com.limelight.nvstream.http.NvHTTP;
+import com.limelight.settings.PreferencesManager;
+import com.limelight.settings.PreferencesManager.Preferences;
+import org.xmlpull.v1.XmlPullParserException;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import com.limelight.Limelight;
-import com.limelight.binding.PlatformBinding;
-import com.limelight.nvstream.NvConnection;
-import com.limelight.nvstream.http.NvHTTP;
-import com.limelight.settings.PreferencesManager;
-import com.limelight.settings.PreferencesManager.Preferences;
 
 /**
  * The main frame of Limelight that allows the user to specify the host and begin the stream.
@@ -159,63 +144,96 @@ public class MainFrame {
 					prefs.setHost(host);
 					PreferencesManager.writePreferences(prefs);
 				}
-				Limelight.createInstance(host);
+				// Limelight.createInstance(host);
+                showApps();
 			}
 		};
 	}
-	
-	/*
-	 * Creates the listener for the pair button- requests a pairing with the specified host
-	 */
+
+    /*
+     * Creates the listener for the pair button- requests a pairing with the specified host
+     */
 	private ActionListener createPairButtonListener() {
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new Thread(new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						String macAddress;
-						try {
-							macAddress = NvConnection.getMacAddressString();
-						} catch (SocketException e) {
-							e.printStackTrace();
-							return;
-						}
-						
-						if (macAddress == null) {
-							System.out.println("Couldn't find a MAC address");
-							return;
-						}
-						
-						NvHTTP httpConn;
-						String message;
-						try {
-							httpConn = new NvHTTP(InetAddress.getByName(hostField.getText()),
-									macAddress, PlatformBinding.getDeviceName());
-							try {
-								if (httpConn.getPairState()) {
-									message = "Already paired";
-								}
-								else {
-									int session = httpConn.getSessionId();
-									if (session == 0) {
-										message = "Pairing was declined by the target";
-									}
-									else {
-										message = "Pairing was successful";
-									}
-								}
-							} catch (IOException e) {
-								message = e.getMessage();
-							} catch (XmlPullParserException e) {
-								message = e.getMessage();
-							}
-						} catch (UnknownHostException e1) {
-							message = "Failed to resolve host";
-						}
-						
-						JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+						pair();
 					}
-				}).start();
+				});
 			}
 		};
 	}
+
+    private void pair() {
+        String macAddress;
+        try {
+            macAddress = NvConnection.getMacAddressString();
+        } catch (SocketException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        if (macAddress == null) {
+            System.out.println("Couldn't find a MAC address");
+            return;
+        }
+
+        NvHTTP httpConn;
+        String message;
+        try {
+            httpConn = new NvHTTP(InetAddress.getByName(hostField.getText()),
+                                  macAddress, PlatformBinding.getDeviceName());
+            try {
+                if (httpConn.getPairState()) {
+                    message = "Already paired";
+                }
+                else {
+                    int session = httpConn.getSessionId();
+                    if (session == 0) {
+                        message = "Pairing was declined by the target";
+                    }
+                    else {
+                        message = "Pairing was successful";
+                    }
+                }
+            } catch (IOException e) {
+                message = e.getMessage();
+            } catch (XmlPullParserException e) {
+                message = e.getMessage();
+            }
+        } catch (UnknownHostException e1) {
+            message = "Failed to resolve host";
+        }
+
+        JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showApps() {
+        String macAddress;
+        try {
+            macAddress = NvConnection.getMacAddressString();
+        } catch (SocketException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        if (macAddress == null) {
+            System.out.println("Couldn't find a MAC address");
+            return;
+        }
+
+        NvHTTP httpConn;
+        try {
+            String host = hostField.getText();
+            httpConn = new NvHTTP(InetAddress.getByName(host),
+                                  macAddress, PlatformBinding.getDeviceName());
+            AppsFrame appsFrame = new AppsFrame(httpConn, host);
+            appsFrame.build();
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+
 }

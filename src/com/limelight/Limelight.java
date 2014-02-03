@@ -1,13 +1,5 @@
 package com.limelight;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
 import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.gui.MainFrame;
@@ -20,9 +12,14 @@ import com.limelight.nvstream.NvConnectionListener;
 import com.limelight.nvstream.StreamConfiguration;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.settings.PreferencesManager;
-import com.limelight.settings.SettingsManager;
 import com.limelight.settings.PreferencesManager.Preferences;
 import com.limelight.settings.PreferencesManager.Preferences.Resolution;
+import com.limelight.settings.SettingsManager;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * Main class for Limelight-pc contains methods for starting the application as well
@@ -67,7 +64,7 @@ public class Limelight implements NvConnectionListener {
 	 * Creates a StreamConfiguration given a Resolution. 
 	 * Used to specify what kind of stream will be used.
 	 */
-	private static StreamConfiguration createConfiguration(Resolution res) {
+	public static StreamConfiguration createConfiguration(Resolution res) {
 		switch(res) {
 		case RES_720_30:
 			return new StreamConfiguration(1280, 720, 30);
