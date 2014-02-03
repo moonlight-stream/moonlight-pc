@@ -40,8 +40,6 @@ public class AppsFrame extends JFrame {
         this.host = host;
 
         apps = new HashMap<String, NvApp>();
-        this.setSize(200, 100);
-        this.setResizable(false);
     }
 
     /**
@@ -94,6 +92,8 @@ public class AppsFrame extends JFrame {
 
         if (!apps.isEmpty()) {
             this.setVisible(true);
+            this.setSize(200, 100);
+            this.setResizable(false);
         }
     }
 
