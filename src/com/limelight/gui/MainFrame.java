@@ -102,11 +102,10 @@ public class MainFrame {
 
                 public void serviceResolved(ServiceEvent serviceEvent) {
                     System.out.println("mDNS resolved: " + serviceEvent.getInfo());
-                    for (String host : serviceEvent.getInfo().getHostAddresses()) {
-                        if (!mdnsHosts.contains(host)) {
-                            mdnsHosts.add(host);
-                            mdnsHostList.addItem(host);
-                        }
+                    String host = serviceEvent.getInfo().getHostAddresses()[0];
+                    if (!mdnsHosts.contains(host)) {
+                        mdnsHosts.add(host);
+                        mdnsHostList.addItem(host);
                     }
                 }
             };
