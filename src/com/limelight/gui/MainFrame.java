@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The main frame of Limelight that allows the user to specify the host and begin the stream.
@@ -33,9 +35,11 @@ public class MainFrame {
     private JTextField hostField;
     private JButton    pair;
     private JButton    stream;
-    private JComboBox  mdnsHosts;
+    private JComboBox  mdnsHostList;
     private JFrame     limeFrame;
-    private JmDNS      mdnsService;
+
+    private Set<String> mdnsHosts;
+    private JmDNS       mdnsService;
 
     /**
      * Gets the actual JFrame this class creates
@@ -76,7 +80,8 @@ public class MainFrame {
         pair.addActionListener(createPairButtonListener());
         pair.setToolTipText("Send pair request to GeForce PC");
 
-        mdnsHosts = new JComboBox();
+        mdnsHosts = new HashSet<String>();
+        mdnsHostList = new JComboBox();
         // Set mDNS scanning
         try {
             mdnsService = JmDNS.create();
@@ -88,15 +93,20 @@ public class MainFrame {
 
                 public void serviceRemoved(ServiceEvent serviceEvent) {
                     System.out.println("mDNS lost: " + serviceEvent.getInfo());
-                    for (String host : serviceEvent.getInfo().getHostAddresses()) {
-                        mdnsHosts.removeItem(host);
-                    }
+                    // We'll keep any host we've seen before around, as users will find it convenient
+
+                    //for (String host : serviceEvent.getInfo().getHostAddresses()) {
+                    //    mdnsHostList.removeItem(host);
+                    //}
                 }
 
                 public void serviceResolved(ServiceEvent serviceEvent) {
                     System.out.println("mDNS resolved: " + serviceEvent.getInfo());
                     for (String host : serviceEvent.getInfo().getHostAddresses()) {
-                        mdnsHosts.addItem(host);
+                        if (!mdnsHosts.contains(host)) {
+                            mdnsHosts.add(host);
+                            mdnsHostList.addItem(host);
+                        }
                     }
                 }
             };
@@ -107,9 +117,9 @@ public class MainFrame {
         }
 
         // Propagate selections from mDNS to the hosts field
-        mdnsHosts.addActionListener(new ActionListener() {
+        mdnsHostList.addActionListener(new ActionListener() {
             @Override public void actionPerformed(ActionEvent e) {
-                hostField.setText((String) mdnsHosts.getSelectedItem());
+                hostField.setText((String) mdnsHostList.getSelectedItem());
             }
         });
 
@@ -130,7 +140,7 @@ public class MainFrame {
 
         Box mdnsBox = Box.createHorizontalBox();
         mdnsBox.add(Box.createHorizontalStrut(20));
-        mdnsBox.add(mdnsHosts);
+        mdnsBox.add(mdnsHostList);
         mdnsBox.add(Box.createHorizontalStrut(20));
 
         Box contentBox = Box.createVerticalBox();
