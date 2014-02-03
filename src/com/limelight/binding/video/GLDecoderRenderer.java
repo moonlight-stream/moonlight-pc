@@ -1,7 +1,7 @@
 package com.limelight.binding.video;
 
 
-import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.limelight.nvstream.av.ByteBufferDescriptor;
@@ -44,7 +44,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     protected final GLProfile      glprofile;
     protected final GLCapabilities glcapabilities;
     protected final GLCanvas       glcanvas;
-    private       Animator       animator;
+    private         FPSAnimator    animator;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -98,7 +98,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         frame.setLayout(null);
         frame.add(glcanvas, 0, 0);
 
-        animator = new Animator(glcanvas);
+        animator = new FPSAnimator(glcanvas, targetFps);
     }
 
     @Override public void start() {
