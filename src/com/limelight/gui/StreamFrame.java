@@ -79,8 +79,11 @@ public class StreamFrame extends JFrame {
 		
 		this.addWindowListener(createWindowListener());
 		
+		
 		if (fullscreen) {
 			makeFullScreen(streamConfig);
+			this.setVisible(false);
+			this.setVisible(true);
 		}
 
 		hideCursor();
@@ -151,7 +154,7 @@ public class StreamFrame extends JFrame {
 		if (gd.isFullScreenSupported()) {
 			this.setUndecorated(true);
 			gd.setFullScreenWindow(this);
-			
+
 			if (gd.isDisplayChangeSupported()) {
 				DisplayMode config = getBestDisplay(streamConfig, gd.getDisplayModes());
 				if (config != null) {
