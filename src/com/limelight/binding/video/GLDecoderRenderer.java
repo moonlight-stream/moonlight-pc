@@ -120,6 +120,9 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
 
     @Override
     public void display(GLAutoDrawable glautodrawable) {
+        double widthScale = (double)frame.getWidth() / width;
+        double heightScale = (double)frame.getHeight() / height;
+
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
 
