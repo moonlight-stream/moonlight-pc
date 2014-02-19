@@ -45,6 +45,8 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     protected final GLCapabilities glcapabilities;
     protected final GLCanvas       glcanvas;
     private         FPSAnimator    animator;
+    protected       Texture        texture;
+    protected       IntBuffer      bufferRGB;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -70,6 +72,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         image = new BufferedImage(width, height,
                                   BufferedImage.TYPE_INT_ARGB);
         imageBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        bufferRGB = IntBuffer.wrap(imageBuffer);
 
         int err = AvcDecoder.init(width, height, avcFlags, threadCount);
         if (err != 0) {
