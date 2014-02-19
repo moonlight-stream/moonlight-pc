@@ -2,6 +2,7 @@ package com.limelight.binding;
 
 import com.limelight.binding.audio.JavaxAudioRenderer;
 import com.limelight.binding.video.GLDecoderRenderer;
+import com.limelight.binding.video.debug.DebugGLDecoderRenderer;
 import com.limelight.nvstream.av.audio.AudioRenderer;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 
@@ -21,7 +22,7 @@ public class PlatformBinding {
      * @return a video decoder and renderer
      */
     public static VideoDecoderRenderer getVideoDecoderRenderer() {
-        return new GLDecoderRenderer();
+        return new DebugGLDecoderRenderer();
     }
 
     /**
