@@ -124,7 +124,6 @@ public class SettingsManager {
 	
 	/**
 	 * Writes the specified settings to the desired file
-	 * @param <T>
 	 * @param file the file to write the settings to 
 	 * @param settings the settings to be written out
 	 */
