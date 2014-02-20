@@ -85,7 +85,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         // Add canvas to the frame
         glcanvas.setSize(width, height);
         glcanvas.addGLEventListener(this);
-
+        
         for (MouseListener m : frame.getMouseListeners()) {
             glcanvas.addMouseListener(m);
         }
@@ -215,5 +215,11 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     @Override public void stop() {
         animator.stop();
     }
+
+	@Override
+	public int getCapabilities() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
 

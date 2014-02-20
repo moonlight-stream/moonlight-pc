@@ -75,22 +75,25 @@ public abstract class PreferencesManager {
 		private Resolution res;
 		private boolean fullscreen;
 		private String host;
+		private boolean useOpenGlRenderer;
 		
 		/**
-		 * constructs default preferences: 720p 30Hz fullscreen
+		 * constructs default preferences: 720p 60Hz fullscreen
 		 */
 		public Preferences() {
-			this(Resolution.RES_720_30, true);
+			this(Resolution.RES_720_60, true, false);
 		}
 		
 		/**
 		 * Constructs a preference with the specified values
 		 * @param res the <code>Resolution</code> to use
 		 * @param fullscreen whether to start the stream in fullscreen
+		 * @param useOpenGlRenderer whether to use the OpenGL renderer
 		 */
-		public Preferences(Resolution res, boolean fullscreen) {
+		public Preferences(Resolution res, boolean fullscreen, boolean useOpenGlRenderer) {
 			this.res = res;
 			this.fullscreen = fullscreen;
+			this.useOpenGlRenderer = useOpenGlRenderer;
 			this.host = "GeForce PC host";
 		}
 		
@@ -127,6 +130,14 @@ public abstract class PreferencesManager {
 		}
 		
 		/**
+		 * Gets whether to use the OpenGL renderer
+		 * @return the stored fullscreen mode
+		 */
+		public boolean getUseOpenGlRenderer() {
+			return useOpenGlRenderer;
+		}
+		
+		/**
 		 * Sets the resolution in this preference
 		 * @param res the resolution to save
 		 */
@@ -140,6 +151,14 @@ public abstract class PreferencesManager {
 		 */
 		public void setFullscreen(boolean fullscreen) {
 			this.fullscreen = fullscreen;
+		}
+		
+		/**
+		 * Sets the OpenGL renderer use of this preference
+		 * @param useOpenGlRenderer whether to use OpenGL rendering
+		 */
+		public void setUseOpenGlRenderer(boolean useOpenGlRenderer) {
+			this.useOpenGlRenderer = useOpenGlRenderer;
 		}
 	}
 }
