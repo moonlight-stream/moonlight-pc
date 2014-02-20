@@ -335,5 +335,9 @@ public class Limelight implements NvConnectionListener {
 	public void displayError(String title, String message) {
 		JOptionPane.showMessageDialog(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
 	}
+
+	public void displayTransientMessage(String message) {
+		// FIXME: Implement transient messages
+	}
 }
 
