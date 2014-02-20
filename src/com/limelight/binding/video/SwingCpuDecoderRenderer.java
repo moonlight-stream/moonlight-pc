@@ -219,4 +219,8 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 
 		return (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
 	}
+
+	public int getCapabilities() {
+		return 0;
+	}
 }

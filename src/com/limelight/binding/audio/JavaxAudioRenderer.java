@@ -129,4 +129,8 @@ public class JavaxAudioRenderer implements AudioRenderer {
 		}
 	}
 
+	public int getCapabilities() {
+		return 0;
+	}
+
 }
