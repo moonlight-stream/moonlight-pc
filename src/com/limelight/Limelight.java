@@ -87,6 +87,14 @@ public class Limelight implements NvConnectionListener {
 	 * Creates the main frame for the application.
 	 */
 	private static void createFrame() {
+		// Tell the user how to map the gamepad if it's a new install and there's no default for this platform
+		if (!PreferencesManager.hasExistingPreferences() &&
+			!System.getProperty("os.name").contains("Windows")) {
+			JOptionPane.showMessageDialog(null, "Gamepad mapping is not set. If you want to use a gamepad, "+
+			"click the Options menu and choose Gamepad Settings. After mapping your gamepad,"+
+			" it will work while streaming.", "Limelight", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
 		MainFrame main = new MainFrame();
 		main.build();
 		limeFrame = main.getLimeFrame();

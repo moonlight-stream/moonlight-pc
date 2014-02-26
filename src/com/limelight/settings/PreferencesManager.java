@@ -25,6 +25,15 @@ public abstract class PreferencesManager {
 	}
 	
 	/**
+	 * Checks if the preferences file exists
+	 * @return true if preferences exist
+	 */
+	public static boolean hasExistingPreferences() {
+		File prefFile = SettingsManager.getInstance().getSettingsFile();
+		return SettingsManager.readSettings(prefFile, Preferences.class) != null;
+	}
+	
+	/**
 	 * Reads the user preferences from the preferences file and caches them
 	 * @return the user preferences
 	 */
