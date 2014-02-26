@@ -119,11 +119,11 @@ public class Gamepad implements DeviceListener {
 			break;
 		case RS_UP:
 		case RS_DOWN:
-			rightStickX = (short)Math.round(value * 0x7FFF);
+			rightStickY = (short)Math.round(value * 0x7FFF);
 			break;
 		case RS_RIGHT:
 		case RS_LEFT:
-			rightStickY = (short)Math.round(value * 0x7FFF);
+			rightStickX = (short)Math.round(value * 0x7FFF);
 			break;
 		case LT:
 			leftTrigger = (byte)Math.round(value * 0xFF);
