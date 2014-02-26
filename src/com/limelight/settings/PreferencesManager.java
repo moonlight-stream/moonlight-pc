@@ -79,10 +79,10 @@ public abstract class PreferencesManager {
 		private String host;
 		
 		/**
-		 * constructs default preferences: 720p 30Hz fullscreen
+		 * constructs default preferences: 720p 60Hz fullscreen
 		 */
 		public Preferences() {
-			this(Resolution.RES_720_30, true);
+			this(Resolution.RES_720_60, true);
 		}
 		
 		/**
