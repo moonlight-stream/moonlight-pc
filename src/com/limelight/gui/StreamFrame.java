@@ -85,6 +85,12 @@ public class StreamFrame extends JFrame {
 		this.addKeyListener(keyboard);
 		this.addMouseListener(mouse);
 		this.addMouseMotionListener(mouse);
+		
+		this.setFocusable(true);
+		this.setFocusableWindowState(true);
+		this.setAutoRequestFocus(true);
+		
+		this.enableInputMethods(true);
 
 		this.setFocusTraversalKeysEnabled(false);
 
@@ -95,7 +101,6 @@ public class StreamFrame extends JFrame {
 		this.getRootPane().setBackground(Color.BLACK);
 		
 		this.addWindowListener(createWindowListener());
-		
 		
 		if (fullscreen) {
 			makeFullScreen(streamConfig);
