@@ -50,9 +50,9 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		this.width = width;
 		this.height = height;
 		
-		// Two threads to ease the work, especially for higher resolutions and frame rates
-		int avcFlags = AvcDecoder.BILINEAR_FILTERING;
-		int threadCount = 2;
+		// We only use one thread because each additional thread adds a frame of latency
+		int avcFlags = AvcDecoder.BILINEAR_FILTERING | AvcDecoder.LOW_LATENCY_DECODE;
+		int threadCount = 1;
 		
 		GraphicsConfiguration graphicsConfiguration = GraphicsEnvironment.
 				getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
