@@ -129,14 +129,12 @@ public class MainFrame {
 		JMenuItem generalSettings = new JMenuItem("Preferences");
 		
 		gamepadSettings.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				new GamepadConfigFrame().build();
 			}
 		});
 		
 		generalSettings.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				new PreferencesFrame().build();
 			}
@@ -155,7 +153,6 @@ public class MainFrame {
 	 */
 	private ActionListener createStreamButtonListener() {
 		return new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				String host = hostField.getText();
 				Preferences prefs = PreferencesManager.getPreferences();
@@ -173,10 +170,8 @@ public class MainFrame {
 	 */
 	private ActionListener createPairButtonListener() {
 		return new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new Thread(new Runnable() {
-					@Override
 					public void run() {
 						String macAddress;
 						try {

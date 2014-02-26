@@ -158,9 +158,9 @@ public class Limelight implements NvConnectionListener {
 
 		} else {
 			try {
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (Exception e) {
-				System.out.println("Unable to set cross platform look and feel.");
+				LimeLog.severe("Unable to set system platform look and feel.");
 				e.printStackTrace();
 				System.exit(2);
 			}
@@ -263,7 +263,6 @@ public class Limelight implements NvConnectionListener {
 	 * Callback to specify which stage is starting. Used to update UI.
 	 * @param stage the Stage that is starting
 	 */
-	@Override
 	public void stageStarting(Stage stage) {
 		LimeLog.info("Starting "+stage.getName());
 		streamFrame.showSpinner(stage);
@@ -274,7 +273,6 @@ public class Limelight implements NvConnectionListener {
 	 * <br><b>NOTE: Currently unimplemented.</b>
 	 * @param stage the Stage that has finished.
 	 */
-	@Override
 	public void stageComplete(Stage stage) {
 	}
 
@@ -282,7 +280,6 @@ public class Limelight implements NvConnectionListener {
 	 * Callback that a stage has failed. Used to inform user that an error occurred.
 	 * @param stage the Stage that was loading when the error occurred
 	 */
-	@Override
 	public void stageFailed(Stage stage) {
 		stop();
 		displayError("Connection Error", "Starting " + stage.getName() + " failed");
@@ -291,7 +288,6 @@ public class Limelight implements NvConnectionListener {
 	/**
 	 * Callback that the connection has finished loading and is started.
 	 */
-	@Override
 	public void connectionStarted() {
 		streamFrame.hideSpinner();
 		
@@ -304,7 +300,6 @@ public class Limelight implements NvConnectionListener {
 	 * <br>This is were the stream shutdown procedure takes place.
 	 * @param e the Exception that was thrown- probable cause of termination.
 	 */
-	@Override
 	public void connectionTerminated(Exception e) {
 		if (!(e instanceof InterruptedException)) {
 			e.printStackTrace();
@@ -316,7 +311,6 @@ public class Limelight implements NvConnectionListener {
 			// this thread has been interrupted and will terminate
 			// shortly
 			new Thread(new Runnable() {
-				@Override
 				public void run() {
 					streamFrame.dispose();
 					displayError("Connection Terminated", "The connection failed unexpectedly");
@@ -329,7 +323,6 @@ public class Limelight implements NvConnectionListener {
 	 * Displays a message to the user in the form of an info dialog.
 	 * @param message the message to show the user
 	 */
-	@Override
 	public void displayMessage(String message) {
 		JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
 	}	
@@ -341,6 +334,10 @@ public class Limelight implements NvConnectionListener {
 	 */
 	public void displayError(String title, String message) {
 		JOptionPane.showMessageDialog(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
+	}
+
+	public void displayTransientMessage(String message) {
+		// FIXME: Implement transient messages
 	}
 }
 

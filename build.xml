@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="all" name="Create Runnable Jar for Limelight">
+<project default="all" name="Limelight-PC">
   <property name="one-jar.dist.dir" value="${basedir}"/>
 
   <property name="src.dir" location="${basedir}/src"/>
@@ -21,6 +21,19 @@
     <mkdir dir="${classes.dir}/src"/>
     <mkdir dir="${build.dir}"/>
   </target>
+  
+  <target name="limelight-java" depends="init">
+    <javac srcdir="${src.dir}"
+           destdir="${classes.dir}/src"
+           includeantruntime="false"
+           source="1.5"
+           target="1.5"
+           classpath="${build.dir}">
+      <classpath>
+        <fileset dir="${libs.dir}" includes="*.jar"/>
+      </classpath>
+    </javac>
+  </target>
 
   <import file="one-jar-ant-task.xml"/>
 
@@ -29,18 +42,9 @@
     <delete dir="${classes.dir}"/>
   </target>
 
-  <target name="all" depends="limelight-osx,limelight-lin64,limelight-win32,limelight-win64"/>
+  <target name="all" depends="clean,limelight-osx,limelight-lin32,limelight-lin64,limelight-win32,limelight-win64"/>
 
-  <target name="limelight-osx" depends="init">
-    <!-- compile limelight -->
-    <javac includeantruntime="false" destdir="${classes.dir}/src">
-      <src path="${src.dir}"/>
-      <classpath path="${build.dir}"/>
-      <classpath>
-        <fileset dir="${libs.dir}" includes="*.jar"/>
-      </classpath>
-    </javac>
-
+  <target name="limelight-osx" depends="limelight-java">
     <!-- construct one-jar file -->
     <one-jar destfile="${build.dir}/limelight-osx64.jar">
       <manifest>
@@ -61,16 +65,7 @@
       </binlib>
     </one-jar>
   </target>
-  <target name="limelight-lin32" depends="init">
-    <!-- compile limelight -->
-    <javac includeantruntime="false" destdir="${classes.dir}/src">
-      <src path="${src.dir}"/>
-      <classpath path="${build.dir}"/>
-      <classpath>
-        <fileset dir="${libs.dir}" includes="*.jar"/>
-      </classpath>
-    </javac>
-
+  <target name="limelight-lin32" depends="limelight-java">
     <!-- construct one-jar file -->
     <one-jar destfile="${build.dir}/limelight-lin32.jar">
       <manifest>
@@ -92,16 +87,7 @@
     </one-jar>
   </target>
 
-  <target name="limelight-lin64" depends="init">
-    <!-- compile limelight -->
-    <javac includeantruntime="false" destdir="${classes.dir}/src">
-      <src path="${src.dir}"/>
-      <classpath path="${build.dir}"/>
-      <classpath>
-        <fileset dir="${libs.dir}" includes="*.jar"/>
-      </classpath>
-    </javac>
-
+  <target name="limelight-lin64" depends="limelight-java">
     <!-- construct one-jar file -->
     <one-jar destfile="${build.dir}/limelight-lin64.jar">
       <manifest>
@@ -123,16 +109,7 @@
     </one-jar>
   </target>
 
-  <target name="limelight-win32" depends="init">
-    <!-- compile limelight -->
-    <javac includeantruntime="false" destdir="${classes.dir}/src">
-      <src path="${src.dir}"/>
-      <classpath path="${build.dir}"/>
-      <classpath>
-        <fileset dir="${libs.dir}" includes="*.jar"/>
-      </classpath>
-    </javac>
-
+  <target name="limelight-win32" depends="limelight-java">
     <!-- construct one-jar file -->
     <one-jar destfile="${build.dir}/limelight-win32.jar">
       <manifest>
@@ -154,16 +131,7 @@
     </one-jar>
   </target>
 
-  <target name="limelight-win64" depends="init">
-    <!-- compile limelight -->
-    <javac includeantruntime="false" destdir="${classes.dir}/src">
-      <src path="${src.dir}"/>
-      <classpath path="${build.dir}"/>
-      <classpath>
-        <fileset dir="${libs.dir}" includes="*.jar"/>
-      </classpath>
-    </javac>
-
+  <target name="limelight-win64" depends="limelight-java">
     <!-- construct one-jar file -->
     <one-jar destfile="${build.dir}/limelight-win64.jar">
       <manifest>
@@ -184,6 +152,4 @@
       </binlib>
     </one-jar>
   </target>
-
-
 </project>

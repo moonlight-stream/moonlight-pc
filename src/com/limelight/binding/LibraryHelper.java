@@ -85,7 +85,9 @@ public class LibraryHelper {
 		}
 		
 		// Check OS arch
-		if (jreArch.equalsIgnoreCase("x86")) {
+		if (jreArch.equalsIgnoreCase("x86") ||
+			jreArch.equalsIgnoreCase("i386") ||
+			jreArch.equalsIgnoreCase("i686")) {
 			str.append("32");
 		}
 		else {

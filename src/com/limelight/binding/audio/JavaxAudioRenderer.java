@@ -35,7 +35,6 @@ public class JavaxAudioRenderer implements AudioRenderer {
 	 * @param offset the offset at which the data starts in the array
 	 * @param length the length of data to be rendered
 	 */
-	@Override
 	public void playDecodedAudio(byte[] pcmData, int offset, int length) {
 		if (soundLine != null) {
 			// Queue the decoded samples into the staging sound buffer
@@ -75,7 +74,6 @@ public class JavaxAudioRenderer implements AudioRenderer {
 	/**
 	 * Callback for when the stream session is closing and the audio renderer should stop.
 	 */
-	@Override
 	public void streamClosing() {
 		if (soundLine != null) {
 			soundLine.close();
@@ -117,7 +115,6 @@ public class JavaxAudioRenderer implements AudioRenderer {
 	 * @param channelCount the number of channels in the audio
 	 * @param sampleRate the sample rate for the audio.
 	 */
-	@Override
 	public void streamInitialized(int channelCount, int sampleRate) {
 		this.channelCount = channelCount;
 		this.sampleRate = sampleRate;
@@ -131,6 +128,10 @@ public class JavaxAudioRenderer implements AudioRenderer {
 			createSoundLine(DEFAULT_BUFFER_SIZE);
 			reallocateLines = false;
 		}
+	}
+
+	public int getCapabilities() {
+		return 0;
 	}
 
 }

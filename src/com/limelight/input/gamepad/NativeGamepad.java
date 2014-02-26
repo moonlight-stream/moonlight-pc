@@ -5,17 +5,16 @@ import java.util.ArrayList;
 import com.limelight.LimeLog;
 
 public class NativeGamepad {
-	public static final int DEFAULT_DEVICE_POLLING_INTERVAL = 1000;
+	public static final int DEFAULT_DEVICE_POLLING_ITERATIONS = 100;
 	public static final int DEFAULT_EVENT_POLLING_INTERVAL = 20;
 	
 	private static ArrayList<NativeGamepadListener> listenerList =
 			new ArrayList<NativeGamepadListener>();
 	private static boolean running = false;
 	private static boolean initialized = false;
-	private static Thread deviceThread = null;
-	private static Thread eventThread = null;
-	private static int devicePollingIntervalMs = DEFAULT_DEVICE_POLLING_INTERVAL;
-	private static int eventPollingIntervalMs = DEFAULT_EVENT_POLLING_INTERVAL;
+	private static Thread pollingThread = null;
+	private static int devicePollingIterations = DEFAULT_DEVICE_POLLING_ITERATIONS;
+	private static int pollingIntervalMs = DEFAULT_EVENT_POLLING_INTERVAL;
 
 	static {
 		System.loadLibrary("gamepad_jni");
@@ -39,39 +38,32 @@ public class NativeGamepad {
 		return running;
 	}
 	
-	public static void setDevicePollingInterval(int interval) {
-		devicePollingIntervalMs = interval;
+	public static void setDevicePollingIterations(int iterations) {
+		devicePollingIterations = iterations;
 	}
 	
-	public static int getDevicePollingInterval() {
-		return devicePollingIntervalMs;
+	public static int getDevicePollingIterations() {
+		return devicePollingIterations;
 	}
 	
-	public static void setEventPollingInterval(int interval) {
-		eventPollingIntervalMs = interval;
+	public static void setPollingInterval(int interval) {
+		pollingIntervalMs = interval;
 	}
 	
-	public static int getEventPollingInterval() {
-		return eventPollingIntervalMs;
+	public static int getPollingInterval() {
+		return pollingIntervalMs;
 	}
 	
 	public static void start() {
-		LimeLog.info("Native Gamepad starting up...");
-		if (!initialized) {
-			NativeGamepad.init();
-			initialized = true;
-		}
 		if (!running) {
-			startDevicePolling();
-			startEventPolling();
+			startPolling();
 			running = true;
 		}
 	}
 	
 	public static void stop() {
 		if (running) {
-			stopEventPolling();
-			stopDevicePolling();
+			stopPolling();
 			running = false;
 		}
 	}
@@ -95,60 +87,42 @@ public class NativeGamepad {
 		return NativeGamepad.numDevices();
 	}
 	
-	private static void startDevicePolling() {
-		deviceThread = new Thread() {
+	private static void startPolling() {
+		pollingThread = new Thread() {
 			@Override
 			public void run() {
-				while (!isInterrupted()) {
-					NativeGamepad.detectDevices();
-					
-					try {
-						Thread.sleep(devicePollingIntervalMs);
-					} catch (InterruptedException e) {
-						return;
-					}
+				int iterations = 0;
+				
+				if (!initialized) {
+					NativeGamepad.init();
+					initialized = true;
 				}
-			}
-		};
-		deviceThread.setName("Native Gamepad - Device Polling Thread");
-		deviceThread.start();
-	}
-	
-	private static void startEventPolling() {
-		eventThread = new Thread() {
-			@Override
-			public void run() {
+				
 				while (!isInterrupted()) {
+					if ((iterations++ % devicePollingIterations) == 0) {
+						NativeGamepad.detectDevices();
+					}
+					
 					NativeGamepad.processEvents();
 					
 					try {
-						Thread.sleep(eventPollingIntervalMs);
+						Thread.sleep(pollingIntervalMs);
 					} catch (InterruptedException e) {
 						return;
 					}
 				}
 			}
 		};
-		eventThread.setName("Native Gamepad - Event Polling Thread");
-		eventThread.start();
+		pollingThread.setName("Native Gamepad - Polling Thread");
+		pollingThread.start();
 	}
 	
-	private static void stopDevicePolling() {
-		if (deviceThread != null) {
-			deviceThread.interrupt();
+	private static void stopPolling() {
+		if (pollingThread != null) {
+			pollingThread.interrupt();
 			
 			try {
-				deviceThread.join();
-			} catch (InterruptedException e) {}
-		}
-	}
-	
-	private static void stopEventPolling() {
-		if (eventThread != null) {
-			eventThread.interrupt();
-			
-			try {
-				eventThread.join();
+				pollingThread.join();
 			} catch (InterruptedException e) {}
 		}
 	}

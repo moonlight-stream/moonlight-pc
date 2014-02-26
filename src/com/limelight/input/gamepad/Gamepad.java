@@ -4,6 +4,7 @@ import com.limelight.LimeLog;
 import com.limelight.input.Device;
 import com.limelight.input.DeviceListener;
 import com.limelight.input.gamepad.GamepadMapping.Mapping;
+import com.limelight.input.gamepad.SourceComponent.Direction;
 import com.limelight.input.gamepad.SourceComponent.Type;
 import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.input.ControllerPacket;
@@ -14,7 +15,7 @@ import com.limelight.settings.GamepadSettingsManager;
  * @author Diego Waxemberg
  */
 public class Gamepad implements DeviceListener {
-	
+
 	private short inputMap = 0x0000;
 	private byte leftTrigger = 0x00;
 	private byte rightTrigger = 0x00;
@@ -24,11 +25,11 @@ public class Gamepad implements DeviceListener {
 	private short leftStickY = 0x0000;
 
 	private NvConnection conn;
-	
+
 	public Gamepad(NvConnection conn) {
 		this.conn = conn;
 	}
-	
+
 	public Gamepad() {
 		this(null);
 	}
@@ -36,47 +37,57 @@ public class Gamepad implements DeviceListener {
 	public void setConnection(NvConnection conn) {
 		this.conn = conn;
 	}
-	
-	@Override
+
 	public void handleButton(Device device, int buttonId, boolean pressed) {
 		GamepadMapping mapping = GamepadSettingsManager.getSettings();
-		
-		Mapping mapped = mapping.get(new SourceComponent(Type.BUTTON, buttonId));
+
+		Mapping mapped = mapping.get(new SourceComponent(Type.BUTTON, buttonId, null));
 		if (mapped == null) {
-			LimeLog.info("Unmapped button pressed: " + buttonId);
+			//LimeLog.info("Unmapped button pressed: " + buttonId);
 			return;
 		}
-		
+
 		if (!mapped.padComp.isAnalog()) {
 			handleDigitalComponent(mapped, pressed);
 		} else {
 			handleAnalogComponent(mapped.padComp, sanitizeValue(mapped, pressed));
 		}
-		
+
+		//used for debugging
 		//printInfo(device, new SourceComponent(Type.BUTTON, buttonId), mapped.padComp, pressed ? 1F : 0F);
 	}
-	
-	@Override
+
 	public void handleAxis(Device device, int axisId, float newValue, float lastValue) {
 		GamepadMapping mapping = GamepadSettingsManager.getSettings();
-		
-		Mapping mapped = mapping.get(new SourceComponent(Type.AXIS, axisId));
-		if (mapped == null) {
-			LimeLog.info("Unmapped axis moved: " + axisId);
-			return;
+		Direction mappedDir = null;
+		if (newValue == 0) {
+			if (lastValue > 0) {
+				mappedDir = Direction.POSITIVE;
+			} else {
+				mappedDir = Direction.NEGATIVE;
+			}
+		} else {
+			mappedDir = newValue > 0 ? Direction.POSITIVE : Direction.NEGATIVE;
 		}
 		
+		Mapping mapped = mapping.get(new SourceComponent(Type.AXIS, axisId, mappedDir));
+		if (mapped == null) {
+			//LimeLog.info("Unmapped axis moved: " + axisId);
+			return;
+		}
 		float value =  sanitizeValue(mapped, newValue);
-		
+
 		if (mapped.padComp.isAnalog()) {
 			handleAnalogComponent(mapped.padComp, value);
 		} else {
-			handleDigitalComponent(mapped, (value > 0.5));
+			handleDigitalComponent(mapped, (Math.abs(value) > 0.5));
 		}
-		
-		//printInfo(device, new SourceComponent(Type.AXIS, axisId), mapped.padComp, newValue);
+
+		//used for debugging
+		//printInfo(device, new SourceComponent(Type.AXIS, axisId, mappedDir), mapped.padComp, newValue);
 	}
-	
+
+
 	private float sanitizeValue(Mapping mapped, boolean value) {
 		if (mapped.invert) {
 			return value ? 0F : 1F;
@@ -95,19 +106,23 @@ public class Gamepad implements DeviceListener {
 		}
 		return retVal;
 	}
-	
+
 	private void handleAnalogComponent(GamepadComponent padComp, float value) {
 		switch (padComp) {
-		case LS_X:
+		case LS_RIGHT:
+		case LS_LEFT:
 			leftStickX = (short)Math.round(value * 0x7FFF);
 			break;
-		case LS_Y:
+		case LS_UP:
+		case LS_DOWN:
 			leftStickY = (short)Math.round(value * 0x7FFF);
 			break;
-		case RS_X:
+		case RS_UP:
+		case RS_DOWN:
 			rightStickX = (short)Math.round(value * 0x7FFF);
 			break;
-		case RS_Y:
+		case RS_RIGHT:
+		case RS_LEFT:
 			rightStickY = (short)Math.round(value * 0x7FFF);
 			break;
 		case LT:
@@ -124,8 +139,7 @@ public class Gamepad implements DeviceListener {
 			sendControllerPacket();
 		}
 	}
-	
-	
+
 	private void handleDigitalComponent(Mapping mapped, boolean pressed) {
 		switch (mapped.padComp) {
 		case BTN_A:
@@ -181,7 +195,7 @@ public class Gamepad implements DeviceListener {
 			sendControllerPacket();
 		}
 	}
-	
+
 	/*
 	 * Sends a controller packet to the specified connection containing the current gamepad values
 	 */
@@ -200,11 +214,11 @@ public class Gamepad implements DeviceListener {
 	private void printInfo(Device device, SourceComponent sourceComp, GamepadComponent padComp, float value) {
 
 		StringBuilder builder = new StringBuilder();
-		
+
 		builder.append(sourceComp.getType().name() + ": ");
 		builder.append(sourceComp.getId() + " ");
 		builder.append("mapped to: " + padComp + " ");
-		builder.append("changed to ");
+		builder.append("changed to " + value);
 
 		LimeLog.info(builder.toString());
 	}
@@ -219,5 +233,5 @@ public class Gamepad implements DeviceListener {
 			inputMap &= ~button;
 		}
 	}
-	
+
 }

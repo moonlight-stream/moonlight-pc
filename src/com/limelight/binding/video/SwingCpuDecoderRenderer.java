@@ -46,15 +46,14 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	 * @param renderTarget what to render the video onto
 	 * @param drFlags flags for the decoder and renderer
 	 */
-	@Override
 	public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
 		this.targetFps = redrawRate;
 		this.width = width;
 		this.height = height;
 		
-		// Two threads to ease the work, especially for higher resolutions and frame rates
-		int avcFlags = AvcDecoder.BILINEAR_FILTERING;
-		int threadCount = 2;
+		// We only use one thread because each additional thread adds a frame of latency
+		int avcFlags = AvcDecoder.BILINEAR_FILTERING | AvcDecoder.LOW_LATENCY_DECODE;
+		int threadCount = 1;
 		
 		GraphicsConfiguration graphicsConfiguration = GraphicsEnvironment.
 				getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
@@ -114,7 +113,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	/**
 	 * Starts the decoding and rendering of the video stream on a new thread
 	 */
-	@Override
 	public void start() {
 		rendererThread = new Thread() {
 			@Override
@@ -174,7 +172,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	/**
 	 * Stops the decoding and rendering of the video stream.
 	 */
-	@Override
 	public void stop() {
 		rendererThread.interrupt();
 		
@@ -186,7 +183,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	/**
 	 * Releases resources held by the decoder.
 	 */
-	@Override
 	public void release() {
 		AvcDecoder.destroy();
 	}
@@ -196,7 +192,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	 * @param decodeUnit the unit to be decoded
 	 * @return true if the unit was decoded successfully, false otherwise
 	 */
-	@Override
 	public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
 		byte[] data;
 		
@@ -221,5 +216,9 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		}
 		
 		return (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
+	}
+
+	public int getCapabilities() {
+		return 0;
 	}
 }
