@@ -2,7 +2,6 @@ package com.limelight;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -148,9 +147,8 @@ public class Limelight implements NvConnectionListener {
 	 */
 	public static void main(String args[]) {
 		// Redirect logging to a file if we're running from a JAR
-		if (LibraryHelper.isRunningFromJar()) {
+		if (LibraryHelper.isRunningFromJar() && args.length == 0) {
 			try {
-				System.setErr(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "error.log")));
 				LimeLog.setFileHandler(SettingsManager.SETTINGS_DIR + File.separator + "limelight.log");
 			} catch (IOException e) {
 			}
