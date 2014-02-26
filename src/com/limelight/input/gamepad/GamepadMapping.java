@@ -122,30 +122,30 @@ public class GamepadMapping implements Serializable {
 	public static GamepadMapping getWindowsDefaultMapping() {
 		GamepadMapping defaultMap = new GamepadMapping();
 		
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_A, false, false), new SourceComponent(Type.BUTTON, 10, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_B, false, false), new SourceComponent(Type.BUTTON, 11, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_X, false, false), new SourceComponent(Type.BUTTON, 12, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_Y, false, false), new SourceComponent(Type.BUTTON, 13, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_BACK, false, false), new SourceComponent(Type.BUTTON, 5, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_START, false, false), new SourceComponent(Type.BUTTON, 4, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_DOWN, false, false), new SourceComponent(Type.BUTTON, 1, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_LEFT, false, false), new SourceComponent(Type.BUTTON, 2, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_RIGHT, false, false), new SourceComponent(Type.BUTTON, 3, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_UP, false, false), new SourceComponent(Type.BUTTON, 0, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LB, false, false), new SourceComponent(Type.BUTTON, 8, Direction.POSITIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_A, false, false), new SourceComponent(Type.BUTTON, 10, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_B, false, false), new SourceComponent(Type.BUTTON, 11, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_X, false, false), new SourceComponent(Type.BUTTON, 12, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_Y, false, false), new SourceComponent(Type.BUTTON, 13, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_BACK, false, false), new SourceComponent(Type.BUTTON, 5, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.BTN_START, false, false), new SourceComponent(Type.BUTTON, 4, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_DOWN, false, false), new SourceComponent(Type.BUTTON, 1, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_LEFT, false, false), new SourceComponent(Type.BUTTON, 2, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_RIGHT, false, false), new SourceComponent(Type.BUTTON, 3, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.DPAD_UP, false, false), new SourceComponent(Type.BUTTON, 0, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LB, false, false), new SourceComponent(Type.BUTTON, 8, null));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LT, false, false), new SourceComponent(Type.AXIS, 4, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LS_THUMB, false, false), new SourceComponent(Type.BUTTON, 6, Direction.POSITIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LS_THUMB, false, false), new SourceComponent(Type.BUTTON, 6, null));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LS_RIGHT, false, false), new SourceComponent(Type.AXIS, 0, Direction.POSITIVE));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LS_LEFT, false, false), new SourceComponent(Type.AXIS, 0, Direction.NEGATIVE));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LS_UP, false, false), new SourceComponent(Type.AXIS, 1, Direction.POSITIVE));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.LS_DOWN, false, false), new SourceComponent(Type.AXIS, 1, Direction.NEGATIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RB, false, false), new SourceComponent(Type.BUTTON, 9, Direction.POSITIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RB, false, false), new SourceComponent(Type.BUTTON, 9, null));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RT, false, false), new SourceComponent(Type.AXIS, 5, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_THUMB, false, false), new SourceComponent(Type.BUTTON, 7, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_LEFT, false, false), new SourceComponent(Type.AXIS, 2, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_RIGHT, false, false), new SourceComponent(Type.AXIS, 2, Direction.NEGATIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_UP, false, false), new SourceComponent(Type.AXIS, 3, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_DOWN, false, false), new SourceComponent(Type.AXIS, 3, Direction.NEGATIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_THUMB, false, false), new SourceComponent(Type.BUTTON, 7, null));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_LEFT, false, false), new SourceComponent(Type.AXIS, 3, Direction.POSITIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_RIGHT, false, false), new SourceComponent(Type.AXIS, 3, Direction.NEGATIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_UP, false, false), new SourceComponent(Type.AXIS, 2, Direction.POSITIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_DOWN, false, false), new SourceComponent(Type.AXIS, 2, Direction.NEGATIVE));
 
 		return defaultMap;
 	}
