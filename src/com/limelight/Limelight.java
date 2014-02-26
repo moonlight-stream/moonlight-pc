@@ -193,7 +193,7 @@ public class Limelight implements NvConnectionListener {
 		String host = null;
 		boolean fullscreen = false;
 		int resolution = 720;
-		int refresh = 30;
+		int refresh = 60;
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-host")) {
