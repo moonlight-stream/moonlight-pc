@@ -99,8 +99,12 @@ public class StreamFrame extends JFrame {
 		
 		if (fullscreen) {
 			makeFullScreen(streamConfig);
-			this.setVisible(false);
-			this.setVisible(true);
+			
+			// OS X hack for full-screen losing focus
+			if (System.getProperty("os.name").contains("Mac OS X")) {
+				this.setVisible(false);
+				this.setVisible(true);
+			}
 		}
 
 		hideCursor();
