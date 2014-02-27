@@ -30,6 +30,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	private Graphics graphics;
 	private JFrame frame;
 	private BufferedImage image;
+	private boolean dying;
 	
 	private static final int DECODER_BUFFER_SIZE = 92*1024;
 	private ByteBuffer decoderBuffer;
@@ -120,7 +121,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 				long nextFrameTime = System.currentTimeMillis();
 				int[] imageBuffer = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 				
-				while (!isInterrupted())
+				while (!isInterrupted() && !dying)
 				{
 					long diff = nextFrameTime - System.currentTimeMillis();
 
@@ -173,6 +174,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	 * Stops the decoding and rendering of the video stream.
 	 */
 	public void stop() {
+		dying = true;
 		rendererThread.interrupt();
 		
 		try {
