@@ -318,7 +318,6 @@ public class Limelight implements NvConnectionListener {
 			// shortly
 			new Thread(new Runnable() {
 				public void run() {
-					streamFrame.dispose();
 					displayError("Connection Terminated", "The connection failed unexpectedly");
 				}
 			}).start();
@@ -330,6 +329,7 @@ public class Limelight implements NvConnectionListener {
 	 * @param message the message to show the user
 	 */
 	public void displayMessage(String message) {
+		streamFrame.dispose();
 		JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
 	}	
 
@@ -339,6 +339,7 @@ public class Limelight implements NvConnectionListener {
 	 * @param message the message to show the user
 	 */
 	public void displayError(String title, String message) {
+		streamFrame.dispose();
 		JOptionPane.showMessageDialog(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
