@@ -88,7 +88,6 @@ public class StreamFrame extends JFrame {
 		
 		this.setFocusable(true);
 		this.setFocusableWindowState(true);
-		this.setAutoRequestFocus(true);
 		
 		this.enableInputMethods(true);
 
