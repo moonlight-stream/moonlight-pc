@@ -129,7 +129,8 @@ public class SettingsManager {
 	 * @param settings the settings to be written out
 	 */
 	public static <T extends Serializable> void writeSettings(File file, T settings) {
-		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		Gson gson = new GsonBuilder()
+			.setPrettyPrinting().enableComplexMapKeySerialization().create();
 		FileWriter writer = null;
 
 		try {
