@@ -102,6 +102,8 @@ public class StreamFrame extends JFrame {
 		
 		this.addWindowListener(createWindowListener());
 		
+		this.setIgnoreRepaint(true);
+		
 		if (fullscreen) {
 			makeFullScreen(streamConfig);
 			
