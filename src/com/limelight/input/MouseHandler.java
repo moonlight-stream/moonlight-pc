@@ -114,6 +114,15 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 			if (mouseButton > 0) {
 				conn.sendMouseButtonDown(mouseButton);
 			}
+			
+			// super jank to get cursor to not appear in OSX FSEM.
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					parent.showCursor();
+					parent.hideCursor();
+				}
+			});
 		}
 	}
 
