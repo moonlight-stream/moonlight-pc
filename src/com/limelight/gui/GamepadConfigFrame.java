@@ -21,12 +21,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import com.limelight.LimeLog;
 import com.limelight.input.Device;
 import com.limelight.input.DeviceListener;
 import com.limelight.input.gamepad.GamepadComponent;
 import com.limelight.input.gamepad.GamepadListener;
 import com.limelight.input.gamepad.GamepadMapping;
 import com.limelight.input.gamepad.GamepadMapping.Mapping;
+import com.limelight.input.gamepad.SourceComponent.Direction;
 import com.limelight.input.gamepad.SourceComponent;
 import com.limelight.settings.GamepadSettingsManager;
 
@@ -49,7 +51,7 @@ public class GamepadConfigFrame extends JFrame {
 	 */
 	public GamepadConfigFrame() {
 		super("Gamepad Settings");
-		System.out.println("Creating Settings Frame");
+		LimeLog.info("Creating Settings Frame");
 		this.setSize(850, 550);
 		this.setResizable(false);
 		this.setAlwaysOnTop(true);
@@ -251,7 +253,13 @@ public class GamepadConfigFrame extends JFrame {
 		if (comp == null) {
 			button.setText("");
 		} else {
-			button.setText(comp.getType().name() + " " + comp.getId());
+			String dir = "";
+			if (comp.getDirection() == Direction.POSITIVE) {
+				dir = "+";
+			} else if (comp.getDirection() == Direction.NEGATIVE) {
+				dir = "-";
+			}
+			button.setText(comp.getType().name() + " " + comp.getId() + " " + dir);
 		}
 	}
 
@@ -295,14 +303,16 @@ public class GamepadConfigFrame extends JFrame {
 
 		public void handleButton(Device device, int buttonId, boolean pressed) {
 			if (pressed) {
-				newMapping = new SourceComponent(SourceComponent.Type.BUTTON, buttonId);
+				newMapping = new SourceComponent(SourceComponent.Type.BUTTON, buttonId, null);
 			}
 		}
 
 		public void handleAxis(Device device, int axisId, float newValue,
 				float lastValue) {
-			if (Math.abs(newValue) > 0.75) {
-				newMapping = new SourceComponent(SourceComponent.Type.AXIS, axisId);
+			if (newValue > 0.75) {
+				newMapping = new SourceComponent(SourceComponent.Type.AXIS, axisId, Direction.POSITIVE);
+			} else if (newValue < -0.75) {
+				newMapping = new SourceComponent(SourceComponent.Type.AXIS, axisId, Direction.NEGATIVE);
 			}
 		}
 
@@ -327,8 +337,8 @@ public class GamepadConfigFrame extends JFrame {
 				mapping.invert = value;
 				break;
 			default:
-				System.out.println("You did something terrible and should feel terrible.");
-				System.out.println("Fix it or the checkbox gods will smite you!");
+				LimeLog.severe("You did something terrible and should feel terrible.");
+				LimeLog.severe("Fix it or the checkbox gods will smite you!");
 				break;
 			}
 		}

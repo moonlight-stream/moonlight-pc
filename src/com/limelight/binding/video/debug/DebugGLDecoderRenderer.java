@@ -6,10 +6,11 @@ import com.jogamp.opengl.util.texture.TextureData;
 import com.limelight.binding.video.GLDecoderRenderer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
+import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLAutoDrawable;
 import java.awt.*;
-import java.nio.IntBuffer;
 
 /**
  * Author: spartango
@@ -32,6 +33,9 @@ public class DebugGLDecoderRenderer extends GLDecoderRenderer {
 
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
+        if (!decoded) {
+        	return;
+        }
 
         long decodeTime = System.currentTimeMillis() - decodeStart;
         long renderStart = System.currentTimeMillis();
@@ -42,15 +46,15 @@ public class DebugGLDecoderRenderer extends GLDecoderRenderer {
         // So we instruct it to read the packed RGB values in the appropriate (REV) order
         if (texture == null)
         {
-            gl.glEnable(gl.GL_TEXTURE_2D);
+            gl.glEnable(GL.GL_TEXTURE_2D);
         	texture = new Texture(gl,
         			new TextureData(glprofile,
         					4,
         					width,
         					height,
         					0,
-        					gl.GL_BGRA,
-        					gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+        					GL.GL_BGRA,
+        					GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV,
         					false,
         					false,
         					true,
@@ -66,8 +70,8 @@ public class DebugGLDecoderRenderer extends GLDecoderRenderer {
 					width,
 					height,
 					0,
-					gl.GL_BGRA,
-					gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+					GL.GL_BGRA,
+					GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV,
 					false,
 					false,
 					true,
@@ -78,7 +82,7 @@ public class DebugGLDecoderRenderer extends GLDecoderRenderer {
 					0);
         }
         
-    	gl.glBegin(gl.GL_QUADS);
+    	gl.glBegin(GL2GL3.GL_QUADS);
     	// This flips the texture as it draws it, as the opengl coordinate system is different
     	gl.glTexCoord2f(0.0f, 0.0f);
     	gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad

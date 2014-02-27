@@ -2,6 +2,7 @@ package com.limelight.settings;
 
 import java.io.File;
 
+import com.limelight.LimeLog;
 import com.limelight.input.gamepad.GamepadMapping;
 
 /**
@@ -17,13 +18,13 @@ public abstract class GamepadSettingsManager {
 	 */
 	public static GamepadMapping getSettings() {
 		if (cachedSettings == null) {
-			System.out.println("Reading Gamepad Settings");
+			LimeLog.info("Reading Gamepad Settings");
 			File gamepadFile = SettingsManager.getInstance().getGamepadFile();
 			GamepadMapping savedMapping = (GamepadMapping)SettingsManager.readSettings(gamepadFile, GamepadMapping.class);
 			cachedSettings = savedMapping;
 		}
 		if (cachedSettings == null) {
-			System.out.println("Unable to get gamepad settings. Using default mapping instead.");
+			LimeLog.warning("Unable to get gamepad settings. Using default mapping instead.");
 			if (System.getProperty("os.name").contains("Windows")) {
 				cachedSettings = GamepadMapping.getWindowsDefaultMapping();
 			} else {
@@ -40,7 +41,7 @@ public abstract class GamepadSettingsManager {
 	 */
 	public static void writeSettings(GamepadMapping settings) {
 		cachedSettings = settings;
-		System.out.println("Writing Gamepad Settings");
+		LimeLog.info("Writing Gamepad Settings");
 		
 		File gamepadFile = SettingsManager.getInstance().getGamepadFile();
 		SettingsManager.writeSettings(gamepadFile, settings);
