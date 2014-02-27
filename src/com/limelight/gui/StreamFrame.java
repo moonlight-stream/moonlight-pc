@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
@@ -92,8 +93,6 @@ public class StreamFrame extends JFrame {
 		this.enableInputMethods(true);
 
 		this.setFocusTraversalKeysEnabled(false);
-
-		this.setSize(streamConfig.getWidth(), streamConfig.getHeight());
 		
 		this.setBackground(Color.BLACK);
 		this.getContentPane().setBackground(Color.BLACK);
@@ -111,6 +110,13 @@ public class StreamFrame extends JFrame {
 				this.setVisible(false);
 				this.setVisible(true);
 			}
+		}
+		else {
+			// Fill the available screen area (excluding taskbar, etc)
+			Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			this.setSize(screenSize.width - (screenInsets.left + screenInsets.right),
+					screenSize.height - (screenInsets.top + screenInsets.bottom));	
 		}
 
 		hideCursor();
