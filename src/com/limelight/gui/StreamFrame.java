@@ -18,6 +18,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+
+import com.limelight.LimeLog;
+import com.limelight.Limelight;
+import com.limelight.input.KeyboardHandler;
+import com.limelight.input.MouseHandler;
+import com.limelight.nvstream.NvConnection;
+import com.limelight.nvstream.NvConnectionListener.Stage;
+import com.limelight.nvstream.StreamConfiguration;
+
 /**
  * The frame to which the video is rendered
  * @author Diego Waxemberg
@@ -68,6 +84,12 @@ public class StreamFrame extends JFrame {
 		this.addKeyListener(keyboard);
 		this.addMouseListener(mouse);
 		this.addMouseMotionListener(mouse);
+		
+		this.setFocusable(true);
+		this.setFocusableWindowState(true);
+		this.setAutoRequestFocus(true);
+		
+		this.enableInputMethods(true);
 
 		this.setFocusTraversalKeysEnabled(false);
 
@@ -79,11 +101,16 @@ public class StreamFrame extends JFrame {
 		
 		this.addWindowListener(createWindowListener());
 		
+		this.setIgnoreRepaint(true);
 		
 		if (fullscreen) {
 			makeFullScreen(streamConfig);
-			this.setVisible(false);
-			this.setVisible(true);
+			
+			// OS X hack for full-screen losing focus
+			if (System.getProperty("os.name").contains("Mac OS X")) {
+				this.setVisible(false);
+				this.setVisible(true);
+			}
 		}
 
 		hideCursor();
@@ -138,11 +165,11 @@ public class StreamFrame extends JFrame {
 		}
 		
 		if (bestConfig != null) {
-			System.out.println("Using full-screen display mode "+bestConfig.getWidth()+"x"+bestConfig.getHeight()+
+			LimeLog.info("Using full-screen display mode "+bestConfig.getWidth()+"x"+bestConfig.getHeight()+
 					" for "+targetConfig.getWidth()+"x"+targetConfig.getHeight()+" stream");
 		} else {
 			bestConfig = aspectMatchingConfigs.get(0);
-			System.out.println("No matching display modes. Using largest: " +bestConfig.getWidth()+"x"+bestConfig.getHeight()+
+			LimeLog.info("No matching display modes. Using largest: " +bestConfig.getWidth()+"x"+bestConfig.getHeight()+
 					" for "+targetConfig.getWidth()+"x"+targetConfig.getHeight()+" stream");
 		}
 		
@@ -152,6 +179,7 @@ public class StreamFrame extends JFrame {
 	private void makeFullScreen(StreamConfiguration streamConfig) {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		if (gd.isFullScreenSupported()) {
+			this.setResizable(false);
 			this.setUndecorated(true);
 			gd.setFullScreenWindow(this);
 

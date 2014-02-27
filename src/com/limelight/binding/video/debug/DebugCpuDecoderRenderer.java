@@ -1,5 +1,7 @@
 package com.limelight.binding.video.debug;
 
+import java.awt.Color;
+
 import com.limelight.binding.video.SwingCpuDecoderRenderer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
@@ -50,7 +52,7 @@ public class DebugCpuDecoderRenderer extends SwingCpuDecoderRenderer {
     private void renderOverlay(long decodeTime, long renderTime) {
         long frameDelta = System.currentTimeMillis() - lastFrameTime;
         double frameRate = 1000.0 / frameDelta;
-        // graphics.setColor(Color.white);
+        graphics.setColor(Color.white);
         String overlayInfo = decodeTime
                              + "ms + "
                              + renderTime
@@ -59,7 +61,6 @@ public class DebugCpuDecoderRenderer extends SwingCpuDecoderRenderer {
                              + " / "
                              + targetFps
                              + " fps";
-        System.out.println(overlayInfo);
-        //graphics.drawString(overlayInfo, 20, 20);
+        graphics.drawString(overlayInfo, 20, 40);
     }
 }

@@ -1,16 +1,21 @@
 package com.limelight.binding.video;
 
-import com.limelight.nvstream.av.ByteBufferDescriptor;
-import com.limelight.nvstream.av.DecodeUnit;
-import com.limelight.nvstream.av.video.VideoDecoderRenderer;
-import com.limelight.nvstream.av.video.cpu.AvcDecoder;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
+
+import javax.swing.JFrame;
+
+import com.limelight.LimeLog;
+import com.limelight.nvstream.av.ByteBufferDescriptor;
+import com.limelight.nvstream.av.DecodeUnit;
+import com.limelight.nvstream.av.video.VideoDecoderRenderer;
+import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 /**
  * Implementation of a video decoder and renderer.
@@ -46,10 +51,10 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		this.width = width;
 		this.height = height;
 
-		// Two threads to ease the work, especially for higher resolutions and frame rates
-		int avcFlags = AvcDecoder.BILINEAR_FILTERING;
-		int threadCount = 2;
-
+		// We only use one thread because each additional thread adds a frame of latency
+		int avcFlags = AvcDecoder.BILINEAR_FILTERING | AvcDecoder.LOW_LATENCY_DECODE;
+		int threadCount = 1;
+		
 		GraphicsConfiguration graphicsConfiguration = GraphicsEnvironment.
 				getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 
@@ -63,24 +68,24 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		if (optimalCm.hasAlpha()) {
 			int alphaIndex = optimalCm.getAlpha(REFERENCE_PIXEL);
 			if (alphaIndex == 1 && redIndex == 2 && greenIndex == 3 && blueIndex == 4) {
-				System.out.println("Using optimal color space (ARGB)");
+				LimeLog.info("Using optimal color space (ARGB)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_ARGB;
 				image = optimalImage;
 			}
 			else if (redIndex == 1 && greenIndex == 2 && blueIndex == 3 && alphaIndex == 4) {
-				System.out.println("Using optimal color space (RGBA)");
+				LimeLog.info("Using optimal color space (RGBA)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_RGBA;
 				image = optimalImage;
 			}
 		}
 		else {
 			if (redIndex == 1 && greenIndex == 2 && blueIndex == 3) {
-				System.out.println("Using optimal color space (RGB0)");
+				LimeLog.info("Using optimal color space (RGB0)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_RGB0;
 				image = optimalImage;
 			}
 			else if (redIndex == 2 && greenIndex == 3 && blueIndex == 4) {
-				System.out.println("Using optimal color space (0RGB)");
+				LimeLog.info("Using optimal color space (0RGB)");
 				avcFlags |= AvcDecoder.NATIVE_COLOR_0RGB;
 				image = optimalImage;
 			}
@@ -101,7 +106,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		}
 
 		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
-		System.out.println("Using software decoding");
+		LimeLog.info("Using software decoding");
 	}
 
 	/**
@@ -218,5 +223,9 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		}
 
 		return (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
+	}
+
+	public int getCapabilities() {
+		return 0;
 	}
 }

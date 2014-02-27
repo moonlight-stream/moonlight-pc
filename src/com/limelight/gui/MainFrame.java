@@ -21,6 +21,27 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import com.limelight.LimeLog;
+import com.limelight.Limelight;
+import com.limelight.binding.PlatformBinding;
+import com.limelight.nvstream.NvConnection;
+import com.limelight.nvstream.http.NvHTTP;
+import com.limelight.settings.PreferencesManager;
+import com.limelight.settings.PreferencesManager.Preferences;
+
 /**
  * The main frame of Limelight that allows the user to specify the host and begin the stream.
  *
@@ -298,6 +319,4 @@ public class MainFrame {
             e1.printStackTrace();
         }
     }
-
-
 }
