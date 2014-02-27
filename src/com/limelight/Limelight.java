@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
 import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
@@ -156,20 +155,8 @@ public class Limelight implements NvConnectionListener {
 		
 		//fix the menu bar if we are running in osx
 		if (System.getProperty("os.name").contains("Mac OS X")) {
-			// take the menu bar off the jframe
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-
 			// set the name of the application menu item
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Limelight");
-
-		} else {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
-				LimeLog.severe("Unable to set system platform look and feel.");
-				e.printStackTrace();
-				System.exit(2);
-			}
 		}
 		
 		GamepadListener.getInstance().addDeviceListener(new Gamepad());
