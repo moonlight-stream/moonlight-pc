@@ -296,6 +296,7 @@ public class StreamFrame extends JFrame {
 	public void hideSpinner() {
 		spinner.setVisible(false);
 		spinnerLabel.setVisible(false);
+		this.getContentPane().setVisible(false);
 	}
 
 	/**
