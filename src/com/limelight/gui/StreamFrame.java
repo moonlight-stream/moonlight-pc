@@ -297,6 +297,8 @@ public class StreamFrame extends JFrame {
 		spinner.setVisible(false);
 		spinnerLabel.setVisible(false);
 		this.getContentPane().setVisible(false);
+
+		this.requestFocus();
 	}
 
 	/**
