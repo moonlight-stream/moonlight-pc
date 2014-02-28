@@ -134,9 +134,17 @@ public class Gamepad implements DeviceListener {
 			rightStickX = (short)Math.round(-Math.abs(value) * 0x7FFF);
 			break;
 		case LT:
+			// HACK: Fix polling so we don't have to do this
+			if (Math.abs(value) < 0.9) {
+				value = 0;
+			}
 			leftTrigger = (byte)Math.round(Math.abs(value) * 0xFF);
 			break;
 		case RT:
+			// HACK: Fix polling so we don't have to do this
+			if (Math.abs(value) < 0.9) {
+				value = 0;
+			}
 			rightTrigger = (byte)Math.round(Math.abs(value) * 0xFF);
 			break;
 		default:
