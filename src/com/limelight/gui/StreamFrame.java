@@ -112,11 +112,13 @@ public class StreamFrame extends JFrame {
 			}
 		}
 		else {
-			// Fill the available screen area (excluding taskbar, etc)
+			// Only fill the available screen area (excluding taskbar, etc)
 			Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			this.setSize(screenSize.width - (screenInsets.left + screenInsets.right),
-					screenSize.height - (screenInsets.top + screenInsets.bottom));	
+			int maxWidth = screenSize.width - (screenInsets.left + screenInsets.right);
+			int maxHeight = screenSize.height - (screenInsets.top + screenInsets.bottom);
+			this.setSize(Math.min(streamConfig.getWidth(), maxWidth),
+				Math.min(streamConfig.getHeight(), maxHeight));	
 		}
 
 		hideCursor();
