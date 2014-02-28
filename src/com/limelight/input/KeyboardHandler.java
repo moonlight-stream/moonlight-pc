@@ -16,6 +16,7 @@ public class KeyboardHandler implements KeyListener {
 
 	private static KeyboardTranslator translator;
 	private StreamFrame parent;
+	private boolean mouseCaptured = true;
 
 	/**
 	 * Constructs a new keyboard listener that will send key events to the specified connection
@@ -54,11 +55,17 @@ public class KeyboardHandler implements KeyListener {
 				event.getKeyCode() == KeyEvent.VK_Q) {
 			LimeLog.info("quitting");
 			parent.close();
+			return;
 		} else if (
 				(modifiers & KeyEvent.SHIFT_DOWN_MASK) != 0 &&
 				(modifiers & KeyEvent.ALT_DOWN_MASK) != 0 &&
 				(modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
-			parent.freeMouse();
+			if (mouseCaptured) {
+				parent.freeMouse();
+			} else {
+				parent.captureMouse();
+			}
+			mouseCaptured = !mouseCaptured;
 			return;
 		}
 
@@ -72,18 +79,11 @@ public class KeyboardHandler implements KeyListener {
 	 * @param event the key-up event
 	 */
 	public void keyReleased(KeyEvent event) {
-		int modifiers = event.getModifiersEx();
-		
-		if ((modifiers & KeyEvent.SHIFT_DOWN_MASK) != 0 ||
-				(modifiers & KeyEvent.ALT_DOWN_MASK) != 0 ||
-				(modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
-			parent.captureMouse();
-		}
-		
 		short keyMap = translator.translate(event.getKeyCode());
 
 		byte modifier = 0x0;
 
+		int modifiers = event.getModifiersEx();
 		if ((modifiers & KeyEvent.SHIFT_DOWN_MASK) != 0) {
 			modifier |= KeyboardPacket.MODIFIER_SHIFT;
 		}
