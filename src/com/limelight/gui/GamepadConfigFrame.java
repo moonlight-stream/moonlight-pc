@@ -293,6 +293,11 @@ public class GamepadConfigFrame extends JFrame {
 				getButton(getBox(oldConfig)).setText("");
 			}
 
+			SourceComponent oldSource = config.getMapping(mappingToMap.padComp);
+			if (oldSource != null) {
+				config.remove(oldSource);
+			}
+
 			config.insertMapping(mappingToMap, newMapping);
 
 			setButtonText(buttonPressed, newMapping);
