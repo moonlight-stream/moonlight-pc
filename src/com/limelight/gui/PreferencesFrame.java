@@ -55,6 +55,11 @@ public class PreferencesFrame extends JFrame {
 		
 		fullscreen = new JCheckBox("Fullscreen");
 		fullscreen.setSelected(prefs.getFullscreen());
+		if (System.getProperty("os.name", "").contains("Mac OS X")) {
+			fullscreen.setSelected(false);
+			fullscreen.setEnabled(false);
+			fullscreen.setText("Fullscreen (Unsupported)");
+		}
 	
 		Box resolutionBox = Box.createHorizontalBox();
 		resolutionBox.add(Box.createHorizontalGlue());
