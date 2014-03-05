@@ -88,10 +88,12 @@ public abstract class PreferencesManager {
 		private String host;
 		
 		/**
-		 * constructs default preferences: 720p 60Hz fullscreen
+		 * constructs default preferences: 720p 60Hz
+		 * full-screen will be default for Windows (where it always runs properly)
+		 * windowed will be default for other platforms
 		 */
 		public Preferences() {
-			this(Resolution.RES_720_60, true);
+			this(Resolution.RES_720_60, System.getProperty("os.name", "").contains("Windows"));
 		}
 		
 		/**
