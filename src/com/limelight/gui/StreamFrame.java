@@ -114,20 +114,22 @@ public class StreamFrame extends JFrame {
 			}
 		}
 		else {
+			this.setVisible(true);
+			
 			// Only fill the available screen area (excluding taskbar, etc)
 			Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
 			Insets windowInsets = this.getInsets();
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			
-			int maxWidth = screenSize.width - (screenInsets.left + windowInsets.left + screenInsets.right + windowInsets.right);
-			int maxHeight = screenSize.height - (screenInsets.top + windowInsets.top + screenInsets.bottom + windowInsets.bottom);
-			renderingSurface.setPreferredSize(new Dimension(Math.min(streamConfig.getWidth(), maxWidth),
-				Math.min(streamConfig.getHeight(), maxHeight)));
-			this.pack();
+			int windowInsetWidth = windowInsets.left + windowInsets.right;
+			int windowInsetHeight = windowInsets.top + windowInsets.bottom;
+			int maxWidth = screenSize.width - (screenInsets.left + screenInsets.right);
+			int maxHeight = screenSize.height - (screenInsets.top + screenInsets.bottom);
+			this.setSize(new Dimension(Math.min(streamConfig.getWidth() + windowInsetWidth, maxWidth),
+				Math.min(streamConfig.getHeight() + windowInsetHeight, maxHeight)));
 		}
 
 		hideCursor();
-		this.setVisible(true);
 	}
 	
 	private ArrayList<DisplayMode> getDisplayModesByAspectRatio(DisplayMode[] configs, double aspectRatio) {
