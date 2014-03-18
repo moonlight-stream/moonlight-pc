@@ -83,7 +83,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         System.out.println("Using OpenGL rendering");
 
         // Add canvas to the frame
-        glcanvas.setSize(width, height);
+        glcanvas.setSize(frame.getWidth(), frame.getHeight());
         glcanvas.addGLEventListener(this);
         
         for (MouseListener m : frame.getMouseListeners()) {
@@ -123,9 +123,6 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
 
     @Override
     public void display(GLAutoDrawable glautodrawable) {
-        double widthScale = (double)frame.getWidth() / width;
-        double heightScale = (double)frame.getHeight() / height;
-
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         if (!decoded) {

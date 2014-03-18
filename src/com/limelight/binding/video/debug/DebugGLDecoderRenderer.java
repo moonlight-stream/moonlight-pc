@@ -28,13 +28,12 @@ public class DebugGLDecoderRenderer extends GLDecoderRenderer {
 
     @Override
     public void display(GLAutoDrawable glautodrawable) {
-
         long decodeStart = System.currentTimeMillis();
 
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         if (!decoded) {
-        	return;
+            return;
         }
 
         long decodeTime = System.currentTimeMillis() - decodeStart;
@@ -44,59 +43,57 @@ public class DebugGLDecoderRenderer extends GLDecoderRenderer {
 
         // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
         // So we instruct it to read the packed RGB values in the appropriate (REV) order
-        if (texture == null)
-        {
+        if (texture == null) {
             gl.glEnable(GL.GL_TEXTURE_2D);
-        	texture = new Texture(gl,
-        			new TextureData(glprofile,
-        					4,
-        					width,
-        					height,
-        					0,
-        					GL.GL_BGRA,
-        					GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV,
-        					false,
-        					false,
-        					true,
-        					bufferRGB,
-        					null));
-        	texture.enable(gl);
-        	texture.bind(gl);
+            texture = new Texture(gl,
+                                  new TextureData(glprofile,
+                                                  4,
+                                                  width,
+                                                  height,
+                                                  0,
+                                                  GL.GL_BGRA,
+                                                  GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV,
+                                                  false,
+                                                  false,
+                                                  true,
+                                                  bufferRGB,
+                                                  null));
+            texture.enable(gl);
+            texture.bind(gl);
+        } else {
+            texture.updateSubImage(gl, new TextureData(glprofile,
+                                                       4,
+                                                       width,
+                                                       height,
+                                                       0,
+                                                       GL.GL_BGRA,
+                                                       GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV,
+                                                       false,
+                                                       false,
+                                                       true,
+                                                       bufferRGB,
+                                                       null),
+                                   0,
+                                   0,
+                                   0);
         }
-        else
-        {
-        	texture.updateSubImage(gl, new TextureData(glprofile,
-					4,
-					width,
-					height,
-					0,
-					GL.GL_BGRA,
-					GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV,
-					false,
-					false,
-					true,
-					bufferRGB,
-					null),
-					0,
-					0,
-					0);
-        }
-        
-    	gl.glBegin(GL2GL3.GL_QUADS);
-    	// This flips the texture as it draws it, as the opengl coordinate system is different
-    	gl.glTexCoord2f(0.0f, 0.0f);
-    	gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
 
-    	gl.glTexCoord2f(1.0f, 0.0f);
-    	gl.glVertex3f(1.0f, 1.0f, 1.0f); // Bottom Right Of The Texture and Quad
+        gl.glBegin(GL2GL3.GL_QUADS);
 
-    	gl.glTexCoord2f(1.0f, 1.0f);
-    	gl.glVertex3f(1.0f, -1.0f, 1.0f); // Top Right Of The Texture and Quad
+        // This flips the texture as it draws it, as the opengl coordinate system is different
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
 
-    	gl.glTexCoord2f(0.0f, 1.0f);
-    	gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex3f(1.0f, 1.0f, 1.0f); // Bottom Right Of The Texture and Quad
 
-    	gl.glEnd();
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex3f(1.0f, -1.0f, 1.0f); // Top Right Of The Texture and Quad
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+
+        gl.glEnd();
 
         long renderTime = System.currentTimeMillis() - renderStart;
         long refreshTime = System.currentTimeMillis() - lastRender;
@@ -108,7 +105,7 @@ public class DebugGLDecoderRenderer extends GLDecoderRenderer {
                       + renderTime
                       + ")ms "
                       + Math.round(1000.0
-                         / refreshTime)
+                                   / refreshTime)
                       + "FPS";
 
         renderer.beginRendering(glautodrawable.getWidth(), glautodrawable.getHeight());
