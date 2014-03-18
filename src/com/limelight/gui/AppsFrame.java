@@ -1,5 +1,6 @@
 package com.limelight.gui;
 
+import com.limelight.LimeLog;
 import com.limelight.Limelight;
 import com.limelight.nvstream.StreamConfiguration;
 import com.limelight.nvstream.http.NvApp;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Author: spartango
@@ -50,11 +52,30 @@ public class AppsFrame extends JFrame {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         appSelector = new JComboBox();
-        Collection<NvApp> fetched = fetchApps();
-        for (NvApp app : fetched) {
-            apps.put(app.getAppName(), app);
-            appSelector.addItem(app.getAppName());
-        }
+        appSelector.addItem("Steam");
+
+        // Send this to be done asynchronously
+        SwingWorker<Collection<NvApp>, Void> fetchBg = new SwingWorker<Collection<NvApp>, Void>() {
+            @Override protected Collection<NvApp> doInBackground() throws Exception {
+                return fetchApps();
+            }
+
+            @Override protected void done() {
+                try {
+                    Collection<NvApp> fetched = get();
+                    appSelector.removeAllItems();
+                    for (NvApp app : fetched) {
+                        apps.put(app.getAppName(), app);
+                        appSelector.addItem(app.getAppName());
+                    }
+                } catch (InterruptedException e) {
+                    LimeLog.warning("Failed to get list of apps; interrupted by " + e);
+                } catch (ExecutionException e) {
+                    LimeLog.warning("Failed to get list of apps; broken by " + e);
+                }
+            }
+        };
+        fetchBg.execute();
 
         launchButton = new JButton("Launch");
         launchButton.addActionListener(new ActionListener() {
@@ -63,6 +84,8 @@ public class AppsFrame extends JFrame {
                 NvApp app = apps.get(appName);
                 if (app != null) {
                     launchApp(app);
+                } else {
+                    launchSteam();
                 }
             }
         });
@@ -90,11 +113,9 @@ public class AppsFrame extends JFrame {
         this.setLocation((int) dim.getWidth() / 2 - this.getWidth() / 2,
                          (int) dim.getHeight() / 2 - this.getHeight() / 2);
 
-        if (!apps.isEmpty()) {
-            this.setVisible(true);
-            this.setSize(200, 100);
-            this.setResizable(false);
-        }
+        this.setVisible(true);
+        this.setSize(200, 100);
+        this.setResizable(false);
     }
 
     private Collection<NvApp> fetchApps() {

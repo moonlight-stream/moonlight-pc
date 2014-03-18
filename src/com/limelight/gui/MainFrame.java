@@ -43,6 +43,7 @@ public class MainFrame {
     private Set<String> mdnsHosts;
     private JmDNS       mdnsService;
 
+
     /**
      * Gets the actual JFrame this class creates
      *
@@ -127,6 +128,7 @@ public class MainFrame {
             }
         });
 
+
         Box streamBox = Box.createHorizontalBox();
         streamBox.add(Box.createHorizontalGlue());
         streamBox.add(stream);
@@ -154,9 +156,8 @@ public class MainFrame {
         contentBox.add(mdnsBox);
         contentBox.add(Box.createVerticalStrut(5));
         contentBox.add(streamBox);
-        contentBox.add(Box.createVerticalStrut(10));
+        gcontentBox.add(Box.createVerticalStrut(10));
         contentBox.add(pairBox);
-
         contentBox.add(Box.createVerticalGlue());
 
         centerPane.add(contentBox);
@@ -165,7 +166,6 @@ public class MainFrame {
 
         limeFrame.setJMenuBar(createMenuBar());
         limeFrame.getRootPane().setDefaultButton(stream);
-
         limeFrame.setSize(300, 200);
         limeFrame.setLocation(dim.width / 2 - limeFrame.getSize().width / 2,
                               dim.height / 2 - limeFrame.getSize().height / 2);
@@ -176,7 +176,6 @@ public class MainFrame {
     /*
      * Creates the menu bar for the user to go to preferences, mappings, etc.
      */
-
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenu optionsMenu = new JMenu("Options");
