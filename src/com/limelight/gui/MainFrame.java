@@ -14,33 +14,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import com.limelight.LimeLog;
-import com.limelight.Limelight;
-import com.limelight.binding.PlatformBinding;
-import com.limelight.nvstream.NvConnection;
-import com.limelight.nvstream.http.NvHTTP;
-import com.limelight.settings.PreferencesManager;
-import com.limelight.settings.PreferencesManager.Preferences;
 
 /**
  * The main frame of Limelight that allows the user to specify the host and begin the stream.
@@ -103,6 +84,7 @@ public class MainFrame {
 
         mdnsHosts = new HashSet<String>();
         mdnsHostList = new JComboBox();
+        mdnsHostList.addItem("Choose a local PC...");
         // Set mDNS scanning
         try {
             mdnsService = JmDNS.create();
@@ -137,9 +119,11 @@ public class MainFrame {
         }
 
         // Propagate selections from mDNS to the hosts field
-        mdnsHostList.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent e) {
-                hostField.setText((String) mdnsHostList.getSelectedItem());
+        mdnsHostList.addItemListener(new ItemListener() {
+            @Override public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED && mdnsHostList.getSelectedIndex() != 0) {
+                    hostField.setText((String) mdnsHostList.getSelectedItem());
+                }
             }
         });
 
