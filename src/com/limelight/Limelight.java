@@ -1,5 +1,6 @@
 package com.limelight;
 
+
 import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.gui.MainFrame;
@@ -19,318 +20,345 @@ import com.limelight.settings.SettingsManager;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * Main class for Limelight-pc contains methods for starting the application as well
  * as the stream to the host pc.
+ *
  * @author Diego Waxemberg<br>
- * Cameron Gutman
+ *         Cameron Gutman
  */
 public class Limelight implements NvConnectionListener {
-	public static final double VERSION = 1.0;
-	public static boolean COMMAND_LINE_LAUNCH = false;
-	
-	private String host;
-	private StreamFrame streamFrame;
-	private NvConnection conn;
-	private boolean connectionTerminating;
-	private static JFrame limeFrame;
-	private Gamepad gamepad;
+    public static final double  VERSION             = 1.0;
+    public static       boolean COMMAND_LINE_LAUNCH = false;
 
-	/**
-	 * Constructs a new instance based on the given host
-	 * @param host can be hostname or IP address.
-	 */
-	public Limelight(String host) {
-		this.host = host;
-	}
+    private        String       host;
+    private        StreamFrame  streamFrame;
+    private        NvConnection conn;
+    private        boolean      connectionTerminating;
+    private static JFrame       limeFrame;
+    private        Gamepad      gamepad;
 
-	/*
-	 * Creates a connection to the host and starts up the stream.
-	 */
-	private void startUp(StreamConfiguration streamConfig, boolean fullscreen) {
-		streamFrame = new StreamFrame();
-		
-		conn = new NvConnection(host, this, streamConfig);
-		streamFrame.build(this, conn, streamConfig, fullscreen);
-		conn.start(PlatformBinding.getDeviceName(), streamFrame,
-				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
-				PlatformBinding.getAudioRenderer(),
-				PlatformBinding.getVideoDecoderRenderer());
-	}
-	
-	/*
-	 * Creates a StreamConfiguration given a Resolution. 
-	 * Used to specify what kind of stream will be used.
-	 */
-	public static StreamConfiguration createConfiguration(Resolution res) {
-		switch(res) {
-		case RES_720_30:
-			return new StreamConfiguration(1280, 720, 30);
-		case RES_720_60:
-			return new StreamConfiguration(1280, 720, 60);
-		case RES_1080_30:
-			return new StreamConfiguration(1920, 1080, 30);
-		case RES_1080_60:
-			return new StreamConfiguration(1920, 1080, 60);
-		default:
-			// this should never happen, if it does we want the NPE to occur so we know something is wrong
-			return null;
-		}
-	}
-	
-	/*
-	 * Creates the main frame for the application.
-	 */
-	private static void createFrame() {
-		MainFrame main = new MainFrame();
-		main.build();
-		limeFrame = main.getLimeFrame();
-	}
-	
-	/**
-	 * Load native libraries for this platform or show an error dialog
-	 * @return Error message or null for success
-	 */
-	public static String loadNativeLibraries() {
-		String errorMessage;
-		
-		try {
-			String libraryPlatform = LibraryHelper.getLibraryPlatformString();
-			String jrePlatform = LibraryHelper.getRunningPlatformString();
+    /**
+     * Constructs a new instance based on the given host
+     *
+     * @param host can be hostname or IP address.
+     */
+    public Limelight(String host) {
+        this.host = host;
+    }
 
-			if (libraryPlatform.equals(jrePlatform)) {
-				// Success path
-				LibraryHelper.prepareNativeLibraries();
-				NativeGamepad.addListener(GamepadListener.getInstance());
-				NativeGamepad.start();
-				return null;
-			}
-			else {
-				errorMessage = "This is not the correct JAR for your platform. Please download the \""+jrePlatform+"\" JAR.";
-			}
-		} catch (IOException e) {
-			errorMessage = "The JAR is malformed or an invalid native library path was specified.";
-		}
-		
-		return errorMessage;
-	}
+    /*
+     * Creates a connection to the host and starts up the stream.
+     */
+    private void startUp(StreamConfiguration streamConfig, boolean fullscreen) {
+        streamFrame = new StreamFrame();
 
-	/**
-	 * Creates a new instance and starts the stream.
-	 * @param host the host pc to connect to. Can be a hostname or IP address.
-	 */
-	public static void createInstance(String host) {
-		Limelight limelight = new Limelight(host);
-		
-		Preferences prefs = PreferencesManager.getPreferences();
-		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution());
-	
-		limelight.startUp(streamConfig, prefs.getFullscreen());
-	}
+        conn = new NvConnection(host, this, streamConfig);
+        streamFrame.build(this, conn, streamConfig, fullscreen);
+        conn.start(PlatformBinding.getDeviceName(), streamFrame,
+                   VideoDecoderRenderer.FLAG_PREFER_QUALITY,
+                   PlatformBinding.getAudioRenderer(),
+                   PlatformBinding.getVideoDecoderRenderer());
+    }
 
-	/**
-	 * The entry point for the application. <br>
-	 * Does some initializations and then creates the main frame.
-	 * @param args unused.
-	 */
-	public static void main(String args[]) {
-		// Redirect logging to a file if we're running from a JAR
-		if (LibraryHelper.isRunningFromJar()) {
-			try {
-				System.setErr(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "error.log")));
-				System.setOut(new PrintStream(new File(SettingsManager.SETTINGS_DIR + File.separator + "output.log")));
-			} catch (IOException e) {
-			}
-		}
-		
-		//fix the menu bar if we are running in osx
-		if (System.getProperty("os.name").contains("Mac OS X")) {
-			// take the menu bar off the jframe
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
+    /*
+     * Creates a StreamConfiguration given a Resolution.
+     * Used to specify what kind of stream will be used.
+     */
+    public static StreamConfiguration createConfiguration(Resolution res) {
+        switch (res) {
+            case RES_720_30:
+                return new StreamConfiguration(1280, 720, 30);
+            case RES_720_60:
+                return new StreamConfiguration(1280, 720, 60);
+            case RES_1080_30:
+                return new StreamConfiguration(1920, 1080, 30);
+            case RES_1080_60:
+                return new StreamConfiguration(1920, 1080, 60);
+            default:
+                // this should never happen, if it does we want the NPE to occur so we know something is wrong
+                return null;
+        }
+    }
 
-			// set the name of the application menu item
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Limelight");
+    /*
+     * Creates the main frame for the application.
+     */
+    private static void createFrame() {
+        // Tell the user how to map the gamepad if it's a new install and there's no default for this platform
+        if (!PreferencesManager.hasExistingPreferences() &&
+            !System.getProperty("os.name").contains("Windows")) {
+            JOptionPane.showMessageDialog(null,
+                                          "Gamepad mapping is not set. If you want to use a gamepad, "
+                                          +
+                                          "click the Options menu and choose Gamepad Settings. After mapping your gamepad,"
+                                          +
+                                          " it will work while streaming.",
+                                          "Limelight",
+                                          JOptionPane.INFORMATION_MESSAGE);
+        }
 
-		} else {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
-				System.out.println("Unable to set system platform look and feel.");
-				e.printStackTrace();
-				System.exit(2);
-			}
-		}
-		
-		GamepadListener.getInstance().addDeviceListener(new Gamepad());
-		
-		String libraryError = loadNativeLibraries();
-		
-		// launching with command line arguments
-		if (args.length > 0) {
-			if (libraryError == null) {
-				parseCommandLine(args);
-			}
-			else {
-				// Print the error to stderr if running from command line
-				System.err.println(libraryError);
-			}
-		} else {
-			if (libraryError == null) {
-				createFrame();
-			} else {
-				JOptionPane.showMessageDialog(null, libraryError, "Wrong JAR platform", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
-	
-	//TODO: make this less jank
-	private static void parseCommandLine(String[] args) {
-		String host = null;
-		boolean fullscreen = false;
-		int resolution = 720;
-		int refresh = 30;
-		
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-host")) {
-				if (i + 1 < args.length) {
-					host = args[i+1];
-					i++;
-				} else {
-					System.out.println("Syntax error: hostname or ip address expected after -host");
-					System.exit(3);
-				}
-			} else if (args[i].equals("-fs")) {
-				fullscreen = true;
-			} else if (args[i].equals("-720")) {
-				resolution = 720;
-			} else if (args[i].equals("-1080")) {
-				resolution = 1080;
-			} else if (args[i].equals("-30fps")) {
-				refresh = 30;
-			} else if (args[i].equals("-60fps")) {
-				refresh = 60;
-			} else {
-				System.out.println("Syntax Error: Unrecognized argument: " + args[i]);
-			}
-		}
-		
-		if (host == null) {
-			System.out.println("Syntax Error: You must include a host. Use -host to specifiy a hostname or ip address.");
-			System.exit(5);
-		}
-		
-		Resolution streamRes = null;
-		
-		if (resolution == 720 && refresh == 30) {
-			streamRes = Resolution.RES_720_30;
-		} else if (resolution == 720 && refresh == 60) {
-			streamRes = Resolution.RES_720_60;
-		} else if (resolution == 1080 && refresh == 30) {
-			streamRes = Resolution.RES_1080_30;
-		} else if (resolution == 1080 && refresh == 60) {
-			streamRes = Resolution.RES_1080_60;
-		}
-		
-		StreamConfiguration streamConfig = createConfiguration(streamRes);
-		
-		Limelight limelight = new Limelight(host);
-		limelight.startUp(streamConfig, fullscreen);
-		COMMAND_LINE_LAUNCH = true;
-	}
-	
-	
-	public void stop() {
-		connectionTerminating = true;
+        MainFrame main = new MainFrame();
+        main.build();
+        limeFrame = main.getLimeFrame();
+    }
 
-		// Kill the connection to the target
-		conn.stop();
-		
-		// Remove the gamepad listener
-		if (gamepad != null) {
-			GamepadListener.getInstance().removeListener(gamepad);
-		}
-		
-		// Close the stream frame
-		streamFrame.dispose();
-	}
+    /**
+     * Load native libraries for this platform or show an error dialog
+     *
+     * @return Error message or null for success
+     */
+    public static String loadNativeLibraries() {
+        String errorMessage;
 
-	/**
-	 * Callback to specify which stage is starting. Used to update UI.
-	 * @param stage the Stage that is starting
-	 */
-	public void stageStarting(Stage stage) {
-		System.out.println("Starting "+stage.getName());
-		streamFrame.showSpinner(stage);
-	}
+        try {
+            String libraryPlatform = LibraryHelper.getLibraryPlatformString();
+            String jrePlatform = LibraryHelper.getRunningPlatformString();
 
-	/**
-	 * Callback that a stage has finished loading.
-	 * <br><b>NOTE: Currently unimplemented.</b>
-	 * @param stage the Stage that has finished.
-	 */
-	public void stageComplete(Stage stage) {
-	}
+            if (libraryPlatform.equals(jrePlatform)) {
+                // Success path
+                LibraryHelper.prepareNativeLibraries();
+                NativeGamepad.addListener(GamepadListener.getInstance());
+                NativeGamepad.start();
+                return null;
+            } else {
+                errorMessage = "This is not the correct JAR for your platform. Please download the \""
+                               + jrePlatform
+                               + "\" JAR.";
+            }
+        } catch (IOException e) {
+            errorMessage = "The JAR is malformed or an invalid native library path was specified.";
+        }
 
-	/**
-	 * Callback that a stage has failed. Used to inform user that an error occurred.
-	 * @param stage the Stage that was loading when the error occurred
-	 */
-	public void stageFailed(Stage stage) {
-		stop();
-		displayError("Connection Error", "Starting " + stage.getName() + " failed");
-	}
+        return errorMessage;
+    }
 
-	/**
-	 * Callback that the connection has finished loading and is started.
-	 */
-	public void connectionStarted() {
-		streamFrame.hideSpinner();
-		
-		gamepad = new Gamepad(conn);
-		GamepadListener.getInstance().addDeviceListener(gamepad);
-	}
+    /**
+     * Creates a new instance and starts the stream.
+     *
+     * @param host the host pc to connect to. Can be a hostname or IP address.
+     */
+    public static void createInstance(String host) {
+        Limelight limelight = new Limelight(host);
 
-	/**
-	 * Callback that the connection has been terminated for some reason.
-	 * <br>This is were the stream shutdown procedure takes place.
-	 * @param e the Exception that was thrown- probable cause of termination.
-	 */
-	public void connectionTerminated(Exception e) {
-		if (!(e instanceof InterruptedException)) {
-			e.printStackTrace();
-		}
-		if (!connectionTerminating) {
-			stop();
+        Preferences prefs = PreferencesManager.getPreferences();
+        StreamConfiguration streamConfig = createConfiguration(prefs.getResolution());
 
-			// Spin off a new thread to update the UI since
-			// this thread has been interrupted and will terminate
-			// shortly
-			new Thread(new Runnable() {
-				public void run() {
-					streamFrame.dispose();
-					displayError("Connection Terminated", "The connection failed unexpectedly");
-				}
-			}).start();
-		}
-	}
+        limelight.startUp(streamConfig, prefs.getFullscreen());
+    }
 
-	/**
-	 * Displays a message to the user in the form of an info dialog.
-	 * @param message the message to show the user
-	 */
-	public void displayMessage(String message) {
-		JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
-	}	
+    /**
+     * The entry point for the application. <br>
+     * Does some initializations and then creates the main frame.
+     *
+     * @param args unused.
+     */
+    public static void main(String args[]) {
+        // Redirect logging to a file if we're running from a JAR
+        if (LibraryHelper.isRunningFromJar() && args.length == 0) {
+            try {
+                LimeLog.setFileHandler(SettingsManager.SETTINGS_DIR + File.separator + "limelight.log");
+            } catch (IOException e) {
+            }
+        }
 
-	/**
-	 * Displays an error to the user in the form of an error dialog
-	 * @param title the title for the dialog frame
-	 * @param message the message to show the user
-	 */
-	public void displayError(String title, String message) {
-		JOptionPane.showMessageDialog(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
-	}
+        //fix the menu bar if we are running in osx
+        if (System.getProperty("os.name").contains("Mac OS X")) {
+            // take the menu bar off the jframe
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+            // set the name of the application menu item
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Limelight");
+
+        } else {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                LimeLog.severe("Unable to set system platform look and feel.");
+                e.printStackTrace();
+                System.exit(2);
+            }
+        }
+
+        GamepadListener.getInstance().addDeviceListener(new Gamepad());
+
+        String libraryError = loadNativeLibraries();
+
+        // launching with command line arguments
+        if (args.length > 0) {
+            if (libraryError == null) {
+                parseCommandLine(args);
+            } else {
+                // Print the error to stderr if running from command line
+                System.err.println(libraryError);
+            }
+        } else {
+            if (libraryError == null) {
+                createFrame();
+            } else {
+                JOptionPane.showMessageDialog(null, libraryError, "Wrong JAR platform", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    //TODO: make this less jank
+    private static void parseCommandLine(String[] args) {
+        String host = null;
+        boolean fullscreen = false;
+        int resolution = 720;
+        int refresh = 60;
+
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-host")) {
+                if (i + 1 < args.length) {
+                    host = args[i + 1];
+                    i++;
+                } else {
+                    System.out.println("Syntax error: hostname or ip address expected after -host");
+                    System.exit(3);
+                }
+            } else if (args[i].equals("-fs")) {
+                fullscreen = true;
+            } else if (args[i].equals("-720")) {
+                resolution = 720;
+            } else if (args[i].equals("-1080")) {
+                resolution = 1080;
+            } else if (args[i].equals("-30fps")) {
+                refresh = 30;
+            } else if (args[i].equals("-60fps")) {
+                refresh = 60;
+            } else {
+                System.out.println("Syntax Error: Unrecognized argument: " + args[i]);
+            }
+        }
+
+        if (host == null) {
+            System.out.println("Syntax Error: You must include a host. Use -host to specifiy a hostname or ip address.");
+            System.exit(5);
+        }
+
+        Resolution streamRes = null;
+
+        if (resolution == 720 && refresh == 30) {
+            streamRes = Resolution.RES_720_30;
+        } else if (resolution == 720 && refresh == 60) {
+            streamRes = Resolution.RES_720_60;
+        } else if (resolution == 1080 && refresh == 30) {
+            streamRes = Resolution.RES_1080_30;
+        } else if (resolution == 1080 && refresh == 60) {
+            streamRes = Resolution.RES_1080_60;
+        }
+
+        StreamConfiguration streamConfig = createConfiguration(streamRes);
+
+        Limelight limelight = new Limelight(host);
+        limelight.startUp(streamConfig, fullscreen);
+        COMMAND_LINE_LAUNCH = true;
+    }
+
+
+    public void stop() {
+        connectionTerminating = true;
+
+        // Kill the connection to the target
+        conn.stop();
+
+        // Remove the gamepad listener
+        if (gamepad != null) {
+            GamepadListener.getInstance().removeListener(gamepad);
+        }
+
+        // Close the stream frame
+        streamFrame.dispose();
+    }
+
+    /**
+     * Callback to specify which stage is starting. Used to update UI.
+     *
+     * @param stage the Stage that is starting
+     */
+    public void stageStarting(Stage stage) {
+        LimeLog.info("Starting " + stage.getName());
+        streamFrame.showSpinner(stage);
+    }
+
+    /**
+     * Callback that a stage has finished loading.
+     * <br><b>NOTE: Currently unimplemented.</b>
+     *
+     * @param stage the Stage that has finished.
+     */
+    public void stageComplete(Stage stage) {
+    }
+
+    /**
+     * Callback that a stage has failed. Used to inform user that an error occurred.
+     *
+     * @param stage the Stage that was loading when the error occurred
+     */
+    public void stageFailed(Stage stage) {
+        stop();
+        displayError("Connection Error", "Starting " + stage.getName() + " failed");
+    }
+
+    /**
+     * Callback that the connection has finished loading and is started.
+     */
+    public void connectionStarted() {
+        streamFrame.hideSpinner();
+
+        gamepad = new Gamepad(conn);
+        GamepadListener.getInstance().addDeviceListener(gamepad);
+    }
+
+    /**
+     * Callback that the connection has been terminated for some reason.
+     * <br>This is were the stream shutdown procedure takes place.
+     *
+     * @param e the Exception that was thrown- probable cause of termination.
+     */
+    public void connectionTerminated(Exception e) {
+        if (!(e instanceof InterruptedException)) {
+            e.printStackTrace();
+        }
+        if (!connectionTerminating) {
+            stop();
+
+            // Spin off a new thread to update the UI since
+            // this thread has been interrupted and will terminate
+            // shortly
+            new Thread(new Runnable() {
+                public void run() {
+                    displayError("Connection Terminated", "The connection failed unexpectedly");
+                }
+            }).start();
+        }
+    }
+
+    /**
+     * Displays a message to the user in the form of an info dialog.
+     *
+     * @param message the message to show the user
+     */
+    public void displayMessage(String message) {
+        streamFrame.dispose();
+        JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Displays an error to the user in the form of an error dialog
+     *
+     * @param title   the title for the dialog frame
+     * @param message the message to show the user
+     */
+    public void displayError(String title, String message) {
+        streamFrame.dispose();
+        JOptionPane.showMessageDialog(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void displayTransientMessage(String message) {
+        // FIXME: Implement transient messages
+    }
 }
 

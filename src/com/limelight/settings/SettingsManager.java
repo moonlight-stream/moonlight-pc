@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.limelight.LimeLog;
 
 /**
  * Manages the settings files
@@ -62,7 +63,7 @@ public class SettingsManager {
 			try {
 				gamepadFile.createNewFile();
 			} catch (IOException e) {
-				System.out.println("Unable to create gamepad file");
+				LimeLog.warning("Unable to create gamepad file");
 				return null;
 			}
 		}
@@ -83,7 +84,7 @@ public class SettingsManager {
 			try {
 				settingsFile.createNewFile();
 			} catch (IOException e) {
-				System.out.println("Unable to create setting file");
+				LimeLog.warning("Unable to create setting file");
 				return null;
 			}
 		}
@@ -107,14 +108,14 @@ public class SettingsManager {
 			br = new BufferedReader(new FileReader(file));
 			settings = gson.fromJson(br, klass);
 		} catch (FileNotFoundException e) {
-			System.out.println("Could not find " + file.getName() + " settings file");
+			LimeLog.warning("Could not find " + file.getName() + " settings file");
 			e.printStackTrace();
 		} finally {
 			if (br != null) {
 				try {
 					br.close();
 				} catch (IOException e) {
-					System.out.println("Could not close gamepad settings file");
+					LimeLog.warning("Could not close gamepad settings file");
 					e.printStackTrace();
 				}
 			}
@@ -124,7 +125,6 @@ public class SettingsManager {
 	
 	/**
 	 * Writes the specified settings to the desired file
-	 * @param <T>
 	 * @param file the file to write the settings to 
 	 * @param settings the settings to be written out
 	 */
@@ -137,11 +137,11 @@ public class SettingsManager {
 			writer = new FileWriter(file);
 			writer.write(json);
 		} catch (FileNotFoundException e) {
-			System.out.println("Could not find " + file.getName() + " settings file");
+			LimeLog.warning("Could not find " + file.getName() + " settings file");
 			e.printStackTrace();
 
 		} catch (IOException e) {
-			System.out.println("Could not write to " + file.getName() + " settings file");
+			LimeLog.warning("Could not write to " + file.getName() + " settings file");
 			e.printStackTrace();
 
 		} finally {
@@ -149,7 +149,7 @@ public class SettingsManager {
 				try {
 					writer.close();
 				} catch (IOException e) {
-					System.out.println("Unable to close " + file.getName() + " settings file");
+					LimeLog.warning("Unable to close " + file.getName() + " settings file");
 					e.printStackTrace();
 				}
 			}

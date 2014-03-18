@@ -20,7 +20,9 @@ public class UnifiedDecoderRenderer extends SwingCpuDecoderRenderer {
 
         // Add a Jcomponent to the frame
         component = new JComponent() {
-            @Override protected void paintComponent(Graphics g) {
+			private static final long serialVersionUID = 1L;
+
+			@Override protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 draw(g);
             }
