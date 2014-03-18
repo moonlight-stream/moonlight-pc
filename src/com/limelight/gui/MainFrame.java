@@ -156,7 +156,7 @@ public class MainFrame {
         contentBox.add(mdnsBox);
         contentBox.add(Box.createVerticalStrut(5));
         contentBox.add(streamBox);
-        gcontentBox.add(Box.createVerticalStrut(10));
+        contentBox.add(Box.createVerticalStrut(10));
         contentBox.add(pairBox);
         contentBox.add(Box.createVerticalGlue());
 
