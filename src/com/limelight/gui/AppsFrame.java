@@ -134,7 +134,6 @@ public class AppsFrame extends JFrame {
             System.err.println("Failed to parse app list: " + e);
         }
 
-        launchSteam();
         return Collections.EMPTY_LIST;
     }
 
