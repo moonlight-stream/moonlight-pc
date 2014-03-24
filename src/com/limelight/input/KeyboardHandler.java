@@ -34,6 +34,9 @@ public class KeyboardHandler implements KeyListener {
 	 * @param event the key-down event
 	 */
 	public void keyPressed(KeyEvent event) {
+		if (event.isConsumed()) return;
+		event.consume();
+		
 		short keyMap = translator.translate(event.getKeyCode());
 
 		byte modifier = 0x0;
@@ -79,6 +82,9 @@ public class KeyboardHandler implements KeyListener {
 	 * @param event the key-up event
 	 */
 	public void keyReleased(KeyEvent event) {
+		if (event.isConsumed()) return;
+		event.consume();
+
 		short keyMap = translator.translate(event.getKeyCode());
 
 		byte modifier = 0x0;
