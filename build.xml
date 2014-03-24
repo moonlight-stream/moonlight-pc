@@ -15,7 +15,7 @@
 
   <property name="classes.dir" location="${basedir}/classes"/>
 
-  <target name="init">
+  <target name="init" depends="clean">
     <mkdir dir="${classes.dir}"/>
     <mkdir dir="${classes.dir}/lib"/>
     <mkdir dir="${classes.dir}/src"/>
