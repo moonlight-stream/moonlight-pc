@@ -48,6 +48,7 @@ To launch Limelight from a command line:
 * `-1080` use 1920x1080 resolution
 * `-30fps` use 30 fps stream
 * `-60fps` use 60 fps stream
+
 The default launch will be 1280x720 30fps non-full screen.
 
 ##Contribute
