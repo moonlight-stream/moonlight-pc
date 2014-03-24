@@ -42,6 +42,7 @@ To launch Limelight from a command line:
 * `java -jar limelight-[os].jar -host address [options]`
 * `-host` [address] the address to connect to. This can be a hostname or ip
   address.
+* `-pair` [address] the address to pair to. This can be a hostname or ip address.
 * `-fs` launch in full screen
 * `-720` use 1280x720 resolution
 * `-1080` use 1920x1080 resolution
