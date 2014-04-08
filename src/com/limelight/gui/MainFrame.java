@@ -30,7 +30,6 @@ import java.util.Set;
  *         <br>Cameron Gutman
  */
 public class MainFrame {
-    // <<<<<<<HEAD
     public static       String MDNS_QUERY           = "_nvstream._tcp.local.";
     public static       String MDNS_MULTICAST_GROUP = "224.0.0.251";
     public static final short  MDNS_PORT            = 5353;

@@ -34,7 +34,6 @@ import static com.limelight.settings.PreferencesManager.Preferences.Resolution;
  *         Cameron Gutman
  */
 public class Limelight implements NvConnectionListener {
-    // <<<<<<<HEAD
     public static final double  VERSION             = 1.0;
     public static       boolean COMMAND_LINE_LAUNCH = false;
 
