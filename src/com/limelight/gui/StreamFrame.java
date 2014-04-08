@@ -21,23 +21,27 @@ import java.util.Comparator;
 
 /**
  * The frame to which the video is rendered
- * @author Diego Waxemberg
- * <br>Cameron Gutman
  *
+ * @author Diego Waxemberg
+ *         <br>Cameron Gutman
  */
 public class StreamFrame extends JFrame {
     private static final long serialVersionUID = 1L;
 
-    private static final double DESIRED_ASPECT_RATIO = 16.0/9.0;
-    private static final double ALTERNATE_ASPECT_RATIO = 16.0/10.0;
+    private static final double DESIRED_ASPECT_RATIO   = 16.0 / 9.0;
+    private static final double ALTERNATE_ASPECT_RATIO = 16.0 / 10.0;
+
+    private static Cursor noCursor = Toolkit.getDefaultToolkit()
+                                            .createCustomCursor(new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB),
+                                                                new Point(0, 0),
+                                                                "blank cursor");
 
     private KeyboardHandler keyboard;
-    private MouseHandler mouse;
-    private JProgressBar spinner;
-    private JLabel spinnerLabel;
-    private Cursor noCursor;
-    private Limelight limelight;
-    private JPanel renderingSurface;
+    private MouseHandler    mouse;
+    private JProgressBar    spinner;
+    private JLabel          spinnerLabel;
+    private Limelight       limelight;
+    private JPanel          renderingSurface;
 
     /**
      * Frees the mouse ie. makes it visible and allowed to move outside the frame.
@@ -57,9 +61,10 @@ public class StreamFrame extends JFrame {
 
     /**
      * Builds the components of this frame with the specified configurations.
-     * @param conn the connection this frame belongs to
+     *
+     * @param conn         the connection this frame belongs to
      * @param streamConfig the configurations for this frame
-     * @param fullscreen if the frame should be made fullscreen
+     * @param fullscreen   if the frame should be made fullscreen
      */
     public void build(Limelight limelight, NvConnection conn, StreamConfiguration streamConfig, boolean fullscreen) {
         this.limelight = limelight;
@@ -95,8 +100,7 @@ public class StreamFrame extends JFrame {
                 this.setVisible(false);
                 this.setVisible(true);
             }
-        }
-        else {
+        } else {
             this.setVisible(true);
 
             // Only fill the available screen area (excluding taskbar, etc)
@@ -119,7 +123,7 @@ public class StreamFrame extends JFrame {
         ArrayList<DisplayMode> matchingConfigs = new ArrayList<DisplayMode>();
 
         for (DisplayMode config : configs) {
-            if ((double)config.getWidth()/(double)config.getHeight() == aspectRatio) {
+            if ((double) config.getWidth() / (double) config.getHeight() == aspectRatio) {
                 matchingConfigs.add(config);
             }
         }
@@ -128,7 +132,7 @@ public class StreamFrame extends JFrame {
     }
 
     private DisplayMode getBestDisplay(StreamConfiguration targetConfig, DisplayMode[] configs) {
-        int targetDisplaySize = targetConfig.getWidth()*targetConfig.getHeight();
+        int targetDisplaySize = targetConfig.getWidth() * targetConfig.getHeight();
 
         // Try to match the target aspect ratio
         ArrayList<DisplayMode> aspectMatchingConfigs = getDisplayModesByAspectRatio(configs, DESIRED_ASPECT_RATIO);
@@ -144,9 +148,9 @@ public class StreamFrame extends JFrame {
         // Sort by display size
         Collections.sort(aspectMatchingConfigs, new Comparator<DisplayMode>() {
             public int compare(DisplayMode o1, DisplayMode o2) {
-                if (o1.getWidth()*o1.getHeight() > o2.getWidth()*o2.getHeight()) {
+                if (o1.getWidth() * o1.getHeight() > o2.getWidth() * o2.getHeight()) {
                     return -1;
-                } else if (o2.getWidth()*o2.getHeight() > o1.getWidth()*o1.getHeight()) {
+                } else if (o2.getWidth() * o2.getHeight() > o1.getWidth() * o1.getHeight()) {
                     return 1;
                 } else {
                     return 0;
@@ -157,18 +161,26 @@ public class StreamFrame extends JFrame {
         // Find the aspect-matching config with the closest matching display size
         DisplayMode bestConfig = null;
         for (DisplayMode config : aspectMatchingConfigs) {
-            if (config.getWidth()*config.getHeight() >= targetDisplaySize) {
+            if (config.getWidth() * config.getHeight() >= targetDisplaySize) {
                 bestConfig = config;
             }
         }
 
         if (bestConfig != null) {
-            LimeLog.info("Using full-screen display mode "+bestConfig.getWidth()+"x"+bestConfig.getHeight()+
-                         " for "+targetConfig.getWidth()+"x"+targetConfig.getHeight()+" stream");
+            LimeLog.info("Using full-screen display mode " + bestConfig.getWidth() + "x" + bestConfig.getHeight() +
+                         " for " + targetConfig.getWidth() + "x" + targetConfig.getHeight() + " stream");
         } else {
             bestConfig = aspectMatchingConfigs.get(0);
-            LimeLog.info("No matching display modes. Using largest: " +bestConfig.getWidth()+"x"+bestConfig.getHeight()+
-                         " for "+targetConfig.getWidth()+"x"+targetConfig.getHeight()+" stream");
+            LimeLog.info("No matching display modes. Using largest: "
+                         + bestConfig.getWidth()
+                         + "x"
+                         + bestConfig.getHeight()
+                         +
+                         " for "
+                         + targetConfig.getWidth()
+                         + "x"
+                         + targetConfig.getHeight()
+                         + " stream");
         }
 
         return bestConfig;
@@ -206,28 +218,36 @@ public class StreamFrame extends JFrame {
      * Makes the mouse cursor invisible
      */
     public void hideCursor() {
-        if (noCursor == null) {
-            // Transparent 16 x 16 pixel cursor image.
-            BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        hideCursor(this);
+    }
 
-            // Create a new blank cursor.
-            noCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-                    cursorImg, new Point(0, 0), "blank cursor");
-        }
+
+    /**
+     * Makes the mouse cursor invisible
+     */
+    public static void hideCursor(Component component) {
         // Set the blank cursor to the JFrame.
-        renderingSurface.setCursor(noCursor);
+        component.setCursor(noCursor);
     }
 
     /**
      * Makes the mouse cursor visible
      */
     public void showCursor() {
-        renderingSurface.setCursor(Cursor.getDefaultCursor());
+        showCursor(this);
+    }
+
+    /**
+     * Makes the mouse cursor visible
+     */
+    public static void showCursor(Component component) {
+        component.setCursor(Cursor.getDefaultCursor());
     }
 
     /**
      * Shows a progress bar with a label underneath that tells the user what
      * loading stage the stream is at.
+     *
      * @param stage the currently loading stage
      */
     public void showSpinner(Stage stage) {
@@ -264,7 +284,6 @@ public class StreamFrame extends JFrame {
      */
     private WindowListener createWindowListener() {
         return new WindowAdapter() {
-            @Override
             public void windowClosing(WindowEvent e) {
                 close();
             }

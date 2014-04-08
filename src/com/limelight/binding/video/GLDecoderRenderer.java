@@ -13,7 +13,6 @@ import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -96,13 +95,6 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         for (MouseMotionListener m : renderingSurface.getMouseMotionListeners()) {
             glcanvas.addMouseMotionListener(m);
         }
-
-        // Transparent 16 x 16 pixel cursor image.
-        // Set the blank cursor to the canvase.
-        glcanvas.setCursor(Toolkit.getDefaultToolkit()
-                                  .createCustomCursor(new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB),
-                                                      new Point(0, 0),
-                                                      "blank cursor"));
 
         frame.setLayout(null);
         frame.add(glcanvas, 0, 0);
