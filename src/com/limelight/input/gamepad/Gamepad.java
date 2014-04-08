@@ -110,26 +110,42 @@ public class Gamepad implements DeviceListener {
 	private void handleAnalogComponent(GamepadComponent padComp, float value) {
 		switch (padComp) {
 		case LS_RIGHT:
+			leftStickX = (short)Math.round(Math.abs(value) * 0x7FFF);
+			break;
 		case LS_LEFT:
-			leftStickX = (short)Math.round(value * 0x7FFF);
+			leftStickX = (short)Math.round(-Math.abs(value) * 0x7FFF);
 			break;
 		case LS_UP:
+			leftStickY = (short)Math.round(Math.abs(value) * 0x7FFF);
+			break;
 		case LS_DOWN:
-			leftStickY = (short)Math.round(value * 0x7FFF);
+			leftStickY = (short)Math.round(-Math.abs(value) * 0x7FFF);
 			break;
 		case RS_UP:
+			rightStickY = (short)Math.round(Math.abs(value) * 0x7FFF);
+			break;
 		case RS_DOWN:
-			rightStickY = (short)Math.round(value * 0x7FFF);
+			rightStickY = (short)Math.round(-Math.abs(value) * 0x7FFF);
 			break;
 		case RS_RIGHT:
+			rightStickX = (short)Math.round(Math.abs(value) * 0x7FFF);
+			break;
 		case RS_LEFT:
-			rightStickX = (short)Math.round(value * 0x7FFF);
+			rightStickX = (short)Math.round(-Math.abs(value) * 0x7FFF);
 			break;
 		case LT:
-			leftTrigger = (byte)Math.round(value * 0xFF);
+			// HACK: Fix polling so we don't have to do this
+			if (Math.abs(value) < 0.9) {
+				value = 0;
+			}
+			leftTrigger = (byte)Math.round(Math.abs(value) * 0xFF);
 			break;
 		case RT:
-			rightTrigger = (byte)Math.round(value * 0xFF);
+			// HACK: Fix polling so we don't have to do this
+			if (Math.abs(value) < 0.9) {
+				value = 0;
+			}
+			rightTrigger = (byte)Math.round(Math.abs(value) * 0xFF);
 			break;
 		default:
 			LimeLog.warning("A mapping error has occured. Ignoring: " + padComp.name());

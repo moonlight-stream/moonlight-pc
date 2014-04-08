@@ -1,10 +1,12 @@
 package com.limelight.gui;
 
+
+import com.limelight.LimeLog;
 import com.limelight.Limelight;
 import com.limelight.input.KeyboardHandler;
 import com.limelight.input.MouseHandler;
 import com.limelight.nvstream.NvConnection;
-import com.limelight.nvstream.NvConnectionListener.Stage;
+import com.limelight.nvstream.NvConnectionListener;
 import com.limelight.nvstream.StreamConfiguration;
 
 import javax.swing.*;
@@ -18,22 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-
-import com.limelight.LimeLog;
-import com.limelight.Limelight;
-import com.limelight.input.KeyboardHandler;
-import com.limelight.input.MouseHandler;
-import com.limelight.nvstream.NvConnection;
-import com.limelight.nvstream.NvConnectionListener.Stage;
-import com.limelight.nvstream.StreamConfiguration;
-
 /**
  * The frame to which the video is rendered
  * @author Diego Waxemberg
@@ -41,31 +27,32 @@ import com.limelight.nvstream.StreamConfiguration;
  *
  */
 public class StreamFrame extends JFrame {
-	private static final long serialVersionUID = 1L;
-	
-	private static final double DESIRED_ASPECT_RATIO = 16.0/9.0;
-	private static final double ALTERNATE_ASPECT_RATIO = 16.0/10.0;
+    private static final long serialVersionUID = 1L;
 
-	private KeyboardHandler keyboard;
-	private MouseHandler mouse;
-	private JProgressBar spinner;
-	private JLabel spinnerLabel;
-	private Cursor noCursor;
-	private Limelight limelight;
+    private static final double DESIRED_ASPECT_RATIO   = 16.0 / 9.0;
+    private static final double ALTERNATE_ASPECT_RATIO = 16.0 / 10.0;
 
-	/**
-	 * Frees the mouse ie. makes it visible and allowed to move outside the frame.
-	 */
-	public void freeMouse() {
-		mouse.free();
-		showCursor();
-	}
+    private KeyboardHandler keyboard;
+    private MouseHandler    mouse;
+    private JProgressBar    spinner;
+    private JLabel          spinnerLabel;
+    private Cursor          noCursor;
+    private Limelight       limelight;
+    private JPanel          renderingSurface;
 
-	/**
-	 * Captures the mouse ie. makes it invisible and not allowed to leave the frame
-	 */
-	public void captureMouse() {
-		mouse.capture();
+    /**
+     * Frees the mouse ie. makes it visible and allowed to move outside the frame.
+     */
+    public void freeMouse() {
+        mouse.free();
+        showCursor();
+    }
+
+    /**
+     * Captures the mouse ie. makes it invisible and not allowed to leave the frame
+     */
+    public void captureMouse() {
+        mouse.capture();
 		hideCursor();
 	}
 
@@ -81,27 +68,25 @@ public class StreamFrame extends JFrame {
 		keyboard = new KeyboardHandler(conn, this);
 		mouse = new MouseHandler(conn, this);
 
-		this.addKeyListener(keyboard);
-		this.addMouseListener(mouse);
-		this.addMouseMotionListener(mouse);
-		
-		this.setFocusable(true);
-		this.setFocusableWindowState(true);
-		this.setAutoRequestFocus(true);
-		
-		this.enableInputMethods(true);
-
-		this.setFocusTraversalKeysEnabled(false);
-
-		this.setSize(streamConfig.getWidth(), streamConfig.getHeight());
-		
 		this.setBackground(Color.BLACK);
-		this.getContentPane().setBackground(Color.BLACK);
-		this.getRootPane().setBackground(Color.BLACK);
-		
+		this.setFocusableWindowState(true);
+		this.setFocusTraversalKeysEnabled(false);
 		this.addWindowListener(createWindowListener());
 		
-		this.setIgnoreRepaint(true);
+		Container contentPane = this.getContentPane();
+		
+		renderingSurface = new JPanel(false);
+		renderingSurface.addKeyListener(keyboard);
+		renderingSurface.addMouseListener(mouse);
+		renderingSurface.addMouseMotionListener(mouse);
+		renderingSurface.setBackground(Color.BLACK);
+		renderingSurface.setIgnoreRepaint(true);
+		renderingSurface.setFocusable(true);
+		renderingSurface.setLayout(new BoxLayout(renderingSurface, BoxLayout.Y_AXIS));
+		renderingSurface.setVisible(true);
+		
+		contentPane.setLayout(new BorderLayout());
+		contentPane.add(renderingSurface, "Center");
 		
 		if (fullscreen) {
 			makeFullScreen(streamConfig);
@@ -112,9 +97,23 @@ public class StreamFrame extends JFrame {
 				this.setVisible(true);
 			}
 		}
+		else {
+			this.setVisible(true);
+			
+			// Only fill the available screen area (excluding taskbar, etc)
+			Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+			Insets windowInsets = this.getInsets();
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			
+			int windowInsetWidth = windowInsets.left + windowInsets.right;
+			int windowInsetHeight = windowInsets.top + windowInsets.bottom;
+			int maxWidth = screenSize.width - (screenInsets.left + screenInsets.right);
+			int maxHeight = screenSize.height - (screenInsets.top + screenInsets.bottom);
+			this.setSize(new Dimension(Math.min(streamConfig.getWidth() + windowInsetWidth, maxWidth),
+				Math.min(streamConfig.getHeight() + windowInsetHeight, maxHeight)));
+		}
 
 		hideCursor();
-		this.setVisible(true);
 	}
 	
 	private ArrayList<DisplayMode> getDisplayModesByAspectRatio(DisplayMode[] configs, double aspectRatio) {
@@ -145,16 +144,16 @@ public class StreamFrame extends JFrame {
 		
 		// Sort by display size
 		Collections.sort(aspectMatchingConfigs, new Comparator<DisplayMode>() {
-			public int compare(DisplayMode o1, DisplayMode o2) {
-				if (o1.getWidth()*o1.getHeight() > o2.getWidth()*o2.getHeight()) {
-					return -1;
-				} else if (o2.getWidth()*o2.getHeight() > o1.getWidth()*o1.getHeight()) {
-					return 1;
-				} else {
-					return 0;
-				}
-			}
-		});
+            public int compare(DisplayMode o1, DisplayMode o2) {
+                if (o1.getWidth() * o1.getHeight() > o2.getWidth() * o2.getHeight()) {
+                    return -1;
+                } else if (o2.getWidth() * o2.getHeight() > o1.getWidth() * o1.getHeight()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
 
 		// Find the aspect-matching config with the closest matching display size
 		DisplayMode bestConfig = null;
@@ -165,8 +164,8 @@ public class StreamFrame extends JFrame {
 		}
 		
 		if (bestConfig != null) {
-			LimeLog.info("Using full-screen display mode "+bestConfig.getWidth()+"x"+bestConfig.getHeight()+
-					" for "+targetConfig.getWidth()+"x"+targetConfig.getHeight()+" stream");
+			LimeLog.info("Using full-screen display mode " + bestConfig.getWidth() + "x" + bestConfig.getHeight() +
+                         " for " + targetConfig.getWidth() + "x" + targetConfig.getHeight() + " stream");
 		} else {
 			bestConfig = aspectMatchingConfigs.get(0);
 			LimeLog.info("No matching display modes. Using largest: " +bestConfig.getWidth()+"x"+bestConfig.getHeight()+
@@ -175,7 +174,7 @@ public class StreamFrame extends JFrame {
 		
 		return bestConfig;
 	}
-
+	
 	private void makeFullScreen(StreamConfiguration streamConfig) {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		if (gd.isFullScreenSupported()) {
@@ -217,16 +216,14 @@ public class StreamFrame extends JFrame {
 					cursorImg, new Point(0, 0), "blank cursor");
 		}
 		// Set the blank cursor to the JFrame.
-		this.setCursor(noCursor);
-		this.getContentPane().setCursor(noCursor);
+		renderingSurface.setCursor(noCursor);
 	}
 
 	/**
 	 * Makes the mouse cursor visible
 	 */
 	public void showCursor() {
-		this.setCursor(Cursor.getDefaultCursor());
-		this.getContentPane().setCursor(Cursor.getDefaultCursor());
+		renderingSurface.setCursor(Cursor.getDefaultCursor());
 	}
 
 	/**
@@ -234,14 +231,8 @@ public class StreamFrame extends JFrame {
 	 * loading stage the stream is at.
 	 * @param stage the currently loading stage
 	 */
-	public void showSpinner(Stage stage) {
-
+	public void showSpinner(NvConnectionListener.Stage stage) {
 		if (spinner == null) {
-			Container c = this.getContentPane();
-			JPanel panel = new JPanel();
-			panel.setBackground(Color.BLACK);
-			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
 			spinner = new JProgressBar();
 			spinner.setIndeterminate(true);
 			spinner.setMaximumSize(new Dimension(150, 30));
@@ -259,14 +250,11 @@ public class StreamFrame extends JFrame {
 			lblBox.add(spinnerLabel);
 			lblBox.add(Box.createHorizontalGlue());
 
-			panel.add(Box.createVerticalGlue());
-			panel.add(spinBox);
-			panel.add(Box.createVerticalStrut(10));
-			panel.add(lblBox);
-			panel.add(Box.createVerticalGlue());
-
-			c.setLayout(new BorderLayout());
-			c.add(panel, "Center");
+			renderingSurface.add(Box.createVerticalGlue());
+			renderingSurface.add(spinBox);
+			renderingSurface.add(Box.createVerticalStrut(10));
+			renderingSurface.add(lblBox);
+			renderingSurface.add(Box.createVerticalGlue());
 		}
 		spinnerLabel.setText("Starting " + stage.getName() + "...");
 	}
@@ -277,7 +265,6 @@ public class StreamFrame extends JFrame {
 	 */
 	private WindowListener createWindowListener() {
 		return new WindowAdapter() {
-			@Override
 			public void windowClosing(WindowEvent e) {
 				close();
 			}
@@ -288,8 +275,8 @@ public class StreamFrame extends JFrame {
 	 * Hides the spinner and the label
 	 */
 	public void hideSpinner() {
-		spinner.setVisible(false);
-		spinnerLabel.setVisible(false);
+		renderingSurface.removeAll();
+		renderingSurface.requestFocus();
 	}
 
 	/**

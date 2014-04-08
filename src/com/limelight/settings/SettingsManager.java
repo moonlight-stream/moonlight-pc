@@ -1,16 +1,10 @@
 package com.limelight.settings;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.limelight.LimeLog;
+
+import java.io.*;
 
 /**
  * Manages the settings files
@@ -129,7 +123,8 @@ public class SettingsManager {
 	 * @param settings the settings to be written out
 	 */
 	public static <T extends Serializable> void writeSettings(File file, T settings) {
-		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+		Gson gson = new GsonBuilder()
+			.setPrettyPrinting().enableComplexMapKeySerialization().create();
 		FileWriter writer = null;
 
 		try {

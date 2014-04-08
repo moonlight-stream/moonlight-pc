@@ -1,9 +1,9 @@
 package com.limelight.binding.video.debug;
 
-import java.awt.Color;
-
 import com.limelight.binding.video.SwingCpuDecoderRenderer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
+
+import java.awt.*;
 
 /**
  * Author: spartango
@@ -61,6 +61,7 @@ public class DebugCpuDecoderRenderer extends SwingCpuDecoderRenderer {
                              + " / "
                              + targetFps
                              + " fps";
+//        System.out.println(overlayInfo);
         graphics.drawString(overlayInfo, 20, 40);
     }
 }

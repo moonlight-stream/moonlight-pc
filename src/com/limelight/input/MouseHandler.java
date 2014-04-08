@@ -96,6 +96,9 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e event containing the mouse button that was pressed
 	 */
 	public void mousePressed(MouseEvent e) {
+		if (e.isConsumed()) return;
+		e.consume();
+		
 		if (captureMouse) {
 			byte mouseButton = 0x0;
 
@@ -114,7 +117,18 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 			if (mouseButton > 0) {
 				conn.sendMouseButtonDown(mouseButton);
 			}
+			
+			// super jank to get cursor to not appear in OSX FSEM.
+			if (System.getProperty("os.name", "").contains("Mac OS X")) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						parent.showCursor();
+						parent.hideCursor();
+					}
+				});
+			}
 		}
+		
 	}
 
 	/**
@@ -123,6 +137,8 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e event containing the mouse button that was released
 	 */
 	public void mouseReleased(MouseEvent e) {
+		if (e.isConsumed()) return;
+		
 		if (captureMouse) {
 			byte mouseButton = 0x0;
 
@@ -142,6 +158,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 				conn.sendMouseButtonUp(mouseButton);
 			}
 		}
+		e.consume();
 	}
 
 	/**
@@ -163,6 +180,8 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 	 * @param e the mouse move event containing the new location of the mouse
 	 */
 	public void mouseMoved(MouseEvent e) {
+		if (e.isConsumed()) return;
+		
 		if (captureMouse) {
 			Point mouse = e.getLocationOnScreen();
 			int x = (int)mouse.getX();
@@ -173,6 +192,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 			
 			checkBoundaries(e);
 		}
+		e.consume();
 	}
 
 	/*

@@ -1,9 +1,9 @@
 package com.limelight.settings;
 
+import com.limelight.LimeLog;
+
 import java.io.File;
 import java.io.Serializable;
-
-import com.limelight.LimeLog;
 
 /**
  * Manages user preferences
@@ -11,7 +11,7 @@ import com.limelight.LimeLog;
  */
 public abstract class PreferencesManager {
 	private static Preferences cachedPreferences = null;
-	
+
 	/**
 	 * Writes the specified preferences to the preferences file and updates the cached preferences.
 	 * @param prefs the preferences to be written out
@@ -19,11 +19,11 @@ public abstract class PreferencesManager {
 	public static void writePreferences(Preferences prefs) {
 		LimeLog.info("Writing Preferences");
 		File prefFile = SettingsManager.getInstance().getSettingsFile();
-		
+
 		SettingsManager.writeSettings(prefFile, prefs);
 		cachedPreferences = prefs;
 	}
-	
+
 	/**
 	 * Checks if the preferences file exists
 	 * @return true if preferences exist
@@ -32,7 +32,7 @@ public abstract class PreferencesManager {
 		File prefFile = SettingsManager.getInstance().getSettingsFile();
 		return SettingsManager.readSettings(prefFile, Preferences.class) != null;
 	}
-	
+
 	/**
 	 * Reads the user preferences from the preferences file and caches them
 	 * @return the user preferences
@@ -51,7 +51,7 @@ public abstract class PreferencesManager {
 		}
 		return cachedPreferences;
 	}
-	
+
 	/**
 	 * Represents a user's preferences
 	 * @author Diego Waxemberg
@@ -62,17 +62,17 @@ public abstract class PreferencesManager {
 		/**
 		 * The possible resolutions for the stream
 		 */
-		public enum Resolution { RES_720_30("1280x720 (30Hz)"), RES_720_60("1280x720 (60Hz)"), 
+		public enum Resolution { RES_720_30("1280x720 (30Hz)"), RES_720_60("1280x720 (60Hz)"),
 			RES_1080_30("1920x1080 (30Hz)"), RES_1080_60("1920x1080 (60Hz)");
 			public String name;
-			
+
 			/*
 			 * Creates a new resolution with the specified name
 			 */
 			private Resolution(String name) {
 				this.name = name;
 			}
-			
+
 			/**
 			 * Gets the specified name for this resolution
 			 * @return the specified name of this resolution
@@ -82,19 +82,23 @@ public abstract class PreferencesManager {
 				return name;
 			}
 		};
-		
+
 		private Resolution res;
 		private boolean fullscreen;
 		private String host;
 		private boolean useOpenGlRenderer;
-		
+
 		/**
-		 * constructs default preferences: 720p 60Hz fullscreen
+		 * constructs default preferences: 720p 60Hz
+		 * full-screen will be default for Windows (where it always runs properly)
+		 * windowed will be default for other platforms
 		 */
 		public Preferences() {
-			this(Resolution.RES_720_60, true, false);
+			this(Resolution.RES_720_60,
+                 System.getProperty("os.name", "").contains("Windows"),
+                 !System.getProperty("os.name", "").contains("Windows"));
 		}
-		
+
 		/**
 		 * Constructs a preference with the specified values
 		 * @param res the <code>Resolution</code> to use
@@ -107,7 +111,7 @@ public abstract class PreferencesManager {
 			this.useOpenGlRenderer = useOpenGlRenderer;
 			this.host = "GeForce PC host";
 		}
-		
+
 		/**
 		 * The saved host in this preference
 		 * @return the last used host
@@ -115,7 +119,7 @@ public abstract class PreferencesManager {
 		public String getHost() {
 			return host;
 		}
-		
+
 		/**
 		 * Sets the host for this preference
 		 * @param host the host to save
@@ -123,7 +127,7 @@ public abstract class PreferencesManager {
 		public void setHost(String host) {
 			this.host = host;
 		}
-		
+
 		/**
 		 * Gets the resolution in this preference
 		 * @return the stored resolution
@@ -131,7 +135,7 @@ public abstract class PreferencesManager {
 		public Resolution getResolution() {
 			return res;
 		}
-		
+
 		/**
 		 * Gets whether to use fullscreen
 		 * @return the stored fullscreen mode
@@ -139,7 +143,7 @@ public abstract class PreferencesManager {
 		public boolean getFullscreen() {
 			return fullscreen;
 		}
-		
+
 		/**
 		 * Gets whether to use the OpenGL renderer
 		 * @return the stored fullscreen mode
@@ -147,7 +151,7 @@ public abstract class PreferencesManager {
 		public boolean getUseOpenGlRenderer() {
 			return useOpenGlRenderer;
 		}
-		
+
 		/**
 		 * Sets the resolution in this preference
 		 * @param res the resolution to save
@@ -155,7 +159,7 @@ public abstract class PreferencesManager {
 		public void setResolution(Resolution res) {
 			this.res = res;
 		}
-		
+
 		/**
 		 * Sets the fullscreen mode of this preference
 		 * @param fullscreen whether to use fullscreen
@@ -163,7 +167,7 @@ public abstract class PreferencesManager {
 		public void setFullscreen(boolean fullscreen) {
 			this.fullscreen = fullscreen;
 		}
-		
+
 		/**
 		 * Sets the OpenGL renderer use of this preference
 		 * @param useOpenGlRenderer whether to use OpenGL rendering

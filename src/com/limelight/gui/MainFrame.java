@@ -1,11 +1,11 @@
 package com.limelight.gui;
 
+import com.limelight.Limelight;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.http.NvHTTP;
 import com.limelight.settings.PreferencesManager;
 import com.limelight.settings.PreferencesManager.Preferences;
-import org.xmlpull.v1.XmlPullParserException;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -30,6 +30,7 @@ import java.util.Set;
  *         <br>Cameron Gutman
  */
 public class MainFrame {
+    // <<<<<<<HEAD
     public static       String MDNS_QUERY           = "_nvstream._tcp.local.";
     public static       String MDNS_MULTICAST_GROUP = "224.0.0.251";
     public static final short  MDNS_PORT            = 5353;
@@ -121,7 +122,7 @@ public class MainFrame {
 
         // Propagate selections from mDNS to the hosts field
         mdnsHostList.addItemListener(new ItemListener() {
-            @Override public void itemStateChanged(ItemEvent e) {
+            public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED && mdnsHostList.getSelectedIndex() != 0) {
                     hostField.setText((String) mdnsHostList.getSelectedItem());
                 }
@@ -236,45 +237,8 @@ public class MainFrame {
     }
 
     private void pair() {
-        String macAddress;
-        try {
-            macAddress = NvConnection.getMacAddressString();
-        } catch (SocketException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        if (macAddress == null) {
-            System.out.println("Couldn't find a MAC address");
-            return;
-        }
-
-        NvHTTP httpConn;
-        String message;
-        try {
-            httpConn = new NvHTTP(InetAddress.getByName(hostField.getText()),
-                                  macAddress, PlatformBinding.getDeviceName());
-            try {
-                if (httpConn.getPairState()) {
-                    message = "Already paired";
-                } else {
-                    int session = httpConn.getSessionId();
-                    if (session == 0) {
-                        message = "Pairing was declined by the target";
-                    } else {
-                        message = "Pairing was successful";
-                    }
-                }
-            } catch (IOException e) {
-                message = e.getMessage();
-            } catch (XmlPullParserException e) {
-                message = e.getMessage();
-            }
-        } catch (UnknownHostException e1) {
-            message = "Failed to resolve host";
-        }
-
-        JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+        String msg = Limelight.pair(hostField.getText());
+        JOptionPane.showMessageDialog(limeFrame, msg, "Limelight", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void showApps() {
@@ -302,4 +266,5 @@ public class MainFrame {
             e1.printStackTrace();
         }
     }
+
 }

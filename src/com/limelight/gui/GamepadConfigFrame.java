@@ -283,6 +283,7 @@ public class GamepadConfigFrame extends JFrame {
 				} catch (InterruptedException e) {
 					setButtonText(buttonPressed, config.getMapping(mappingToMap.padComp));
 					GamepadListener.getInstance().removeListener(this);
+					buttonPressed.setSelected(false);
 					return;
 				}
 			}
@@ -292,9 +293,15 @@ public class GamepadConfigFrame extends JFrame {
 				getButton(getBox(oldConfig)).setText("");
 			}
 
+			SourceComponent oldSource = config.getMapping(mappingToMap.padComp);
+			if (oldSource != null) {
+				config.remove(oldSource);
+			}
+
 			config.insertMapping(mappingToMap, newMapping);
 
 			setButtonText(buttonPressed, newMapping);
+			buttonPressed.setSelected(false);
 			configChanged = true;
 
 			GamepadListener.getInstance().removeListener(this);
