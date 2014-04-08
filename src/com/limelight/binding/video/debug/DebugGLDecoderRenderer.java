@@ -20,13 +20,11 @@ import java.awt.*;
 public class DebugGLDecoderRenderer extends GLDecoderRenderer {
     private TextRenderer renderer;
 
-    @Override
     public void init(GLAutoDrawable glautodrawable) {
         Font font = new Font("Monospaced", Font.BOLD, 12);
         renderer = new TextRenderer(font, true, false);
     }
 
-    @Override
     public void display(GLAutoDrawable glautodrawable) {
         long decodeStart = System.currentTimeMillis();
 

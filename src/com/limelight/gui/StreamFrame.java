@@ -289,4 +289,16 @@ public class StreamFrame extends JFrame {
             System.exit(0);
         }
     }
+
+    public KeyboardHandler getKeyboard() {
+        return keyboard;
+    }
+
+    public MouseHandler getMouse() {
+        return mouse;
+    }
+
+    public JPanel getRenderingSurface() {
+        return renderingSurface;
+    }
 }

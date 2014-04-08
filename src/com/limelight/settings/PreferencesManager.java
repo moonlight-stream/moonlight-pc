@@ -45,7 +45,7 @@ public abstract class PreferencesManager {
 			cachedPreferences = savedPref;
 		}
 		if (cachedPreferences == null) {
-			LimeLog.warning("Unabled to get preferences, using default");
+			LimeLog.warning("Unable to get preferences, using default");
 			cachedPreferences = new Preferences();
 			writePreferences(cachedPreferences);
 		}

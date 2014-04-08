@@ -4,6 +4,7 @@ package com.limelight.binding.video;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
+import com.limelight.gui.StreamFrame;
 import com.limelight.nvstream.av.ByteBufferDescriptor;
 import com.limelight.nvstream.av.DecodeUnit;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
@@ -12,7 +13,6 @@ import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -31,8 +31,6 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     protected int targetFps;
     protected int width, height;
 
-    protected Graphics      graphics;
-    protected JFrame        frame;
     protected BufferedImage image;
     protected int[]         imageBuffer;
 
@@ -55,17 +53,17 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         glcanvas = new GLCanvas(glcapabilities);
     }
 
-    @Override public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
+    public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
         this.targetFps = redrawRate;
         this.width = width;
         this.height = height;
 
-		// We only use one thread because each additional thread adds a frame of latency
-		int avcFlags = AvcDecoder.BILINEAR_FILTERING | AvcDecoder.LOW_LATENCY_DECODE;
-		int threadCount = 1;
+        // We only use one thread because each additional thread adds a frame of latency
+        int avcFlags = AvcDecoder.BILINEAR_FILTERING | AvcDecoder.LOW_LATENCY_DECODE;
+        int threadCount = 1;
 
-        frame = (JFrame) renderTarget;
-        graphics = frame.getGraphics();
+        final StreamFrame frame = (StreamFrame) renderTarget;
+        final JPanel renderingSurface = frame.getRenderingSurface();
 
         // Force the renderer to use a buffered image that's friendly with OpenGL
         avcFlags |= AvcDecoder.NATIVE_COLOR_ARGB;
@@ -83,18 +81,18 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         System.out.println("Using OpenGL rendering");
 
         // Add canvas to the frame
-        glcanvas.setSize(frame.getWidth(), frame.getHeight());
+        glcanvas.setSize(renderingSurface.getWidth(), renderingSurface.getHeight());
         glcanvas.addGLEventListener(this);
-        
-        for (MouseListener m : frame.getMouseListeners()) {
+
+        for (MouseListener m : renderingSurface.getMouseListeners()) {
             glcanvas.addMouseListener(m);
         }
 
-        for (KeyListener k : frame.getKeyListeners()) {
+        for (KeyListener k : renderingSurface.getKeyListeners()) {
             glcanvas.addKeyListener(k);
         }
 
-        for (MouseMotionListener m : frame.getMouseMotionListeners()) {
+        for (MouseMotionListener m : renderingSurface.getMouseMotionListeners()) {
             glcanvas.addMouseMotionListener(m);
         }
 
@@ -104,29 +102,24 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         animator = new FPSAnimator(glcanvas, targetFps);
     }
 
-    @Override public void start() {
+    public void start() {
         animator.start();
     }
 
-
-    @Override
     public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
     }
 
-    @Override
     public void init(GLAutoDrawable glautodrawable) {
     }
 
-    @Override
     public void dispose(GLAutoDrawable glautodrawable) {
     }
 
-    @Override
     public void display(GLAutoDrawable glautodrawable) {
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         if (!decoded) {
-        	return;
+            return;
         }
 
         GL2 gl = glautodrawable.getGL().getGL2();
@@ -147,7 +140,8 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
                                                       false,
                                                       true,
                                                       bufferRGB,
-                                                      null));
+                                                      null)
+        );
         texture.enable(gl);
         texture.bind(gl);
 
@@ -175,10 +169,9 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     /**
      * Releases resources held by the decoder.
      */
-    @Override public void release() {
+    public void release() {
         AvcDecoder.destroy();
     }
-
 
     /**
      * Give a unit to be decoded to the decoder.
@@ -186,7 +179,7 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
      * @param decodeUnit the unit to be decoded
      * @return true if the unit was decoded successfully, false otherwise
      */
-    @Override public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
+    public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
         byte[] data;
 
         // Use the reserved decoder buffer if this decode unit will fit
@@ -214,14 +207,14 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     /**
      * Stops the decoding and rendering of the video stream.
      */
-    @Override public void stop() {
+    public void stop() {
         animator.stop();
     }
 
-	@Override
-	public int getCapabilities() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+
+    public int getCapabilities() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }
 

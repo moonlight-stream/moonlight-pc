@@ -52,7 +52,7 @@ public class DebugCpuDecoderRenderer extends SwingCpuDecoderRenderer {
     private void renderOverlay(long decodeTime, long renderTime) {
         long frameDelta = System.currentTimeMillis() - lastFrameTime;
         double frameRate = 1000.0 / frameDelta;
-        graphics.setColor(Color.white);
+        graphics.setColor(Color.green);
         String overlayInfo = decodeTime
                              + "ms + "
                              + renderTime

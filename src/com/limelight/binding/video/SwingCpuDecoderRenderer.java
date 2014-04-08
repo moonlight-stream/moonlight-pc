@@ -1,22 +1,18 @@
 package com.limelight.binding.video;
 
-import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Transparency;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBufferInt;
-import java.nio.ByteBuffer;
-
-import javax.swing.JFrame;
-
 import com.limelight.LimeLog;
 import com.limelight.nvstream.av.ByteBufferDescriptor;
 import com.limelight.nvstream.av.DecodeUnit;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBufferInt;
+import java.nio.ByteBuffer;
 
 /**
  * Implementation of a video decoder and renderer.
@@ -51,7 +47,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
      * @param renderTarget what to render the video onto
      * @param drFlags      flags for the decoder and renderer
      */
-    @Override public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
+    public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
         this.targetFps = redrawRate;
         this.width = width;
         this.height = height;

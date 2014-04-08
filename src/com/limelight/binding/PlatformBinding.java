@@ -1,7 +1,6 @@
 package com.limelight.binding;
 
 import com.limelight.binding.audio.JavaxAudioRenderer;
-import com.limelight.binding.video.GLDecoderRenderer;
 import com.limelight.binding.video.debug.DebugCpuDecoderRenderer;
 import com.limelight.binding.video.debug.DebugGLDecoderRenderer;
 import com.limelight.nvstream.av.audio.AudioRenderer;
