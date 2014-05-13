@@ -74,11 +74,11 @@ public class Limelight implements NvConnectionListener {
 	private static StreamConfiguration createConfiguration(Resolution res) {
 		switch(res) {
 		case RES_720_30:
-			return new StreamConfiguration(1280, 720, 30, 10000);
+			return new StreamConfiguration(1280, 720, 30, 5000);
 		case RES_720_60:
 			return new StreamConfiguration(1280, 720, 60, 10000);
 		case RES_1080_30:
-			return new StreamConfiguration(1920, 1080, 30, 15000);
+			return new StreamConfiguration(1920, 1080, 30, 10000);
 		case RES_1080_60:
 			return new StreamConfiguration(1920, 1080, 60, 25000);
 		default:
