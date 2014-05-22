@@ -71,7 +71,7 @@ public class Limelight implements NvConnectionListener {
 	 * Creates a StreamConfiguration given a Resolution.
 	 * Used to specify what kind of stream will be used.
 	 */
-	private static StreamConfiguration createConfiguration(Resolution res) {
+	public static StreamConfiguration createConfiguration(Resolution res) {
 		switch(res) {
 		case RES_720_30:
 			return new StreamConfiguration(1280, 720, 30, 5000);
