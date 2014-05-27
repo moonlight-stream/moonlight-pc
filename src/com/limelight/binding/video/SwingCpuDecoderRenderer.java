@@ -1,5 +1,6 @@
 package com.limelight.binding.video;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -172,6 +173,14 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 						do {
 							do {
 								Graphics g = strategy.getDrawGraphics();
+								// make any remaining space black
+								g.setColor(Color.BLACK);
+								g.fillRect(0, 0, dx1, frame.getHeight());
+								g.fillRect(0, 0, frame.getWidth(), dy1);
+								g.fillRect(0, dy1+newHeight, frame.getWidth(), frame.getHeight());
+								g.fillRect(dx1+newWidth, 0, frame.getWidth(), frame.getHeight());
+								
+								// draw the frame
 								g.drawImage(image, dx1, dy1, dx1+newWidth, dy1+newHeight, 0, 0, width, height, null);
 								g.dispose();
 							} while (strategy.contentsRestored());
