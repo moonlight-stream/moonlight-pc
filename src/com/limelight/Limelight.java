@@ -9,8 +9,6 @@ import java.net.UnknownHostException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.xmlpull.v1.XmlPullParserException;
-
 import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.gui.MainFrame;
@@ -23,6 +21,7 @@ import com.limelight.nvstream.NvConnectionListener;
 import com.limelight.nvstream.StreamConfiguration;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.nvstream.http.NvHTTP;
+import com.limelight.nvstream.http.PairingManager;
 import com.limelight.settings.PreferencesManager;
 import com.limelight.settings.SettingsManager;
 import com.limelight.settings.PreferencesManager.Preferences;
@@ -59,7 +58,7 @@ public class Limelight implements NvConnectionListener {
 	private void startUp(StreamConfiguration streamConfig, boolean fullscreen) {
 		streamFrame = new StreamFrame();
 
-		conn = new NvConnection(host, this, streamConfig);
+		conn = new NvConnection(host, this, streamConfig, PlatformBinding.getCryptoProvider());
 		streamFrame.build(this, conn, streamConfig, fullscreen);
 		conn.start(PlatformBinding.getDeviceName(), streamFrame,
 				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
@@ -348,28 +347,43 @@ public class Limelight implements NvConnectionListener {
 		NvHTTP httpConn;
 		try {
 			httpConn = new NvHTTP(InetAddress.getByName(host),
-					macAddress, PlatformBinding.getDeviceName());
+					macAddress, PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
 			try {
-				if (httpConn.getPairState()) {
+				if (httpConn.getPairState() == PairingManager.PairState.PAIRED) {
 					message = "Already paired";
 				}
 				else {
-					int session = httpConn.getSessionId();
-					if (session == 0) {
-						message = "Pairing was declined by the target";
+					final String pinStr = PairingManager.generatePinString();
+					
+					// Spin the dialog off in a thread because it blocks
+					new Thread(new Runnable() {
+						public void run() {
+							JOptionPane.showMessageDialog(null, "Please enter the following PIN on the target PC: "+pinStr,
+									"Limelight", JOptionPane.INFORMATION_MESSAGE);
+						}
+					}).start();
+					
+					PairingManager.PairState pairState = httpConn.pair(pinStr);
+					if (pairState == PairingManager.PairState.PIN_WRONG) {
+						message = "Incorrect PIN";
 					}
-					else {
-						message = "Pairing was successful";
+					else if (pairState == PairingManager.PairState.FAILED) {
+						message = "Pairing failed";
+					}
+					else if (pairState == PairingManager.PairState.PAIRED) {
+						message = "Paired successfully";
 					}
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				message = e.getMessage();
-			} catch (XmlPullParserException e) {
-				message = e.getMessage();
+				e.printStackTrace();
 			}
 		} catch (UnknownHostException e1) {
 			message = "Failed to resolve host";
 		}
+		
+		// Dismiss the pairing dialog before showing the final status dialog
+		JOptionPane.getRootFrame().dispose();
 
 		return message;
 
