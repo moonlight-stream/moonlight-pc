@@ -1,11 +1,11 @@
 package com.limelight.binding;
 
 import com.limelight.binding.audio.JavaxAudioRenderer;
-import com.limelight.binding.video.debug.DebugCpuDecoderRenderer;
-import com.limelight.binding.video.debug.DebugGLDecoderRenderer;
+import com.limelight.binding.crypto.PcCryptoProvider;
+import com.limelight.binding.video.SwingCpuDecoderRenderer;
 import com.limelight.nvstream.av.audio.AudioRenderer;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
-import com.limelight.settings.PreferencesManager;
+import com.limelight.nvstream.http.LimelightCryptoProvider;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -16,19 +16,13 @@ import java.net.UnknownHostException;
  * @author Cameron Gutman
  */
 public class PlatformBinding {
-
     /**
      * Gets an instance of a video decoder/renderer.
      *
      * @return a video decoder and renderer
      */
     public static VideoDecoderRenderer getVideoDecoderRenderer() {
-    	if (PreferencesManager.getPreferences().getUseOpenGlRenderer()) {
-            return new DebugGLDecoderRenderer();
-    	}
-    	else {
-    		return new DebugCpuDecoderRenderer();
-    	}
+        return new SwingCpuDecoderRenderer();
     }
 
     /**
@@ -52,5 +46,14 @@ public class PlatformBinding {
      */
     public static AudioRenderer getAudioRenderer() {
         return new JavaxAudioRenderer();
+    }
+
+    /**
+     * Gets an instance of a crypto provider
+     *
+     * @return a PcCryptoProvider object
+     */
+    public static LimelightCryptoProvider getCryptoProvider() {
+        return new PcCryptoProvider();
     }
 }

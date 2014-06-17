@@ -21,21 +21,19 @@ import java.nio.ByteBuffer;
  */
 public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 
-    private   Thread rendererThread;
-    protected int    targetFps;
-    protected int    width, height;
+    private Thread rendererThread;
+    private int    targetFps;
+    private int    width, height;
 
-    protected Graphics      graphics;
-    protected JFrame        frame;
-    protected BufferedImage image;
+    private JFrame        frame;
+    private BufferedImage image;
+    private boolean       dying;
 
-    protected boolean dying = false;
-
-    protected static final int DECODER_BUFFER_SIZE = 92 * 1024;
-    protected ByteBuffer decoderBuffer;
+    private static final int DECODER_BUFFER_SIZE = 92 * 1024;
+    private ByteBuffer decoderBuffer;
 
     // Only sleep if the difference is above this value
-    public static final int WAIT_CEILING_MS = 8;
+    private static final int WAIT_CEILING_MS = 8;
 
     private static final int REFERENCE_PIXEL = 0x01020304;
 
@@ -56,7 +54,8 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
         int avcFlags = AvcDecoder.BILINEAR_FILTERING | AvcDecoder.LOW_LATENCY_DECODE;
         int threadCount = 1;
 
-        GraphicsConfiguration graphicsConfiguration = GraphicsEnvironment.getLocalGraphicsEnvironment()
+        GraphicsConfiguration graphicsConfiguration = GraphicsEnvironment.
+                                                                                 getLocalGraphicsEnvironment()
                                                                          .getDefaultScreenDevice()
                                                                          .getDefaultConfiguration();
 
@@ -104,13 +103,14 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
         }
 
         decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
+
         LimeLog.info("Using software decoding");
     }
 
     /**
      * Starts the decoding and rendering of the video stream on a new thread
      */
-    @Override public void start() {
+    public void start() {
         rendererThread = new Thread() {
             @Override
             public void run() {
@@ -134,9 +134,15 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
                                                                    .isAccelerated());
 
                 while (!isInterrupted() && !dying) {
+                    long diff = nextFrameTime - System.currentTimeMillis();
+
+                    if (diff < WAIT_CEILING_MS) {
+                        // We must call Thread.sleep in order to be interruptable
+                        diff = 0;
+                    }
+
                     try {
-                        delayFrame(nextFrameTime);
-                        nextFrameTime = computePresentationTimeMs(targetFps);
+                        Thread.sleep(diff);
                     } catch (InterruptedException e) {
                         return;
                     }
@@ -165,6 +171,14 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
                         do {
                             do {
                                 Graphics g = strategy.getDrawGraphics();
+                                // make any remaining space black
+                                g.setColor(Color.BLACK);
+                                g.fillRect(0, 0, dx1, frame.getHeight());
+                                g.fillRect(0, 0, frame.getWidth(), dy1);
+                                g.fillRect(0, dy1 + newHeight, frame.getWidth(), frame.getHeight());
+                                g.fillRect(dx1 + newWidth, 0, frame.getWidth(), frame.getHeight());
+
+                                // draw the frame
                                 g.drawImage(image,
                                             dx1,
                                             dy1,
@@ -187,39 +201,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
         rendererThread.start();
     }
 
-    protected void delayFrame(final long nextFrameTime) throws InterruptedException {
-        // Time the frame to match framerate
-        long diff = nextFrameTime - System.currentTimeMillis();
-        if (diff < WAIT_CEILING_MS) {
-            // We must call Thread.sleep in order to be interruptible
-            diff = 0;
-        }
-
-        Thread.sleep(diff);
-    }
-
-    protected void renderFrame(final int[] imageBuffer) {
-        // Scaling for the window
-        double widthScale = (double) frame.getWidth() / width;
-        double heightScale = (double) frame.getHeight() / height;
-        double lowerScale = Math.min(widthScale, heightScale);
-        int newWidth = (int) (width * lowerScale);
-        int newHeight = (int) (height * lowerScale);
-
-        int dx1 = 0;
-        int dy1 = 0;
-        if (frame.getWidth() > newWidth) {
-            dx1 = (frame.getWidth() - newWidth) / 2;
-        }
-        if (frame.getHeight() > newHeight) {
-            dy1 = (frame.getHeight() - newHeight) / 2;
-        }
-
-        if (AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length)) {
-            graphics.drawImage(image, dx1, dy1, dx1 + newWidth, dy1 + newHeight, 0, 0, width, height, null);
-        }
-    }
-
     /*
      * Computes the amount of time to display a certain frame
      */
@@ -230,7 +211,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
     /**
      * Stops the decoding and rendering of the video stream.
      */
-
     public void stop() {
         dying = true;
         rendererThread.interrupt();
@@ -244,7 +224,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
     /**
      * Releases resources held by the decoder.
      */
-    @Override public void release() {
+    public void release() {
         AvcDecoder.destroy();
     }
 
@@ -254,7 +234,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
      * @param decodeUnit the unit to be decoded
      * @return true if the unit was decoded successfully, false otherwise
      */
-    @Override public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
+    public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
         byte[] data;
 
         // Use the reserved decoder buffer if this decode unit will fit
@@ -282,4 +262,5 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
     public int getCapabilities() {
         return 0;
     }
+
 }
