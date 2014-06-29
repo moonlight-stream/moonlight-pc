@@ -17,6 +17,7 @@ import com.limelight.LimeLog;
 import com.limelight.nvstream.av.ByteBufferDescriptor;
 import com.limelight.nvstream.av.DecodeUnit;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
+import com.limelight.nvstream.av.video.VideoDepacketizer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 /**
@@ -114,7 +115,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	/**
 	 * Starts the decoding and rendering of the video stream on a new thread
 	 */
-	public void start() {
+	public void start(final VideoDepacketizer depacketizer) {
 		rendererThread = new Thread() {
 			@Override
 			public void run() {
@@ -134,19 +135,18 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 				LimeLog.info("Front buffer accelerated? "+strategy.getCapabilities().getFrontBufferCapabilities().isAccelerated());
 				LimeLog.info("Back buffer accelerated? "+strategy.getCapabilities().getBackBufferCapabilities().isAccelerated());
 				
+				DecodeUnit du;
 				while (!isInterrupted() && !dying)
 				{
-					long diff = nextFrameTime - System.currentTimeMillis();
-
-					if (diff < WAIT_CEILING_MS) {
-						// We must call Thread.sleep in order to be interruptable
-						diff = 0;
+					du = depacketizer.pollNextDecodeUnit();
+					if (du != null) {
+						submitDecodeUnit(du);
 					}
 					
-					try {
-						Thread.sleep(diff);
-					} catch (InterruptedException e) {
-						return;
+					long diff = nextFrameTime - System.currentTimeMillis();
+
+					if (diff > WAIT_CEILING_MS) {
+						continue;
 					}
 					
 					nextFrameTime = computePresentationTimeMs(targetFps);
@@ -190,6 +190,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 				}
 			}
 		};
+		rendererThread.setPriority(Thread.MAX_PRIORITY);
 		rendererThread.setName("Video - Renderer (CPU)");
 		rendererThread.start();
 	}
