@@ -80,7 +80,7 @@ public class JavaxAudioRenderer implements AudioRenderer {
 		}
 	}
 
-	private void createSoundLine(int bufferSize) {
+	private boolean createSoundLine(int bufferSize) {
 		AudioFormat audioFormat = new AudioFormat(sampleRate, 16, channelCount, true, ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
 		
 		DataLine.Info info;
@@ -106,8 +106,10 @@ public class JavaxAudioRenderer implements AudioRenderer {
 			lineBuffer = new byte[soundLine.getBufferSize()];
 			soundBuffer = new SoundBuffer(STAGING_BUFFERS);
 		} catch (LineUnavailableException e) {
-			soundLine = null;
+			return false;
 		}
+		
+		return true;
 	}
 
 	/**
@@ -115,19 +117,25 @@ public class JavaxAudioRenderer implements AudioRenderer {
 	 * @param channelCount the number of channels in the audio
 	 * @param sampleRate the sample rate for the audio.
 	 */
-	public void streamInitialized(int channelCount, int sampleRate) {
+	public boolean streamInitialized(int channelCount, int sampleRate) {
 		this.channelCount = channelCount;
 		this.sampleRate = sampleRate;
 		
 		// Workaround OS X's bad Java mixer
 		if (System.getProperty("os.name").contains("Mac OS X")) {
-			createSoundLine(STARING_BUFFER_SIZE);
+			if (!createSoundLine(STARING_BUFFER_SIZE)) {
+				return false;
+			}
 			reallocateLines = true;
 		}
 		else {
-			createSoundLine(DEFAULT_BUFFER_SIZE);
+			if (!createSoundLine(DEFAULT_BUFFER_SIZE)) {
+				return false;
+			}
 			reallocateLines = false;
 		}
+		
+		return true;
 	}
 
 	public int getCapabilities() {

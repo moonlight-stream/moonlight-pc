@@ -49,7 +49,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	 * @param renderTarget what to render the video onto
 	 * @param drFlags flags for the decoder and renderer
 	 */
-	public void setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
+	public boolean setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
 		this.targetFps = redrawRate;
 		this.width = width;
 		this.height = height;
@@ -96,7 +96,8 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 
 		int err = AvcDecoder.init(width, height, avcFlags, threadCount);
 		if (err != 0) {
-			throw new IllegalStateException("AVC decoder initialization failure: "+err);
+			LimeLog.severe("AVC decoder initialization failure: "+err);
+			return false;
 		}
 		
 		frame = (JFrame)renderTarget;
@@ -110,12 +111,14 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
 		
 		LimeLog.info("Using software decoding");
+		
+		return true;
 	}
 
 	/**
 	 * Starts the decoding and rendering of the video stream on a new thread
 	 */
-	public void start(final VideoDepacketizer depacketizer) {
+	public boolean start(final VideoDepacketizer depacketizer) {
 		rendererThread = new Thread() {
 			@Override
 			public void run() {
@@ -193,6 +196,7 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		rendererThread.setPriority(Thread.MAX_PRIORITY);
 		rendererThread.setName("Video - Renderer (CPU)");
 		rendererThread.start();
+		return true;
 	}
 	
 	/*
