@@ -36,7 +36,7 @@ int nv_opus_get_channel_count(void) {
 	return 2;
 }
 
-// This number assumes 2 channels with 16-bit samples at 48 KHz with 2.5 ms frames
+// This number assumes 16-bit samples at 48 KHz with 2.5 ms frames
 int nv_opus_get_max_out_shorts(void) {
 	return 240*nv_opus_get_channel_count();
 }
