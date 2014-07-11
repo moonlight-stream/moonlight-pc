@@ -42,6 +42,7 @@ public class Limelight implements NvConnectionListener {
 	private boolean connectionTerminating;
 	private static JFrame limeFrame;
 	private Gamepad gamepad;
+	private VideoDecoderRenderer decoderRenderer;
 
 	/**
 	 * Constructs a new instance based on the given host
@@ -57,12 +58,14 @@ public class Limelight implements NvConnectionListener {
 	private void startUp(StreamConfiguration streamConfig, Preferences prefs) {
 		streamFrame = new StreamFrame();
 
+		decoderRenderer = PlatformBinding.getVideoDecoderRenderer();
+		
 		conn = new NvConnection(host, prefs.getUniqueId(), this, streamConfig, PlatformBinding.getCryptoProvider());
 		streamFrame.build(this, conn, streamConfig, prefs.getFullscreen());
 		conn.start(PlatformBinding.getDeviceName(), streamFrame,
 				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
 				PlatformBinding.getAudioRenderer(),
-				PlatformBinding.getVideoDecoderRenderer());
+				decoderRenderer);
 	}
 
 	/*
@@ -270,6 +273,9 @@ public class Limelight implements NvConnectionListener {
 		if (gamepad != null) {
 			GamepadListener.getInstance().removeListener(gamepad);
 		}
+		
+		displayMessage(String.format("Total latency: %d ms (decoder latency: %d ms)",
+				decoderRenderer.getAverageEndToEndLatency(), decoderRenderer.getAverageDecoderLatency()));
 
 		// Close the stream frame
 		streamFrame.dispose();
