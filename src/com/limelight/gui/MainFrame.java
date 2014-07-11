@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -162,7 +163,12 @@ public class MainFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				new Thread(new Runnable() {
 					public void run() {
-						String msg = Limelight.pair(hostField.getText());
+						Preferences prefs = PreferencesManager.getPreferences();
+						
+						// Save preferences to preserve possibly new unique ID
+						PreferencesManager.writePreferences(prefs);
+						
+						String msg = Limelight.pair(prefs.getUniqueId(), hostField.getText());
 						JOptionPane.showMessageDialog(limeFrame, msg, "Limelight", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}).start();

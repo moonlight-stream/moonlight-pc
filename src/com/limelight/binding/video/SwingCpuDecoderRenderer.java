@@ -42,6 +42,10 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	
 	private static final int REFERENCE_PIXEL = 0x01020304;
 	
+	private int totalFrames;
+	private long decoderTimeMs;
+	private long totalTimeMs;
+	
 	/**
 	 * Sets up the decoder and renderer to render video at the specified dimensions
 	 * @param width the width of the video to render
@@ -233,6 +237,8 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
 		byte[] data;
 		
+		long timeBeforeDecode = System.currentTimeMillis();
+		
 		// Use the reserved decoder buffer if this decode unit will fit
 		if (decodeUnit.getDataLength() <= DECODER_BUFFER_SIZE) {
 			decoderBuffer.clear();
@@ -253,10 +259,36 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 			}
 		}
 		
-		return (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
-	}
+		boolean success = (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
+		if (success) {
+			long timeAfterDecode = System.currentTimeMillis();
+			
+		    // Add delta time to the totals (excluding probable outliers)
+		    long delta = timeAfterDecode - decodeUnit.getReceiveTimestamp();
+			if (delta >= 0 && delta < 300) {
+		    	decoderTimeMs += timeAfterDecode-timeBeforeDecode;
+			    totalTimeMs += delta;
+			    totalFrames++;
+			}
+		}
+		
+		return success;	}
 
 	public int getCapabilities() {
 		return 0;
+	}
+
+	public int getAverageDecoderLatency() {
+		if (totalFrames == 0) {
+			return 0;
+		}
+		return (int)(decoderTimeMs / totalFrames);
+	}
+
+	public int getAverageEndToEndLatency() {
+		if (totalFrames == 0) {
+			return 0;
+		}
+		return (int)(totalTimeMs / totalFrames);
 	}
 }

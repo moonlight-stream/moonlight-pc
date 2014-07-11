@@ -2,6 +2,7 @@ package com.limelight.settings;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Random;
 
 import com.limelight.LimeLog;
 
@@ -86,6 +87,7 @@ public abstract class PreferencesManager {
 		private Resolution res;
 		private boolean fullscreen;
 		private String host;
+		private String uniqueId;
 		
 		/**
 		 * constructs default preferences: 720p 60Hz
@@ -101,10 +103,11 @@ public abstract class PreferencesManager {
 		 * @param res the <code>Resolution</code> to use
 		 * @param fullscreen whether to start the stream in fullscreen
 		 */
-		public Preferences(Resolution res, boolean fullscreen) {
+		private Preferences(Resolution res, boolean fullscreen) {
 			this.res = res;
 			this.fullscreen = fullscreen;
 			this.host = "GeForce PC host";
+			this.uniqueId = String.format("%016x", new Random().nextLong());
 		}
 		
 		/**
@@ -153,6 +156,14 @@ public abstract class PreferencesManager {
 		 */
 		public void setFullscreen(boolean fullscreen) {
 			this.fullscreen = fullscreen;
+		}
+		
+		/**
+		 * Gets the unique ID
+		 * @return uniqueId the unique ID
+		 */
+		public String getUniqueId() {
+			return uniqueId;
 		}
 	}
 }

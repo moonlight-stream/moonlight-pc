@@ -3,7 +3,6 @@ package com.limelight;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
@@ -55,11 +54,11 @@ public class Limelight implements NvConnectionListener {
 	/*
 	 * Creates a connection to the host and starts up the stream.
 	 */
-	private void startUp(StreamConfiguration streamConfig, boolean fullscreen) {
+	private void startUp(StreamConfiguration streamConfig, Preferences prefs) {
 		streamFrame = new StreamFrame();
 
-		conn = new NvConnection(host, this, streamConfig, PlatformBinding.getCryptoProvider());
-		streamFrame.build(this, conn, streamConfig, fullscreen);
+		conn = new NvConnection(host, prefs.getUniqueId(), this, streamConfig, PlatformBinding.getCryptoProvider());
+		streamFrame.build(this, conn, streamConfig, prefs.getFullscreen());
 		conn.start(PlatformBinding.getDeviceName(), streamFrame,
 				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
 				PlatformBinding.getAudioRenderer(),
@@ -141,7 +140,7 @@ public class Limelight implements NvConnectionListener {
 		Preferences prefs = PreferencesManager.getPreferences();
 		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution());
 
-		limelight.startUp(streamConfig, prefs.getFullscreen());
+		limelight.startUp(streamConfig, prefs);
 	}
 
 	/**
@@ -192,13 +191,18 @@ public class Limelight implements NvConnectionListener {
 		boolean fullscreen = false;
 		int resolution = 720;
 		int refresh = 60;
+		
+		Preferences prefs = PreferencesManager.getPreferences();
+		
+		// Save preferences to preserve possibly new unique ID
+		PreferencesManager.writePreferences(prefs);
 
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-pair")) {
 				if (i + 1 < args.length){
 					host = args[i+1];
 					System.out.println("Trying to pair to: " + host);
-					String msg = pair(host);
+					String msg = pair(prefs.getUniqueId(), host);
 					System.out.println("Pairing: " + msg);
 					System.exit(0);
 				} else {
@@ -246,9 +250,12 @@ public class Limelight implements NvConnectionListener {
 		}
 
 		StreamConfiguration streamConfig = createConfiguration(streamRes);
-
+		
+		prefs.setResolution(streamRes);
+		prefs.setFullscreen(fullscreen);
+		
 		Limelight limelight = new Limelight(host);
-		limelight.startUp(streamConfig, fullscreen);
+		limelight.startUp(streamConfig, prefs);
 		COMMAND_LINE_LAUNCH = true;
 	}
 
@@ -327,27 +334,13 @@ public class Limelight implements NvConnectionListener {
 		}
 	}
 
-	public static String pair(final String host) {
+	public static String pair(final String uniqueId, final String host) {
 		String message = "";
-		String macAddress;
-		try {
-			macAddress = NvConnection.getMacAddressString();
-		} catch (SocketException e) {
-			e.printStackTrace();
-			message = "An error occured trying to get this system's MAC address";
-			return message;
-		}
-
-		if (macAddress == null) {
-			message = "Couldn't find a MAC address";
-			LimeLog.severe(message);
-			return message;
-		}
 
 		NvHTTP httpConn;
 		try {
 			httpConn = new NvHTTP(InetAddress.getByName(host),
-					macAddress, PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
+					uniqueId, PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
 			try {
 				if (httpConn.getPairState() == PairingManager.PairState.PAIRED) {
 					message = "Already paired";
