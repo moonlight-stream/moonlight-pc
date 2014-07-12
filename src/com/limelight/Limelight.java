@@ -274,8 +274,11 @@ public class Limelight implements NvConnectionListener {
 			GamepadListener.getInstance().removeListener(gamepad);
 		}
 		
-		displayMessage(String.format("Total latency: %d ms (decoder latency: %d ms)",
-				decoderRenderer.getAverageEndToEndLatency(), decoderRenderer.getAverageDecoderLatency()));
+		int endToEndLatency = decoderRenderer.getAverageEndToEndLatency();
+		if (endToEndLatency != 0) {
+			displayMessage(String.format("Average client latency: %d ms",
+					endToEndLatency));
+		}
 
 		// Close the stream frame
 		streamFrame.dispose();
@@ -395,7 +398,7 @@ public class Limelight implements NvConnectionListener {
 	public void displayMessage(String message) {
 		streamFrame.dispose();
 		JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
-	}	
+	}
 
 	/**
 	 * Displays an error to the user in the form of an error dialog
