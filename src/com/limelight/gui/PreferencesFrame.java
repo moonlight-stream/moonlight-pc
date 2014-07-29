@@ -2,6 +2,8 @@ package com.limelight.gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -11,6 +13,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.limelight.settings.PreferencesManager;
 import com.limelight.settings.PreferencesManager.Preferences;
@@ -23,6 +28,7 @@ import com.limelight.settings.PreferencesManager.Preferences.Resolution;
 public class PreferencesFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JComboBox resolution;
+	private JSlider bitrate;
 	private JCheckBox fullscreen;
 	private Preferences prefs;
 	
@@ -32,7 +38,7 @@ public class PreferencesFrame extends JFrame {
 	 */
 	public PreferencesFrame() {
 		super("Preferences");
-		this.setSize(200, 100);
+		this.setSize(200, 200);
 		this.setResizable(false);
 		this.setAlwaysOnTop(true);
 		prefs = PreferencesManager.getPreferences();
@@ -53,6 +59,27 @@ public class PreferencesFrame extends JFrame {
 		
 		resolution.setSelectedItem(prefs.getResolution());
 		
+		bitrate = new JSlider(JSlider.HORIZONTAL, 0, 100, prefs.getBitrate());
+		bitrate.setMajorTickSpacing(20);
+		bitrate.setMinorTickSpacing(1);
+		bitrate.setPaintLabels(true);
+		bitrate.setPaintTicks(true);
+		bitrate.setToolTipText(Integer.toString(bitrate.getValue()));
+		
+		bitrate.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent ce) {
+				bitrate.setToolTipText(Integer.toString(bitrate.getValue()));
+			}
+		});
+
+		resolution.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Resolution newRes = (Resolution) resolution.getSelectedItem();
+				bitrate.setValue(newRes.defaultBitrate);
+			}
+		});
+		
+		
 		fullscreen = new JCheckBox("Fullscreen");
 		fullscreen.setSelected(prefs.getFullscreen());
 	
@@ -61,6 +88,11 @@ public class PreferencesFrame extends JFrame {
 		resolutionBox.add(resolution);
 		resolutionBox.add(Box.createHorizontalGlue());
 		
+		Box bitrateBox = Box.createHorizontalBox();
+		bitrateBox.add(Box.createHorizontalGlue());
+		bitrateBox.add(bitrate);
+		bitrateBox.add(Box.createHorizontalGlue());
+		
 		Box fullscreenBox = Box.createHorizontalBox();
 		fullscreenBox.add(Box.createHorizontalGlue());
 		fullscreenBox.add(fullscreen);
@@ -68,6 +100,8 @@ public class PreferencesFrame extends JFrame {
 		
 		mainPanel.add(Box.createVerticalStrut(10));
 		mainPanel.add(resolutionBox);
+		mainPanel.add(Box.createVerticalStrut(5));
+		mainPanel.add(bitrateBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(fullscreenBox);
 		mainPanel.add(Box.createVerticalGlue());
@@ -96,7 +130,8 @@ public class PreferencesFrame extends JFrame {
 	 */
 	private boolean prefsChanged() {
 		return (prefs.getResolution() != resolution.getSelectedItem()) ||
-				(prefs.getFullscreen() != fullscreen.isSelected());
+				(prefs.getFullscreen() != fullscreen.isSelected()) ||
+				(prefs.getBitrate() != bitrate.getValue());
 	}
 	
 	/*
@@ -104,6 +139,7 @@ public class PreferencesFrame extends JFrame {
 	 */
 	private void writePreferences() {
 		prefs.setFullscreen(fullscreen.isSelected());
+		prefs.setBitrate(bitrate.getValue());
 		prefs.setResolution((Resolution)resolution.getSelectedItem());
 		PreferencesManager.writePreferences(prefs);
 	}

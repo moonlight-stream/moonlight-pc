@@ -72,20 +72,8 @@ public class Limelight implements NvConnectionListener {
 	 * Creates a StreamConfiguration given a Resolution. 
 	 * Used to specify what kind of stream will be used.
 	 */
-	private static StreamConfiguration createConfiguration(Resolution res) {
-		switch(res) {
-		case RES_720_30:
-			return new StreamConfiguration("Steam", 1280, 720, 30, 5000);
-		case RES_720_60:
-			return new StreamConfiguration("Steam", 1280, 720, 60, 10000);
-		case RES_1080_30:
-			return new StreamConfiguration("Steam", 1920, 1080, 30, 10000);
-		case RES_1080_60:
-			return new StreamConfiguration("Steam", 1920, 1080, 60, 25000);
-		default:
-			// this should never happen, if it does we want the NPE to occur so we know something is wrong
-			return null;
-		}
+	private static StreamConfiguration createConfiguration(Resolution res, Integer bitRate) {
+		return new StreamConfiguration("Steam", res.width, res.height, res.frameRate, bitRate*1000);
 	}
 
 	/*
@@ -141,7 +129,7 @@ public class Limelight implements NvConnectionListener {
 		Limelight limelight = new Limelight(host);
 
 		Preferences prefs = PreferencesManager.getPreferences();
-		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution());
+		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution(), prefs.getBitrate());
 
 		limelight.startUp(streamConfig, prefs);
 	}
@@ -194,6 +182,7 @@ public class Limelight implements NvConnectionListener {
 		boolean fullscreen = false;
 		int resolution = 720;
 		int refresh = 60;
+		Integer bitrate = null;
 		
 		Preferences prefs = PreferencesManager.getPreferences();
 		
@@ -218,6 +207,14 @@ public class Limelight implements NvConnectionListener {
 					i++;
 				} else {
 					System.err.println("Syntax error: hostname or ip address expected after -host");
+					System.exit(3);
+				}
+			} else if (args[i].equals("-bitrate")) {
+				if (i + 1 < args.length){
+					bitrate = Integer.parseInt(args[i+1]);
+					i++;
+				} else {
+					System.err.println("Syntax error: bitrate (in Mbps) expected after -bitrate");
 					System.exit(3);
 				}
 			} else if (args[i].equals("-fs")) {
@@ -251,10 +248,15 @@ public class Limelight implements NvConnectionListener {
 		} else if (resolution == 1080 && refresh == 60) {
 			streamRes = Resolution.RES_1080_60;
 		}
+		
+		if (bitrate == null) {
+			bitrate = streamRes.defaultBitrate;
+		}
 
-		StreamConfiguration streamConfig = createConfiguration(streamRes);
+		StreamConfiguration streamConfig = createConfiguration(streamRes, bitrate);
 		
 		prefs.setResolution(streamRes);
+		prefs.setBitrate(bitrate);
 		prefs.setFullscreen(fullscreen);
 		
 		Limelight limelight = new Limelight(host);
