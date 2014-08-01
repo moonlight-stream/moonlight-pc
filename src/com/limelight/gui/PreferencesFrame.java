@@ -14,6 +14,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -59,16 +60,17 @@ public class PreferencesFrame extends JFrame {
 		
 		resolution.setSelectedItem(prefs.getResolution());
 		
+        JLabel bitrateLabel = new JLabel("Maximum Bitrate", JLabel.CENTER);
 		bitrate = new JSlider(JSlider.HORIZONTAL, 0, 100, prefs.getBitrate());
 		bitrate.setMajorTickSpacing(20);
 		bitrate.setMinorTickSpacing(1);
 		bitrate.setPaintLabels(true);
 		bitrate.setPaintTicks(true);
-		bitrate.setToolTipText(Integer.toString(bitrate.getValue()));
+		bitrate.setToolTipText(Integer.toString(bitrate.getValue()) + " Mbps");
 		
 		bitrate.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
-				bitrate.setToolTipText(Integer.toString(bitrate.getValue()));
+				bitrate.setToolTipText(Integer.toString(bitrate.getValue()) + " Mbps");
 			}
 		});
 
@@ -88,8 +90,13 @@ public class PreferencesFrame extends JFrame {
 		resolutionBox.add(resolution);
 		resolutionBox.add(Box.createHorizontalGlue());
 		
+        Box bitrateLabelBox = Box.createHorizontalBox();
+        bitrateLabelBox.add(Box.createHorizontalGlue());
+        bitrateLabelBox.add(bitrateLabel);
+        bitrateLabelBox.add(Box.createHorizontalGlue());
+
 		Box bitrateBox = Box.createHorizontalBox();
-		bitrateBox.add(Box.createHorizontalGlue());
+        bitrateBox.add(Box.createHorizontalGlue());
 		bitrateBox.add(bitrate);
 		bitrateBox.add(Box.createHorizontalGlue());
 		
@@ -100,6 +107,8 @@ public class PreferencesFrame extends JFrame {
 		
 		mainPanel.add(Box.createVerticalStrut(10));
 		mainPanel.add(resolutionBox);
+		mainPanel.add(Box.createVerticalStrut(5));
+		mainPanel.add(bitrateLabelBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(bitrateBox);
 		mainPanel.add(Box.createVerticalStrut(5));
