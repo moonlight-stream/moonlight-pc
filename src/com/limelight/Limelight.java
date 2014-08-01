@@ -221,6 +221,10 @@ public class Limelight implements NvConnectionListener {
 				fullscreen = true;
 			} else if (args[i].equals("-720")) {
 				resolution = 720;
+			} else if (args[i].equals("-768")) {
+			    resolution = 768;
+			} else if (args[i].equals("-900")) {
+			    resolution = 900;
 			} else if (args[i].equals("-1080")) {
 				resolution = 1080;
 			} else if (args[i].equals("-30fps")) {
@@ -237,17 +241,7 @@ public class Limelight implements NvConnectionListener {
 			System.exit(5);
 		}
 
-		Resolution streamRes = null;
-
-		if (resolution == 720 && refresh == 30) {
-			streamRes = Resolution.RES_720_30;
-		} else if (resolution == 720 && refresh == 60) {
-			streamRes = Resolution.RES_720_60;
-		} else if (resolution == 1080 && refresh == 30) {
-			streamRes = Resolution.RES_1080_30;
-		} else if (resolution == 1080 && refresh == 60) {
-			streamRes = Resolution.RES_1080_60;
-		}
+		Resolution streamRes = Resolution.findRes(resolution, refresh);
 		
 		if (bitrate == null) {
 			bitrate = streamRes.defaultBitrate;
