@@ -63,15 +63,21 @@ public abstract class PreferencesManager {
 		/**
 		 * The possible resolutions for the stream
 		 */
-		public enum Resolution { RES_720_30("1280x720 (30Hz)"), RES_720_60("1280x720 (60Hz)"), 
-			RES_1080_30("1920x1080 (30Hz)"), RES_1080_60("1920x1080 (60Hz)");
-			public String name;
+		public enum Resolution { RES_720_30(1280, 720, 30, 5), RES_720_60(1280, 720, 60, 10), 
+			RES_1080_30(1920, 1080, 30, 10), RES_1080_60(1920, 1080, 60, 25);
+			public int width;
+			public int height;
+			public int frameRate;
+			public int defaultBitrate;
 			
 			/*
 			 * Creates a new resolution with the specified name
 			 */
-			private Resolution(String name) {
-				this.name = name;
+			private Resolution(int width, int height, int frameRate, int defaultBitrate) {
+				this.width = width;
+				this.height = height;
+				this.frameRate = frameRate;
+				this.defaultBitrate = defaultBitrate;
 			}
 			
 			/**
@@ -80,11 +86,12 @@ public abstract class PreferencesManager {
 			 */
 			@Override
 			public String toString() {
-				return name;
+				return String.format("%dx%d (%dHz)", width, height, frameRate);
 			}
 		};
 		
 		private Resolution res;
+		private int bitrate;
 		private boolean fullscreen;
 		private String host;
 		private String uniqueId;
@@ -105,6 +112,7 @@ public abstract class PreferencesManager {
 		 */
 		private Preferences(Resolution res, boolean fullscreen) {
 			this.res = res;
+			this.bitrate = res.defaultBitrate;
 			this.fullscreen = fullscreen;
 			this.host = "GeForce PC host";
 			this.uniqueId = String.format("%016x", new Random().nextLong());
@@ -135,6 +143,14 @@ public abstract class PreferencesManager {
 		}
 		
 		/**
+		 * Gets the bitrate in this preference
+		 * @return the stored bitrate
+		 */
+		public int getBitrate() {
+			return bitrate;
+		}
+		
+		/**
 		 * Gets whether to use fullscreen
 		 * @return the stored fullscreen mode
 		 */
@@ -148,6 +164,14 @@ public abstract class PreferencesManager {
 		 */
 		public void setResolution(Resolution res) {
 			this.res = res;
+		}
+		
+		/**
+		 * Sets the bitrate in this preference
+		 * @param bitrate the bitrate to save
+		 */
+		public void setBitrate(int bitrate) {
+			this.bitrate = bitrate;
 		}
 		
 		/**
