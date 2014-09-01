@@ -103,15 +103,15 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 			byte mouseButton = 0x0;
 
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_1;
+				mouseButton = MouseButtonPacket.BUTTON_LEFT;
 			}
 
 			if (SwingUtilities.isMiddleMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_2;
+				mouseButton = MouseButtonPacket.BUTTON_MIDDLE;
 			}
 
 			if (SwingUtilities.isRightMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_3;
+				mouseButton = MouseButtonPacket.BUTTON_RIGHT;
 			}
 
 			if (mouseButton > 0) {
@@ -143,15 +143,15 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 			byte mouseButton = 0x0;
 
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_1;
+				mouseButton = MouseButtonPacket.BUTTON_LEFT;
 			}
 
 			if (SwingUtilities.isMiddleMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_2;
+				mouseButton = MouseButtonPacket.BUTTON_MIDDLE;
 			}
 
 			if (SwingUtilities.isRightMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_3;
+				mouseButton = MouseButtonPacket.BUTTON_RIGHT;
 			}
 
 			if (mouseButton > 0) {	
