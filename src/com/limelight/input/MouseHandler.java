@@ -7,6 +7,8 @@ import java.awt.Robot;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.SwingUtilities;
 
@@ -18,7 +20,7 @@ import com.limelight.nvstream.input.MouseButtonPacket;
  * Handles mouse input and sends them via the connection to the host
  * @author Diego Waxemberg
  */
-public class MouseHandler implements MouseListener, MouseMotionListener {
+public class MouseHandler implements MouseListener, MouseMotionListener, MouseWheelListener {
 	private NvConnection conn;
 	private Robot robot;
 	private Dimension size;
@@ -237,6 +239,11 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 		robot.mouseMove(x, y);
 		lastX = x;
 		lastY = y;
+	}
+
+	public void mouseWheelMoved(MouseWheelEvent event) {
+		conn.sendMouseScroll((byte) event.getWheelRotation());
+		event.consume();
 	}
 
 }

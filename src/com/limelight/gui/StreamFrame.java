@@ -95,6 +95,7 @@ public class StreamFrame extends JFrame {
 		renderingSurface.addKeyListener(keyboard);
 		renderingSurface.addMouseListener(mouse);
 		renderingSurface.addMouseMotionListener(mouse);
+		renderingSurface.addMouseWheelListener(mouse);
 		renderingSurface.setBackground(Color.BLACK);
 		renderingSurface.setIgnoreRepaint(true);
 		renderingSurface.setFocusable(true);
