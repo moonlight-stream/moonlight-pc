@@ -27,7 +27,6 @@ import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 
 	private Thread rendererThread;
-	private int targetFps;
 	private int width, height;
 
 	private JFrame frame;
@@ -36,9 +35,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	
 	private static final int DECODER_BUFFER_SIZE = 92*1024;
 	private ByteBuffer decoderBuffer;
-	
-	// Only sleep if the difference is above this value
-	private static final int WAIT_CEILING_MS = 8;
 	
 	private static final int REFERENCE_PIXEL = 0x01020304;
 	
@@ -53,7 +49,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 	 * @param drFlags flags for the decoder and renderer
 	 */
 	public boolean setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
-		this.targetFps = redrawRate;
 		this.width = width;
 		this.height = height;
 		
@@ -125,7 +120,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		rendererThread = new Thread() {
 			@Override
 			public void run() {
-				long nextFrameTime = System.currentTimeMillis();
 				int[] imageBuffer = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 				
 				frame.createBufferStrategy(2);
@@ -144,19 +138,16 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 				DecodeUnit du;
 				while (!isInterrupted() && !dying)
 				{
-					du = depacketizer.pollNextDecodeUnit();
+					try {
+						du = depacketizer.takeNextDecodeUnit();
+					} catch (InterruptedException e1) {
+						return;
+					}
+					
 					if (du != null) {
 						submitDecodeUnit(du);
 						depacketizer.freeDecodeUnit(du);
 					}
-					
-					long diff = nextFrameTime - System.currentTimeMillis();
-
-					if (diff > WAIT_CEILING_MS) {
-						continue;
-					}
-					
-					nextFrameTime = computePresentationTimeMs(targetFps);
 					
 					int sides = frame.getInsets().left + frame.getInsets().right;
 					int topBottom = frame.getInsets().top + frame.getInsets().bottom;
@@ -203,13 +194,6 @@ public class SwingCpuDecoderRenderer implements VideoDecoderRenderer {
 		return true;
 	}
 	
-	/*
-	 * Computes the amount of time to display a certain frame
-	 */
-	private long computePresentationTimeMs(int frameRate) {
-		return System.currentTimeMillis() + (1000 / frameRate);
-	}
-
 	/**
 	 * Stops the decoding and rendering of the video stream.
 	 */
