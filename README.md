@@ -4,7 +4,7 @@
 
 Limelight-pc allows you to stream your full collection of Steam games from your powerful desktop to another PC or laptop running Linux/OS X/Windows.
 
-Limelight also has an [Android implementation](https://github.com/limelight-stream/limelight-android). Versions for [iOS](https://github.com/limelight-stream/limelight-ios) and [Windows Phone](https://github.com/limelight-stream/limelight-wp) are currently in development.
+Limelight also has an [Android implementation](https://github.com/limelight-stream/limelight-android). Versions for [iOS](https://github.com/limelight-stream/limelight-ios) and [Windows and Windows Phone](https://github.com/limelight-stream/limelight-windows) are currently in development.
 
 ##Features
 
