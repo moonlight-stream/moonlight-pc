@@ -73,7 +73,11 @@ public class Limelight implements NvConnectionListener {
 	 * Used to specify what kind of stream will be used.
 	 */
 	private static StreamConfiguration createConfiguration(Resolution res, Integer bitRate) {
-		return new StreamConfiguration("Steam", res.width, res.height, res.frameRate, bitRate*1000);
+		return new StreamConfiguration.Builder()
+		.setApp("Steam")
+		.setResolution(res.width, res.height)
+		.setRefreshRate(res.frameRate)
+		.setBitrate(bitRate*1000).build();
 	}
 
 	/*
