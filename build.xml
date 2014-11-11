@@ -26,8 +26,8 @@
     <javac srcdir="${src.dir}"
            destdir="${classes.dir}/src"
            includeantruntime="false"
-           source="1.5"
-           target="1.5"
+           source="1.6"
+           target="1.6"
            classpath="${build.dir}">
       <classpath>
         <fileset dir="${libs.dir}" includes="*.jar"/>
