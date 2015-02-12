@@ -5,9 +5,6 @@ import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.limelight.gui.StreamFrame;
-import com.limelight.nvstream.av.ByteBufferDescriptor;
-import com.limelight.nvstream.av.DecodeUnit;
-import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.nvstream.av.video.VideoDepacketizer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
@@ -20,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 
@@ -29,16 +25,10 @@ import java.nio.IntBuffer;
  * Date: 2/1/14
  * Time: 11:42 PM.
  */
-public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener {
-    protected int targetFps;
-    protected int width, height;
-
+public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventListener {
     protected BufferedImage image;
     protected int[]         imageBuffer;
-
-    protected static final int DECODER_BUFFER_SIZE = 92 * 1024;
-    protected ByteBuffer decoderBuffer;
-
+    
     protected long lastRender = System.currentTimeMillis();
 
     protected final GLProfile      glprofile;
@@ -54,33 +44,22 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
         glcapabilities = new GLCapabilities(glprofile);
         glcanvas = new GLCanvas(glcapabilities);
     }
+    
+    @Override
+    public int getColorMode() {
+        // Force the renderer to use a buffered image that's friendly with OpenGL
+    	return AvcDecoder.NATIVE_COLOR_ARGB;
+    }
 
-    public boolean setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
-        this.targetFps = redrawRate;
-        this.width = width;
-        this.height = height;
-
-        // We only use one thread because each additional thread adds a frame of latency
-        int avcFlags = AvcDecoder.BILINEAR_FILTERING | AvcDecoder.LOW_LATENCY_DECODE;
-        int threadCount = 1;
-
+    @Override
+    public boolean setupInternal(Object renderTarget, int drFlags) {
         final StreamFrame frame = (StreamFrame) renderTarget;
         final JPanel renderingSurface = frame.getRenderingSurface();
 
-        // Force the renderer to use a buffered image that's friendly with OpenGL
-        avcFlags |= AvcDecoder.NATIVE_COLOR_ARGB;
         image = new BufferedImage(width, height,
                                   BufferedImage.TYPE_INT_ARGB);
         imageBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         bufferRGB = IntBuffer.wrap(imageBuffer);
-
-        int err = AvcDecoder.init(width, height, avcFlags, threadCount);
-        if (err != 0) {
-            throw new IllegalStateException("AVC decoder initialization failure: " + err);
-        }
-
-        decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
-        System.out.println("Using OpenGL rendering");
 
         // Add canvas to the frame
         glcanvas.setSize(renderingSurface.getWidth(), renderingSurface.getHeight());
@@ -103,11 +82,17 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
 
         animator = new FPSAnimator(glcanvas, targetFps);
         
+        System.out.println("Using OpenGL rendering");
+        
         return true;
     }
 
-    public void start() {
+    public boolean start(VideoDepacketizer depacketizer) {
+    	if (!super.start(depacketizer)) {
+    		return false;
+    	}
         animator.start();
+        return true;
     }
 
     public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
@@ -171,63 +156,12 @@ public class GLDecoderRenderer implements VideoDecoderRenderer, GLEventListener 
     }
 
     /**
-     * Releases resources held by the decoder.
-     */
-    public void release() {
-        AvcDecoder.destroy();
-    }
-
-    /**
-     * Give a unit to be decoded to the decoder.
-     *
-     * @param decodeUnit the unit to be decoded
-     * @return true if the unit was decoded successfully, false otherwise
-     */
-    public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
-        byte[] data;
-
-        // Use the reserved decoder buffer if this decode unit will fit
-        if (decodeUnit.getDataLength() <= DECODER_BUFFER_SIZE) {
-            decoderBuffer.clear();
-
-            for (ByteBufferDescriptor bbd : decodeUnit.getBufferList()) {
-                decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
-            }
-
-            data = decoderBuffer.array();
-        } else {
-            data = new byte[decodeUnit.getDataLength() + AvcDecoder.getInputPaddingSize()];
-
-            int offset = 0;
-            for (ByteBufferDescriptor bbd : decodeUnit.getBufferList()) {
-                System.arraycopy(bbd.data, bbd.offset, data, offset, bbd.length);
-                offset += bbd.length;
-            }
-        }
-
-        return (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
-    }
-
-    /**
      * Stops the decoding and rendering of the video stream.
      */
+    @Override
     public void stop() {
+    	super.stop();
         animator.stop();
     }
-
-
-    public int getCapabilities() {
-        return 0;
-    }
-
-	@Override
-	public int getAverageDecoderLatency() {
-		return 0;
-	}
-
-	@Override
-	public int getAverageEndToEndLatency() {
-		return 0;
-	}
 }
 
