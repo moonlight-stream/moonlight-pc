@@ -16,6 +16,7 @@ import javax.swing.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.IntBuffer;
@@ -72,6 +73,10 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 
         for (KeyListener k : renderingSurface.getKeyListeners()) {
             glcanvas.addKeyListener(k);
+        }
+        
+        for (MouseWheelListener w : renderingSurface.getMouseWheelListeners()) {
+            glcanvas.addMouseWheelListener(w);
         }
 
         for (MouseMotionListener m : renderingSurface.getMouseMotionListeners()) {

@@ -252,16 +252,8 @@ public class MainFrame {
     }
 
     private void showApps() {
-        NvHTTP httpConn;
-        try {
-            String host = hostField.getText();
-            httpConn = new NvHTTP(InetAddress.getByName(host),
-            		PreferencesManager.getPreferences().getUniqueId(),
-            		PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
-            AppsFrame appsFrame = new AppsFrame(httpConn, host);
-            appsFrame.build();
-        } catch (UnknownHostException e1) {
-            e1.printStackTrace();
-        }
+        String host = hostField.getText();
+        AppsFrame appsFrame = new AppsFrame(host);
+        appsFrame.build();
     }
 }

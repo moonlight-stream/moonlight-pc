@@ -2,20 +2,27 @@ package com.limelight.gui;
 
 import com.limelight.LimeLog;
 import com.limelight.Limelight;
+import com.limelight.binding.PlatformBinding;
 import com.limelight.nvstream.StreamConfiguration;
 import com.limelight.nvstream.http.NvApp;
 import com.limelight.nvstream.http.NvHTTP;
 import com.limelight.settings.PreferencesManager;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -35,10 +42,8 @@ public class AppsFrame extends JFrame {
     private JComboBox appSelector;
     private JButton   launchButton;
 
-    public AppsFrame(NvHTTP httpConnection,
-                     String host) {
+    public AppsFrame(String host) {
         super("Apps");
-        this.httpConnection = httpConnection;
         this.host = host;
 
         apps = new HashMap<String, NvApp>();
@@ -48,6 +53,16 @@ public class AppsFrame extends JFrame {
      * Constructs all components of the frame and makes the frame visible to the user.
      */
     public void build() {
+        try {
+			this.httpConnection = new NvHTTP(InetAddress.getByName(host),
+					PreferencesManager.getPreferences().getUniqueId(),
+					PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
+		} catch (UnknownHostException e) {
+			JOptionPane.showMessageDialog(null, "Unable to resolve machine address",
+					"Limelight", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+    	
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
@@ -55,15 +70,28 @@ public class AppsFrame extends JFrame {
         appSelector.addItem("Loading apps...");
 
         // Send this to be done asynchronously
-        SwingWorker<Collection<NvApp>, Void> fetchBg = new SwingWorker<Collection<NvApp>, Void>() {
-            @Override protected Collection<NvApp> doInBackground() throws Exception {
+        SwingWorker<LinkedList<NvApp>, Void> fetchBg = new SwingWorker<LinkedList<NvApp>, Void>() {
+            @Override protected LinkedList<NvApp> doInBackground() throws Exception {
                 return fetchApps();
             }
 
             @Override protected void done() {
                 try {
-                    Collection<NvApp> fetched = get();
+                    LinkedList<NvApp> fetched = get();
+                    if (fetched == null) {
+                    	return;
+                    }
+                    
+                    // Sort the fetched list alphabetically by app name
+                    Collections.sort(fetched, new Comparator<NvApp>() {
+						@Override
+						public int compare(NvApp left, NvApp right) {
+							return left.getAppName().compareTo(right.getAppName());
+						}
+                    });
+                    
                     appSelector.removeAllItems();
+                    
                     for (NvApp app : fetched) {
                         apps.put(app.getAppName(), app);
                         appSelector.addItem(app.getAppName());
@@ -71,7 +99,7 @@ public class AppsFrame extends JFrame {
                     
                     for (NvApp app : fetched) {
                     	if (app.getIsRunning()) {
-                            appSelector.setSelectedItem(app);
+                            appSelector.setSelectedItem(app.getAppName());
                     	}
                     }
                 } catch (InterruptedException e) {
@@ -95,6 +123,7 @@ public class AppsFrame extends JFrame {
                 }
             }
         });
+        getRootPane().setDefaultButton(launchButton);
 
         Box appSelectorBox = Box.createHorizontalBox();
         appSelectorBox.add(Box.createHorizontalGlue());
@@ -124,18 +153,17 @@ public class AppsFrame extends JFrame {
         this.setResizable(false);
     }
 
-    private Collection<NvApp> fetchApps() {
+    private LinkedList<NvApp> fetchApps() {
         // List out the games that are installed
         try {
             return httpConnection.getAppList();
-        } catch (IOException e) {
-            // If any of that fails, fallback to launching steam big picture
-            LimeLog.warning("Failed to fetch app list: " + e);
-        } catch (XmlPullParserException e) {
-        	LimeLog.warning("Failed to parse app list: " + e);
+        } catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Unable to retreive app list",
+					"Limelight", JOptionPane.ERROR_MESSAGE);
+			setVisible(false);
         }
-
-        return Collections.EMPTY_LIST;
+        
+        return null;
     }
 
     private void launchApp(String appName) {
