@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.limelight.LimeLog;
 
 /**
@@ -110,6 +111,8 @@ public class SettingsManager {
 		} catch (FileNotFoundException e) {
 			LimeLog.warning("Could not find " + file.getName() + " settings file");
 			e.printStackTrace();
+		} catch (JsonSyntaxException e) {
+			LimeLog.warning("JSON settings are corrupt; returning null");
 		} finally {
 			if (br != null) {
 				try {
