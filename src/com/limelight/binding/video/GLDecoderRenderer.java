@@ -77,9 +77,10 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         for (MouseMotionListener m : renderingSurface.getMouseMotionListeners()) {
             glcanvas.addMouseMotionListener(m);
         }
-
+        
         frame.setLayout(null);
         frame.add(glcanvas, 0, 0);
+        glcanvas.setCursor(frame.getCursor());
 
         animator = new FPSAnimator(glcanvas, targetFps);
         
@@ -105,7 +106,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     public void dispose(GLAutoDrawable glautodrawable) {
     }
 
-    public void display(GLAutoDrawable glautodrawable) {
+    public void display(GLAutoDrawable glautodrawable) {    	
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         if (!decoded) {

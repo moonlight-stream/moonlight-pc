@@ -215,15 +215,23 @@ public class StreamFrame extends JFrame {
 			noCursor = Toolkit.getDefaultToolkit().createCustomCursor(
 					cursorImg, new Point(0, 0), "blank cursor");
 		}
-		// Set the blank cursor to the JFrame.
-		renderingSurface.setCursor(noCursor);
+		
+		for (Component c : getContentPane().getComponents()) {
+			c.setCursor(noCursor);
+		}
+		
+		setCursor(noCursor);
 	}
 
 	/**
 	 * Makes the mouse cursor visible
 	 */
 	public void showCursor() {
-		renderingSurface.setCursor(Cursor.getDefaultCursor());
+		for (Component c : getContentPane().getComponents()) {
+			c.setCursor(Cursor.getDefaultCursor());
+		}
+		
+		setCursor(Cursor.getDefaultCursor());
 	}
 
 	/**
