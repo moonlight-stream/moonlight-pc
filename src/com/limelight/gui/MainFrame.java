@@ -232,9 +232,9 @@ public class MainFrame {
         contentBox.add(hostBox);
         contentBox.add(Box.createVerticalStrut(5));
         contentBox.add(mdnsBox);
-        contentBox.add(Box.createVerticalStrut(5));
-        contentBox.add(streamBox);
         contentBox.add(Box.createVerticalStrut(10));
+        contentBox.add(streamBox);
+        contentBox.add(Box.createVerticalStrut(7));
         contentBox.add(pairBox);
         contentBox.add(Box.createVerticalGlue());
 
@@ -244,7 +244,7 @@ public class MainFrame {
 
         limeFrame.setJMenuBar(createMenuBar());
         limeFrame.getRootPane().setDefaultButton(stream);
-        limeFrame.setSize(300, 200);
+        limeFrame.setSize(300, 230);
         limeFrame.setLocation(dim.width / 2 - limeFrame.getSize().width / 2,
                               dim.height / 2 - limeFrame.getSize().height / 2);
         limeFrame.setResizable(false);
