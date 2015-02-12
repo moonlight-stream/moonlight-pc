@@ -2,10 +2,12 @@ package com.limelight.binding;
 
 import com.limelight.binding.audio.JavaxAudioRenderer;
 import com.limelight.binding.crypto.PcCryptoProvider;
+import com.limelight.binding.video.GLDecoderRenderer;
 import com.limelight.binding.video.SwingCpuDecoderRenderer;
 import com.limelight.nvstream.av.audio.AudioRenderer;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.nvstream.http.LimelightCryptoProvider;
+import com.limelight.settings.PreferencesManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -22,7 +24,12 @@ public class PlatformBinding {
      * @return a video decoder and renderer
      */
     public static VideoDecoderRenderer getVideoDecoderRenderer() {
-        return new SwingCpuDecoderRenderer();
+    	if (PreferencesManager.getPreferences().getUseOpenGlRenderer()) {
+            return new GLDecoderRenderer();
+    	}
+    	else {
+    		return new SwingCpuDecoderRenderer();
+    	}
     }
 
     /**

@@ -115,21 +115,19 @@ public abstract class PreferencesManager {
 		 */
 		public Preferences() {
 			this(Resolution.RES_720_60,
-                 System.getProperty("os.name", "").contains("Windows"),
-                 !System.getProperty("os.name", "").contains("Windows"));
+                 System.getProperty("os.name", "").contains("Windows"));
 		}
 
 		/**
 		 * Constructs a preference with the specified values
 		 * @param res the <code>Resolution</code> to use
 		 * @param fullscreen whether to start the stream in fullscreen
-		 * @param useOpenGlRenderer whether to use the OpenGL renderer
 		 */
-		private Preferences(Resolution res, boolean fullscreen, boolean useOpenGlRenderer) {
+		private Preferences(Resolution res, boolean fullscreen) {
 			this.res = res;
 			this.bitrate = res.defaultBitrate;
 			this.fullscreen = fullscreen;
-			this.useOpenGlRenderer = useOpenGlRenderer;
+			this.useOpenGlRenderer = true;
 			this.host = "GeForce PC host";
 			this.uniqueId = String.format("%016x", new Random().nextLong());
 		}

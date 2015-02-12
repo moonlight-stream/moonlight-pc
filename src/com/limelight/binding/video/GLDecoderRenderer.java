@@ -4,6 +4,7 @@ package com.limelight.binding.video;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
+import com.limelight.LimeLog;
 import com.limelight.gui.StreamFrame;
 import com.limelight.nvstream.av.video.VideoDepacketizer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
@@ -82,7 +83,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 
         animator = new FPSAnimator(glcanvas, targetFps);
         
-        System.out.println("Using OpenGL rendering");
+        LimeLog.info("Using OpenGL rendering");
         
         return true;
     }

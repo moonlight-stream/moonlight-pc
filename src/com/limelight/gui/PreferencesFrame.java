@@ -22,7 +22,7 @@ public class PreferencesFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JComboBox resolution;
 	private JSlider bitrate;
-	private JCheckBox fullscreen;
+	private JCheckBox fullscreen, openGlRenderer;
 	private Preferences prefs;
 	
 	/**
@@ -75,6 +75,9 @@ public class PreferencesFrame extends JFrame {
 		
 		fullscreen = new JCheckBox("Fullscreen");
 		fullscreen.setSelected(prefs.getFullscreen());
+		
+		openGlRenderer = new JCheckBox("Use OpenGL Renderer");
+		openGlRenderer.setSelected(prefs.getUseOpenGlRenderer());
 	
 		Box resolutionBox = Box.createHorizontalBox();
 		resolutionBox.add(Box.createHorizontalGlue());
@@ -96,6 +99,11 @@ public class PreferencesFrame extends JFrame {
 		fullscreenBox.add(fullscreen);
 		fullscreenBox.add(Box.createHorizontalGlue());
 		
+		Box openGlRendererBox = Box.createHorizontalBox();
+		openGlRendererBox.add(Box.createHorizontalGlue());
+		openGlRendererBox.add(openGlRenderer);
+		openGlRendererBox.add(Box.createHorizontalGlue());
+		
 		mainPanel.add(Box.createVerticalStrut(10));
 		mainPanel.add(resolutionBox);
 		mainPanel.add(Box.createVerticalStrut(5));
@@ -104,6 +112,8 @@ public class PreferencesFrame extends JFrame {
 		mainPanel.add(bitrateBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(fullscreenBox);
+		mainPanel.add(Box.createVerticalStrut(5));
+		mainPanel.add(openGlRendererBox);
 		mainPanel.add(Box.createVerticalGlue());
 		
 		this.addWindowListener(new WindowAdapter() {
@@ -131,7 +141,8 @@ public class PreferencesFrame extends JFrame {
 	private boolean prefsChanged() {
 		return (prefs.getResolution() != resolution.getSelectedItem()) ||
 				(prefs.getFullscreen() != fullscreen.isSelected()) ||
-				(prefs.getBitrate() != bitrate.getValue());
+				(prefs.getBitrate() != bitrate.getValue()) ||
+				(prefs.getUseOpenGlRenderer() != openGlRenderer.isSelected());
 	}
 	
 	/*
@@ -141,6 +152,7 @@ public class PreferencesFrame extends JFrame {
 		prefs.setFullscreen(fullscreen.isSelected());
 		prefs.setBitrate(bitrate.getValue());
 		prefs.setResolution((Resolution)resolution.getSelectedItem());
+		prefs.setUseOpenGlRenderer(openGlRenderer.isSelected());
 		PreferencesManager.writePreferences(prefs);
 	}
 	
