@@ -91,6 +91,20 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
 			checkBoundaries(e);
 		}
 	}
+	
+	private static byte getButtonFromEvent(MouseEvent e) {
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			return MouseButtonPacket.BUTTON_LEFT;
+		}
+		else if (e.getButton() == MouseEvent.BUTTON2) {
+			return MouseButtonPacket.BUTTON_MIDDLE;
+		}
+		else if (e.getButton() == MouseEvent.BUTTON3) {
+			return MouseButtonPacket.BUTTON_RIGHT;
+		}
+		
+		return 0;
+	}
 
 	/**
 	 * Invoked when a mouse button is pressed.
@@ -102,20 +116,8 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
 		e.consume();
 		
 		if (captureMouse) {
-			byte mouseButton = 0x0;
-
-			if (SwingUtilities.isLeftMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_LEFT;
-			}
-
-			if (SwingUtilities.isMiddleMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_MIDDLE;
-			}
-
-			if (SwingUtilities.isRightMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_RIGHT;
-			}
-
+			byte mouseButton = getButtonFromEvent(e);
+			
 			if (mouseButton > 0) {
 				conn.sendMouseButtonDown(mouseButton);
 			}
@@ -142,21 +144,9 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
 		if (e.isConsumed()) return;
 		
 		if (captureMouse) {
-			byte mouseButton = 0x0;
-
-			if (SwingUtilities.isLeftMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_LEFT;
-			}
-
-			if (SwingUtilities.isMiddleMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_MIDDLE;
-			}
-
-			if (SwingUtilities.isRightMouseButton(e)) {
-				mouseButton = MouseButtonPacket.BUTTON_RIGHT;
-			}
-
-			if (mouseButton > 0) {	
+			byte mouseButton = getButtonFromEvent(e);
+			
+			if (mouseButton > 0) {
 				conn.sendMouseButtonUp(mouseButton);
 			}
 		}
