@@ -47,10 +47,25 @@ public class GamepadListener implements NativeGamepadListener {
 	}
 	
 	public void deviceAttached(int deviceId, int numButtons, int numAxes) {
-		devices.put(deviceId, new Device(deviceId, numButtons, numAxes));
+		Device dev = new Device(deviceId, numButtons, numAxes);
+		
+		devices.put(deviceId, dev);
+		
+		for (DeviceListener listener : listeners) {
+			listener.handleDeviceAdded(dev);
+		}
 	}
 
 	public void deviceRemoved(int deviceId) {
+		Device dev = devices.get(deviceId);
+		if (dev == null) {
+			return;
+		}
+		
+		for (DeviceListener listener : listeners) {
+			listener.handleDeviceRemoved(dev);
+		}
+		
 		devices.remove(deviceId);
 	}
 
