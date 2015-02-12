@@ -55,7 +55,7 @@ public class Limelight implements NvConnectionListener {
 	/*
 	 * Creates a connection to the host and starts up the stream.
 	 */
-	private void startUp(StreamConfiguration streamConfig, Preferences prefs) {
+	public void startUp(StreamConfiguration streamConfig, Preferences prefs) {
 		streamFrame = new StreamFrame();
 
 		decoderRenderer = PlatformBinding.getVideoDecoderRenderer();
@@ -72,9 +72,9 @@ public class Limelight implements NvConnectionListener {
 	 * Creates a StreamConfiguration given a Resolution. 
 	 * Used to specify what kind of stream will be used.
 	 */
-	private static StreamConfiguration createConfiguration(Resolution res, Integer bitRate) {
+	public static StreamConfiguration createConfiguration(Resolution res, Integer bitRate, String appName) {
 		return new StreamConfiguration.Builder()
-		.setApp("Steam")
+		.setApp(appName)
 		.setResolution(res.width, res.height)
 		.setRefreshRate(res.frameRate)
 		.setBitrate(bitRate*1000).build();
@@ -129,11 +129,11 @@ public class Limelight implements NvConnectionListener {
 	 * Creates a new instance and starts the stream.
 	 * @param host the host pc to connect to. Can be a hostname or IP address.
 	 */
-	public static void createInstance(String host) {
+	public static void createInstance(String host, String appName) {
 		Limelight limelight = new Limelight(host);
 
 		Preferences prefs = PreferencesManager.getPreferences();
-		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution(), prefs.getBitrate());
+		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution(), prefs.getBitrate(), appName);
 
 		limelight.startUp(streamConfig, prefs);
 	}
@@ -187,6 +187,7 @@ public class Limelight implements NvConnectionListener {
 		int resolution = 720;
 		int refresh = 60;
 		Integer bitrate = null;
+		String appName = "Steam";
 		
 		Preferences prefs = PreferencesManager.getPreferences();
 		
@@ -221,6 +222,14 @@ public class Limelight implements NvConnectionListener {
 					System.err.println("Syntax error: bitrate (in Mbps) expected after -bitrate");
 					System.exit(3);
 				}
+			} else if (args[i].equals("-app")) {
+				if (i + 1 < args.length){
+					appName = args[i+1];
+					i++;
+				} else {
+					System.err.println("Syntax error: app name expected after -app");
+					System.exit(3);
+				}
 			} else if (args[i].equals("-fs")) {
 				fullscreen = true;
 			} else if (args[i].equals("-720")) {
@@ -251,7 +260,7 @@ public class Limelight implements NvConnectionListener {
 			bitrate = streamRes.defaultBitrate;
 		}
 
-		StreamConfiguration streamConfig = createConfiguration(streamRes, bitrate);
+		StreamConfiguration streamConfig = createConfiguration(streamRes, bitrate, appName);
 		
 		prefs.setResolution(streamRes);
 		prefs.setBitrate(bitrate);

@@ -1,16 +1,15 @@
 package com.limelight.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.DisplayMode;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Toolkit;
+import com.limelight.LimeLog;
+import com.limelight.Limelight;
+import com.limelight.input.KeyboardHandler;
+import com.limelight.input.MouseHandler;
+import com.limelight.nvstream.NvConnection;
+import com.limelight.nvstream.NvConnectionListener.Stage;
+import com.limelight.nvstream.StreamConfiguration;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -20,27 +19,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-
-import com.limelight.LimeLog;
-import com.limelight.Limelight;
-import com.limelight.input.KeyboardHandler;
-import com.limelight.input.MouseHandler;
-import com.limelight.nvstream.NvConnection;
-import com.limelight.nvstream.NvConnectionListener.Stage;
-import com.limelight.nvstream.StreamConfiguration;
-
 /**
  * The frame to which the video is rendered
- * @author Diego Waxemberg
- * <br>Cameron Gutman
  *
+ * @author Diego Waxemberg
+ *         <br>Cameron Gutman
  */
 public class StreamFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -307,4 +290,8 @@ public class StreamFrame extends JFrame {
 			System.exit(0);
 		}
 	}
+    
+    public JPanel getRenderingSurface() {
+        return renderingSurface;
+    }
 }

@@ -17,3 +17,13 @@ classes/*
 # Package Files #
 *.war
 *.ear
+
+# Native binaries
+*.dylib
+*.so
+
+# IDE Files
+*.iml
+.idea
+
+/bin/
