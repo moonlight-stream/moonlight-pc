@@ -28,17 +28,15 @@ import java.nio.IntBuffer;
  * Time: 11:42 PM.
  */
 public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventListener {
-    protected BufferedImage image;
-    protected int[]         imageBuffer;
-    
-    protected long lastRender = System.currentTimeMillis();
+    private BufferedImage image;
+    private int[]         imageBuffer;
 
-    protected final GLProfile      glprofile;
-    protected final GLCapabilities glcapabilities;
-    protected final GLCanvas       glcanvas;
+    private final GLProfile      glprofile;
+    private final GLCapabilities glcapabilities;
+    private final GLCanvas       glcanvas;
     private         FPSAnimator    animator;
-    protected       Texture        texture;
-    protected       IntBuffer      bufferRGB;
+    private       Texture        texture;
+    private       IntBuffer      bufferRGB;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -120,46 +118,62 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 
         GL2 gl = glautodrawable.getGL().getGL2();
 
-        IntBuffer bufferRGB = IntBuffer.wrap(imageBuffer);
-        gl.glEnable(GL.GL_TEXTURE_2D);
         // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
         // So we instruct it to read the packed RGB values in the appropriate (REV) order
-        Texture texture = new Texture(gl,
-                                      new TextureData(glprofile,
-                                                      4,
-                                                      width,
-                                                      height,
-                                                      0,
-                                                      GL.GL_BGRA,
-                                                      GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV,
-                                                      false,
-                                                      false,
-                                                      true,
-                                                      bufferRGB,
-                                                      null)
-        );
-        texture.enable(gl);
-        texture.bind(gl);
+        bufferRGB.rewind();
+        if (texture == null)
+        {
+            gl.glEnable(gl.GL_TEXTURE_2D);
+        	texture = new Texture(gl,
+        			new TextureData(glprofile,
+        					4,
+        					width,
+        					height,
+        					0,
+        					gl.GL_BGRA,
+        					gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+        					false,
+        					false,
+        					true,
+        					bufferRGB,
+        					null));
+        	texture.enable(gl);
+        	texture.bind(gl);
+        }
+        else
+        {
+        	texture.updateSubImage(gl, new TextureData(glprofile,
+					4,
+					width,
+					height,
+					0,
+					gl.GL_BGRA,
+					gl.GL_UNSIGNED_INT_8_8_8_8_REV,
+					false,
+					false,
+					true,
+					bufferRGB,
+					null),
+					0,
+					0,
+					0);
+        }
+        
+    	gl.glBegin(gl.GL_QUADS);
+    	// This flips the texture as it draws it, as the opengl coordinate system is different
+    	gl.glTexCoord2f(0.0f, 0.0f);
+    	gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
 
-        gl.glBegin(GL2GL3.GL_QUADS);
-        // This flips the texture as it draws it, as the opengl coordinate system is different
-        gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
+    	gl.glTexCoord2f(1.0f, 0.0f);
+    	gl.glVertex3f(1.0f, 1.0f, 1.0f); // Bottom Right Of The Texture and Quad
 
-        gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(1.0f, 1.0f, 1.0f); // Bottom Right Of The Texture and Quad
+    	gl.glTexCoord2f(1.0f, 1.0f);
+    	gl.glVertex3f(1.0f, -1.0f, 1.0f); // Top Right Of The Texture and Quad
 
-        gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(1.0f, -1.0f, 1.0f); // Top Right Of The Texture and Quad
+    	gl.glTexCoord2f(0.0f, 1.0f);
+    	gl.glVertex3f(-1.0f, -1.0f, 1.0f);
 
-        gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-
-        gl.glEnd();
-        texture.disable(gl);
-        texture.destroy(gl);
-
-        lastRender = System.currentTimeMillis();
+    	gl.glEnd();
     }
 
     /**
