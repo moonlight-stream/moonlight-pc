@@ -18,23 +18,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.limelight.LimeLog;
 import com.limelight.Limelight;
-import com.limelight.binding.PlatformBinding;
-import com.limelight.nvstream.http.NvHTTP;
+import com.limelight.nvstream.mdns.MdnsComputer;
+import com.limelight.nvstream.mdns.MdnsDiscoveryAgent;
+import com.limelight.nvstream.mdns.MdnsDiscoveryListener;
 import com.limelight.settings.PreferencesManager;
 import com.limelight.settings.PreferencesManager.Preferences;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceEvent;
-import javax.jmdns.ServiceListener;
 import javax.swing.*;
+
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
 
 /**
  * The main frame of Limelight that allows the user to specify the host and begin the stream.
@@ -48,13 +45,9 @@ public class MainFrame {
 	private JButton stream;
 	private JFrame limeFrame;
 	private JComboBox mdnsHostList;
-	
-    public static       String MDNS_QUERY           = "_nvstream._tcp.local.";
-    public static       String MDNS_MULTICAST_GROUP = "224.0.0.251";
-    public static final short  MDNS_PORT            = 5353;
 
-    private Set<String> mdnsHosts;
-    private JmDNS       mdnsService;
+    private HashMap<String, InetAddress> mdnsHosts;
+    private MdnsDiscoveryAgent mdnsAgent;
 
 	/**
 	 * Gets the actual JFrame this class creates
@@ -161,47 +154,39 @@ public class MainFrame {
         pair.addActionListener(createPairButtonListener());
         pair.setToolTipText("Send pair request to GeForce PC");
 
-        mdnsHosts = new HashSet<String>();
+        mdnsHosts = new HashMap<String, InetAddress>();
         mdnsHostList = new JComboBox();
         mdnsHostList.addItem("Choose a local PC...");
-        // Set mDNS scanning
-        try {
-            mdnsService = JmDNS.create();
-
-            ServiceListener mdnsServiceListener = new ServiceListener() {
-                public void serviceAdded(ServiceEvent serviceEvent) {
-                    mdnsService.requestServiceInfo(MDNS_QUERY, serviceEvent.getName());
+        
+        mdnsAgent = new MdnsDiscoveryAgent(new MdnsDiscoveryListener() {
+			@Override
+			public void notifyComputerAdded(MdnsComputer computer) {
+                if (!mdnsHosts.containsKey(computer.getName())) {
+                    mdnsHosts.put(computer.getName(), computer.getAddress());
+                    mdnsHostList.addItem(computer.getName());
                 }
+			}
 
-                public void serviceRemoved(ServiceEvent serviceEvent) {
-                    System.out.println("mDNS lost: " + serviceEvent.getInfo());
-                    // We'll keep any host we've seen before around, as users will find it convenient
+			@Override
+			public void notifyComputerRemoved(MdnsComputer computer) {
+                // We'll keep any host we've seen before around, as users will find it convenient
+				LimeLog.info("Computer lost: "+computer.getName());
+			}
 
-                    //for (String host : serviceEvent.getInfo().getHostAddresses()) {
-                    //    mdnsHostList.removeItem(host);
-                    //}
-                }
-
-                public void serviceResolved(ServiceEvent serviceEvent) {
-                    System.out.println("mDNS resolved: " + serviceEvent.getInfo());
-                    String host = serviceEvent.getInfo().getHostAddresses()[0];
-                    if (!mdnsHosts.contains(host)) {
-                        mdnsHosts.add(host);
-                        mdnsHostList.addItem(host);
-                    }
-                }
-            };
-
-            mdnsService.addServiceListener(MDNS_QUERY, mdnsServiceListener);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+			@Override
+			public void notifyDiscoveryFailure(Exception e) {
+				LimeLog.warning("Discovery failure");
+				e.printStackTrace();
+			}
+        	
+        });
+        mdnsAgent.startDiscovery(1000);
 
         // Propagate selections from mDNS to the hosts field
         mdnsHostList.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED && mdnsHostList.getSelectedIndex() != 0) {
-                    hostField.setText((String) mdnsHostList.getSelectedItem());
+                    hostField.setText((String) mdnsHosts.get(mdnsHostList.getSelectedItem()).getHostAddress());
                 }
             }
         });
