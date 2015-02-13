@@ -6,12 +6,12 @@
 	<classpathentry kind="lib" path="libs/bcpkix-jdk15on-151.jar"/>
 	<classpathentry kind="lib" path="libs/bcprov-jdk15on-151.jar"/>
 	<classpathentry kind="lib" path="libs/okio-1.0.1.jar"/>
-	<classpathentry kind="lib" path="libs/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="libs/jogl-all.jar"/>
 	<classpathentry kind="lib" path="libs/tinyrtsp.jar"/>
 	<classpathentry kind="lib" path="libs/gson-2.3.jar"/>
 	<classpathentry kind="lib" path="libs/okhttp-2.1.0.jar"/>
 	<classpathentry kind="lib" path="libs/xpp3-1.1.6.jar"/>
 	<classpathentry kind="lib" path="libs/jmdns-fixed.jar"/>
+	<classpathentry kind="lib" path="libs/gluegen-rt-2.2.4.jar"/>
+	<classpathentry kind="lib" path="libs/jogl-all-2.2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
