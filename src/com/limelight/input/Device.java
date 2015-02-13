@@ -22,4 +22,14 @@ public class Device {
 	public int getNumAxes() {
 		return numAxes;
 	}
+	
+	@Override
+	public int hashCode() {
+		return id;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return (o instanceof Device && ((Device) o).id == id);
+	}
 }

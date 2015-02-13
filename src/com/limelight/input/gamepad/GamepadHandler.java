@@ -86,10 +86,6 @@ public class GamepadHandler implements DeviceListener {
 
 	public void handleButton(Device device, int buttonId, boolean pressed) {
 		Gamepad gamepad = getGamepad(device, true);
-		if (gamepad == null) {
-			return;
-		}
-
 		Mapping mapped = gamepad.mapping.get(new SourceComponent(Type.BUTTON, buttonId, null));
 		if (mapped == null) {
 			//LimeLog.info("Unmapped button pressed: " + buttonId);
@@ -119,10 +115,6 @@ public class GamepadHandler implements DeviceListener {
 		}
 		
 		Gamepad gamepad = getGamepad(device, true);
-		if (gamepad == null) {
-			return;
-		}
-		
 		Mapping mapped = gamepad.mapping.get(new SourceComponent(Type.AXIS, axisId, mappedDir));
 		if (mapped == null) {
 			//LimeLog.info("Unmapped axis moved: " + axisId);
@@ -181,10 +173,10 @@ public class GamepadHandler implements DeviceListener {
 			gamepad.rightStickY = (short)(-Math.abs(value) * 0x7FFE);
 			break;
 		case RS_RIGHT:
-			gamepad.rightStickX = (short)(Math.abs(value) * 0x7FF0);
+			gamepad.rightStickX = (short)(Math.abs(value) * 0x7FFE);
 			break;
 		case RS_LEFT:
-			gamepad.rightStickX = (short)(-Math.abs(value) * 0x7FF0);
+			gamepad.rightStickX = (short)(-Math.abs(value) * 0x7FFE);
 			break;
 		case LT:
 			// HACK: Fix polling so we don't have to do this
