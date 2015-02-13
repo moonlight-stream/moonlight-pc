@@ -15,6 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -40,8 +42,54 @@ public class AppsFrame extends JFrame {
 
     // UI Elements
     private JComboBox appSelector;
-    private JButton   launchButton;
+    private JButton launchButton;
+    private JButton quitButton;
+    
+    private void fetchAppList() {
+    	SwingWorker<LinkedList<NvApp>, Void> fetchBg = new SwingWorker<LinkedList<NvApp>, Void>() {
+            @Override protected LinkedList<NvApp> doInBackground() throws Exception {
+                return fetchApps();
+            }
 
+            @Override protected void done() {
+                try {
+                    LinkedList<NvApp> fetched = get();
+                    if (fetched == null) {
+                    	return;
+                    }
+                    
+                    // Sort the fetched list alphabetically by app name
+                    Collections.sort(fetched, new Comparator<NvApp>() {
+    					@Override
+    					public int compare(NvApp left, NvApp right) {
+    						return left.getAppName().compareTo(right.getAppName());
+    					}
+                    });
+                    
+                    appSelector.removeAllItems();
+                    
+                    for (NvApp app : fetched) {
+                        apps.put(app.getAppName(), app);
+                        appSelector.addItem(app.getAppName());
+                    }
+
+                    quitButton.setEnabled(false);
+                    for (NvApp app : fetched) {
+                    	if (app.getIsRunning()) {
+                            appSelector.setSelectedItem(app.getAppName());
+                            quitButton.setEnabled(true);
+                    	}
+                    }
+                } catch (InterruptedException e) {
+                    LimeLog.warning("Failed to get list of apps; interrupted by " + e);
+                } catch (ExecutionException e) {
+                    LimeLog.warning("Failed to get list of apps; broken by " + e);
+                }
+            }
+        };
+        fetchBg.execute();
+    }
+    
     public AppsFrame(String host) {
         super("Apps");
         this.host = host;
@@ -68,48 +116,23 @@ public class AppsFrame extends JFrame {
 
         appSelector = new JComboBox();
         appSelector.addItem("Loading apps...");
-
-        // Send this to be done asynchronously
-        SwingWorker<LinkedList<NvApp>, Void> fetchBg = new SwingWorker<LinkedList<NvApp>, Void>() {
-            @Override protected LinkedList<NvApp> doInBackground() throws Exception {
-                return fetchApps();
-            }
-
-            @Override protected void done() {
-                try {
-                    LinkedList<NvApp> fetched = get();
-                    if (fetched == null) {
-                    	return;
+        
+        appSelector.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED && appSelector.getSelectedIndex() != -1) {
+                	NvApp app = apps.get(appSelector.getSelectedItem());
+                    if (app.getIsRunning()) {
+                    	launchButton.setText("Resume");
                     }
-                    
-                    // Sort the fetched list alphabetically by app name
-                    Collections.sort(fetched, new Comparator<NvApp>() {
-						@Override
-						public int compare(NvApp left, NvApp right) {
-							return left.getAppName().compareTo(right.getAppName());
-						}
-                    });
-                    
-                    appSelector.removeAllItems();
-                    
-                    for (NvApp app : fetched) {
-                        apps.put(app.getAppName(), app);
-                        appSelector.addItem(app.getAppName());
+                    else {
+                    	launchButton.setText("Launch");
                     }
-                    
-                    for (NvApp app : fetched) {
-                    	if (app.getIsRunning()) {
-                            appSelector.setSelectedItem(app.getAppName());
-                    	}
-                    }
-                } catch (InterruptedException e) {
-                    LimeLog.warning("Failed to get list of apps; interrupted by " + e);
-                } catch (ExecutionException e) {
-                    LimeLog.warning("Failed to get list of apps; broken by " + e);
                 }
             }
-        };
-        fetchBg.execute();
+        });
+        
+        // Asynchronously fetch app list
+        fetchAppList();
 
         launchButton = new JButton("Launch");
         launchButton.addActionListener(new ActionListener() {
@@ -123,6 +146,16 @@ public class AppsFrame extends JFrame {
                 }
             }
         });
+        
+        quitButton = new JButton("Quit Running App");
+        quitButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				quitApp();
+			}
+        });
+        quitButton.setEnabled(false);
+        
         getRootPane().setDefaultButton(launchButton);
 
         Box appSelectorBox = Box.createHorizontalBox();
@@ -133,6 +166,8 @@ public class AppsFrame extends JFrame {
         Box launchBox = Box.createHorizontalBox();
         launchBox.add(Box.createHorizontalGlue());
         launchBox.add(launchButton);
+        launchBox.add(Box.createHorizontalStrut(5));
+        launchBox.add(quitButton);
         launchBox.add(Box.createHorizontalGlue());
 
         mainPanel.add(Box.createVerticalStrut(10));
@@ -149,7 +184,7 @@ public class AppsFrame extends JFrame {
                          (int) dim.getHeight() / 2 - this.getHeight() / 2);
 
         this.setVisible(true);
-        this.setSize(225, 115);
+        this.setSize(300, 115);
         this.setResizable(false);
     }
 
@@ -169,5 +204,29 @@ public class AppsFrame extends JFrame {
     private void launchApp(String appName) {
         this.setVisible(false);
         Limelight.createInstance(host, appName);
+    }
+    
+    private void quitApp() {
+    	boolean quit = false;
+    	
+    	try {
+    		quit = httpConnection.quitApp();
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	} catch (XmlPullParserException e) {
+			e.printStackTrace();
+		}
+    	
+    	if (quit) {
+    		// Update the app list again
+    		fetchAppList();
+
+			JOptionPane.showMessageDialog(null, "Successfully quit app",
+					"Limelight", JOptionPane.INFORMATION_MESSAGE);
+    	}
+    	else {
+			JOptionPane.showMessageDialog(null, "Failed to quit app",
+					"Limelight", JOptionPane.ERROR_MESSAGE);
+    	}
     }
 }
