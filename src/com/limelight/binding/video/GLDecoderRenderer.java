@@ -112,9 +112,6 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     public void display(GLAutoDrawable glautodrawable) {    	
         // Decode the image
         boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-        if (!decoded) {
-            return;
-        }
 
         GL2 gl = glautodrawable.getGL().getGL2();
 
@@ -140,7 +137,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         	texture.enable(gl);
         	texture.bind(gl);
         }
-        else
+        else if (decoded)
         {
         	texture.updateSubImage(gl, new TextureData(glprofile,
 					4,
@@ -157,6 +154,10 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 					0,
 					0,
 					0);
+        }
+        else
+        {
+        	// Redraw the last frame we got
         }
         
     	gl.glBegin(gl.GL_QUADS);
