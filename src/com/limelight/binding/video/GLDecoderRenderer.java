@@ -135,7 +135,6 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         					bufferRGB,
         					null));
         	texture.enable(gl);
-        	texture.bind(gl);
         }
         else if (decoded)
         {
@@ -159,6 +158,8 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         {
         	// Redraw the last frame we got
         }
+        
+    	texture.bind(gl);
         
     	gl.glBegin(gl.GL_QUADS);
     	// This flips the texture as it draws it, as the opengl coordinate system is different
