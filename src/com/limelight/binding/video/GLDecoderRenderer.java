@@ -28,15 +28,15 @@ import java.nio.IntBuffer;
  * Time: 11:42 PM.
  */
 public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventListener {
-    private BufferedImage image;
-    private int[]         imageBuffer;
+	private final GLProfile glprofile;
+	private final GLCapabilities glcapabilities;
+	private final GLCanvas glcanvas;
+	private FPSAnimator animator;
+	private Texture texture;
+	private TextureData textureData;
+	private IntBuffer bufferRGB;
+	private int[] imageBuffer;
 
-    private final GLProfile      glprofile;
-    private final GLCapabilities glcapabilities;
-    private final GLCanvas       glcanvas;
-    private         FPSAnimator    animator;
-    private       Texture        texture;
-    private       IntBuffer      bufferRGB;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -56,9 +56,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         final StreamFrame frame = (StreamFrame) renderTarget;
         final JPanel renderingSurface = frame.getRenderingSurface();
 
-        image = new BufferedImage(width, height,
-                                  BufferedImage.TYPE_INT_ARGB);
-        imageBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        imageBuffer = new int[width * height];
         bufferRGB = IntBuffer.wrap(imageBuffer);
 
         // Add canvas to the frame
@@ -104,55 +102,51 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     }
 
     public void init(GLAutoDrawable glautodrawable) {
+        GL2 gl = glautodrawable.getGL().getGL2();
+    	
+        // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
+        // So we instruct it to read the packed RGB values in the appropriate (REV) order
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        
+        textureData = new TextureData(glprofile,
+				4,
+				width,
+				height,
+				0,
+				GL2.GL_BGRA,
+				GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
+				false,
+				false,
+				true,
+				bufferRGB,
+				null);
+        
+    	texture = new Texture(gl, textureData);
+    	texture.enable(gl);
     }
 
     public void dispose(GLAutoDrawable glautodrawable) {
+        GL2 gl = glautodrawable.getGL().getGL2();
+    	
+    	if (texture != null) {
+    		texture.disable(gl);
+    		texture.destroy(gl);
+    		texture = null;
+    	}
     }
 
-    public void display(GLAutoDrawable glautodrawable) {    	
-        // Decode the image
-        boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-
+    public void display(GLAutoDrawable glautodrawable) {
+        if (texture == null) {
+        	return;
+        }
+    	
         GL2 gl = glautodrawable.getGL().getGL2();
 
-        // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
-        // So we instruct it to read the packed RGB values in the appropriate (REV) order
-        bufferRGB.rewind();
-        if (texture == null)
+        // Get an updated image if available
+        boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
+        if (decoded)
         {
-            gl.glEnable(gl.GL_TEXTURE_2D);
-        	texture = new Texture(gl,
-        			new TextureData(glprofile,
-        					4,
-        					width,
-        					height,
-        					0,
-        					gl.GL_BGRA,
-        					gl.GL_UNSIGNED_INT_8_8_8_8_REV,
-        					false,
-        					false,
-        					true,
-        					bufferRGB,
-        					null));
-        	texture.enable(gl);
-        }
-        else if (decoded)
-        {
-        	texture.updateSubImage(gl, new TextureData(glprofile,
-					4,
-					width,
-					height,
-					0,
-					gl.GL_BGRA,
-					gl.GL_UNSIGNED_INT_8_8_8_8_REV,
-					false,
-					false,
-					true,
-					bufferRGB,
-					null),
-					0,
-					0,
-					0);
+        	texture.updateImage(gl, textureData);
         }
         else
         {
@@ -162,6 +156,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     	texture.bind(gl);
         
     	gl.glBegin(gl.GL_QUADS);
+    	
     	// This flips the texture as it draws it, as the opengl coordinate system is different
     	gl.glTexCoord2f(0.0f, 0.0f);
     	gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
@@ -174,7 +169,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 
     	gl.glTexCoord2f(0.0f, 1.0f);
     	gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-
+    	
     	gl.glEnd();
     }
 
