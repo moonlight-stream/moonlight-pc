@@ -323,6 +323,14 @@ public class GamepadConfigFrame extends JFrame {
 			}
 		}
 
+		@Override
+		public void handleDeviceAdded(Device device) {
+		}
+
+		@Override
+		public void handleDeviceRemoved(Device device) {
+		}
+
 	}
 
 	private static class GamepadCheckBox extends JCheckBox {

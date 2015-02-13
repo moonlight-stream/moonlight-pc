@@ -12,7 +12,7 @@ import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.gui.MainFrame;
 import com.limelight.gui.StreamFrame;
-import com.limelight.input.gamepad.Gamepad;
+import com.limelight.input.gamepad.GamepadHandler;
 import com.limelight.input.gamepad.GamepadListener;
 import com.limelight.input.gamepad.NativeGamepad;
 import com.limelight.nvstream.NvConnection;
@@ -41,7 +41,7 @@ public class Limelight implements NvConnectionListener {
 	private NvConnection conn;
 	private boolean connectionTerminating;
 	private static JFrame limeFrame;
-	private Gamepad gamepad;
+	private GamepadHandler gamepad;
 	private VideoDecoderRenderer decoderRenderer;
 
 	/**
@@ -157,8 +157,6 @@ public class Limelight implements NvConnectionListener {
 			// set the name of the application menu item
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Limelight");
 		}
-
-		GamepadListener.getInstance().addDeviceListener(new Gamepad());
 
 		String libraryError = loadNativeLibraries();
 
@@ -325,7 +323,7 @@ public class Limelight implements NvConnectionListener {
 	public void connectionStarted() {
 		streamFrame.hideSpinner();
 
-		gamepad = new Gamepad(conn);
+		gamepad = new GamepadHandler(conn);
 		GamepadListener.getInstance().addDeviceListener(gamepad);
 	}
 
