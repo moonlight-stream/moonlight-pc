@@ -40,7 +40,7 @@ public abstract class AbstractCpuDecoder implements VideoDecoderRenderer {
 		LimeLog.info("Using software decoding");
 		
 		// Use 2 decoding threads
-		int avcFlags = AvcDecoder.BILINEAR_FILTERING | getColorMode();
+		int avcFlags = AvcDecoder.FAST_BILINEAR_FILTERING | getColorMode();
 		int threadCount = 2;
 
 		int err = AvcDecoder.init(width, height, avcFlags, threadCount);

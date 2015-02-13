@@ -48,7 +48,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     @Override
     public int getColorMode() {
         // Force the renderer to use a buffered image that's friendly with OpenGL
-    	return AvcDecoder.NATIVE_COLOR_ARGB;
+    	return AvcDecoder.NATIVE_COLOR_0RGB;
     }
 
     @Override
@@ -104,12 +104,12 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     public void init(GLAutoDrawable glautodrawable) {
         GL2 gl = glautodrawable.getGL().getGL2();
     	
-        // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
-        // So we instruct it to read the packed RGB values in the appropriate (REV) order
         gl.glEnable(GL2.GL_TEXTURE_2D);
         
+        // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
+        // So we instruct it to read the packed RGB values in the appropriate (REV) order
         textureData = new TextureData(glprofile,
-				4,
+				GL2.GL_RGB8,
 				width,
 				height,
 				0,
@@ -117,7 +117,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 				GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
 				false,
 				false,
-				true,
+				false,
 				bufferRGB,
 				null);
         
