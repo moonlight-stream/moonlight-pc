@@ -11,6 +11,8 @@ import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.*;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -30,6 +32,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 	private FPSAnimator animator;
 	private IntBuffer bufferRGB;
 	private int[] imageBuffer;
+	private float viewportX, viewportY;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -51,6 +54,20 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 
         imageBuffer = new int[width * height];
         bufferRGB = IntBuffer.wrap(imageBuffer);
+        
+        frame.addComponentListener(new ComponentListener() {
+			@Override
+			public void componentHidden(ComponentEvent arg0) {}
+			@Override
+			public void componentMoved(ComponentEvent arg0) {}
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+				renderingSurface.setSize(frame.getContentPane().getSize());
+				glcanvas.setSize(renderingSurface.getSize());
+			}
+			@Override
+			public void componentShown(ComponentEvent arg0) {}
+        });
 
         glcanvas.setSize(renderingSurface.getSize());
         glcanvas.addGLEventListener(this);
@@ -91,6 +108,11 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     }
 
     public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
+        GL2 gl = glautodrawable.getGL().getGL2();
+
+        viewportX = width;
+        viewportY = height;
+        gl.glViewport(x, y, width, height);
     }
 
     public void init(GLAutoDrawable glautodrawable) {
@@ -115,8 +137,6 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         gl.glPixelTransferi(GL2.GL_BLUE_BIAS, 0);
         gl.glPixelTransferi(GL2.GL_ALPHA_SCALE, 1);
         gl.glPixelTransferi(GL2.GL_ALPHA_BIAS, 0);
-        gl.glRasterPos2f(-1, 1);
-        gl.glPixelZoom(1, -1);
     }
 
     public void dispose(GLAutoDrawable glautodrawable) {
@@ -130,6 +150,8 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        gl.glRasterPos2i(-1, 1);
+        gl.glPixelZoom(viewportX / width, -(viewportY / height));
         gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, bufferRGB);
     }
 
