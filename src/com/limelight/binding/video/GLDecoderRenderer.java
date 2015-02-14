@@ -96,7 +96,6 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     public void init(GLAutoDrawable glautodrawable) {
         GL2 gl = glautodrawable.getGL().getGL2();
     	
-        gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glDisable(GL2.GL_ALPHA_TEST);
         gl.glDisable(GL2.GL_BLEND);
         gl.glDisable(GL2.GL_DEPTH_TEST);
