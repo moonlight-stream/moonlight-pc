@@ -2,8 +2,6 @@ package com.limelight.binding.video;
 
 
 import com.jogamp.opengl.util.FPSAnimator;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureData;
 import com.limelight.LimeLog;
 import com.limelight.gui.StreamFrame;
 import com.limelight.nvstream.av.video.VideoDepacketizer;
@@ -17,8 +15,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.nio.IntBuffer;
 
 
@@ -32,11 +28,8 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 	private final GLCapabilities glcapabilities;
 	private final GLCanvas glcanvas;
 	private FPSAnimator animator;
-	private Texture texture;
-	private TextureData textureData;
 	private IntBuffer bufferRGB;
 	private int[] imageBuffer;
-
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -59,8 +52,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         imageBuffer = new int[width * height];
         bufferRGB = IntBuffer.wrap(imageBuffer);
 
-        // Add canvas to the frame
-        glcanvas.setSize(renderingSurface.getWidth(), renderingSurface.getHeight());
+        glcanvas.setSize(renderingSurface.getSize());
         glcanvas.addGLEventListener(this);
 
         for (MouseListener m : renderingSurface.getMouseListeners()) {
@@ -105,72 +97,41 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         GL2 gl = glautodrawable.getGL().getGL2();
     	
         gl.glEnable(GL2.GL_TEXTURE_2D);
-        
-        // OpenGL only supports BGRA and RGBA, rather than ARGB or ABGR (from the buffer)
-        // So we instruct it to read the packed RGB values in the appropriate (REV) order
-        textureData = new TextureData(glprofile,
-				GL2.GL_RGB8,
-				width,
-				height,
-				0,
-				GL2.GL_BGRA,
-				GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
-				false,
-				false,
-				false,
-				bufferRGB,
-				null);
-        
-    	texture = new Texture(gl, textureData);
-    	texture.enable(gl);
+        gl.glDisable(GL2.GL_ALPHA_TEST);
+        gl.glDisable(GL2.GL_BLEND);
+        gl.glDisable(GL2.GL_DEPTH_TEST);
+        gl.glDisable(GL2.GL_DITHER);
+        gl.glDisable(GL2.GL_FOG);
+        gl.glDisable(GL2.GL_LIGHTING);
+        gl.glDisable(GL2.GL_LOGIC_OP);
+        gl.glDisable(GL2.GL_STENCIL_TEST);
+        gl.glDisable(GL2.GL_TEXTURE_1D);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glPixelTransferi(GL2.GL_MAP_COLOR, GL2.GL_FALSE);
+        gl.glPixelTransferi(GL2.GL_RED_SCALE, 1);
+        gl.glPixelTransferi(GL2.GL_RED_BIAS, 0);
+        gl.glPixelTransferi(GL2.GL_GREEN_SCALE, 1);
+        gl.glPixelTransferi(GL2.GL_GREEN_BIAS, 0);
+        gl.glPixelTransferi(GL2.GL_BLUE_SCALE, 1);
+        gl.glPixelTransferi(GL2.GL_BLUE_BIAS, 0);
+        gl.glPixelTransferi(GL2.GL_ALPHA_SCALE, 1);
+        gl.glPixelTransferi(GL2.GL_ALPHA_BIAS, 0);
+        gl.glRasterPos2f(-1, 1);
+        gl.glPixelZoom(1, -1);
     }
 
     public void dispose(GLAutoDrawable glautodrawable) {
-        GL2 gl = glautodrawable.getGL().getGL2();
-    	
-    	if (texture != null) {
-    		texture.disable(gl);
-    		texture.destroy(gl);
-    		texture = null;
-    	}
     }
 
     public void display(GLAutoDrawable glautodrawable) {
-        if (texture == null) {
-        	return;
-        }
-    	
         GL2 gl = glautodrawable.getGL().getGL2();
 
         // Get an updated image if available
-        boolean decoded = AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-        if (decoded)
-        {
-        	texture.updateImage(gl, textureData);
-        }
-        else
-        {
-        	// Redraw the last frame we got
-        }
+        // If not, the image buffer will be left unchanged
+        AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         
-    	texture.bind(gl);
-        
-    	gl.glBegin(gl.GL_QUADS);
-    	
-    	// This flips the texture as it draws it, as the opengl coordinate system is different
-    	gl.glTexCoord2f(0.0f, 0.0f);
-    	gl.glVertex3f(-1.0f, 1.0f, 1.0f); // Bottom Left Of The Texture and Quad
-
-    	gl.glTexCoord2f(1.0f, 0.0f);
-    	gl.glVertex3f(1.0f, 1.0f, 1.0f); // Bottom Right Of The Texture and Quad
-
-    	gl.glTexCoord2f(1.0f, 1.0f);
-    	gl.glVertex3f(1.0f, -1.0f, 1.0f); // Top Right Of The Texture and Quad
-
-    	gl.glTexCoord2f(0.0f, 1.0f);
-    	gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-    	
-    	gl.glEnd();
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, bufferRGB);
     }
 
     /**
