@@ -149,7 +149,6 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         // If not, the image buffer will be left unchanged
         AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
         
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         gl.glRasterPos2i(-1, 1);
         gl.glPixelZoom(viewportX / width, -(viewportY / height));
         gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, bufferRGB);
