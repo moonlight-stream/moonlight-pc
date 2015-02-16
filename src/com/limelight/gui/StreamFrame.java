@@ -111,6 +111,12 @@ public class StreamFrame extends JFrame {
 			int maxHeight = screenSize.height - (screenInsets.top + screenInsets.bottom);
 			this.setSize(new Dimension(Math.min(streamConfig.getWidth() + windowInsetWidth, maxWidth),
 				Math.min(streamConfig.getHeight() + windowInsetHeight, maxHeight)));
+			
+			// Maximize the window if the window size would be larger than the usable screen area
+			if (streamConfig.getWidth() + windowInsetWidth > maxWidth &&
+					streamConfig.getHeight() + windowInsetHeight > maxHeight) {
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+			}
 		}
 
 		hideCursor();
