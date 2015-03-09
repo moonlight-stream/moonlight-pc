@@ -19,6 +19,7 @@ import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.NvConnectionListener;
 import com.limelight.nvstream.StreamConfiguration;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
+import com.limelight.nvstream.http.NvApp;
 import com.limelight.nvstream.http.NvHTTP;
 import com.limelight.nvstream.http.PairingManager;
 import com.limelight.settings.PreferencesManager;
@@ -74,7 +75,7 @@ public class Limelight implements NvConnectionListener {
 	 */
 	public static StreamConfiguration createConfiguration(Resolution res, Integer bitRate, String appName) {
 		return new StreamConfiguration.Builder()
-		.setApp(appName)
+		.setApp(new NvApp(appName))
 		.setResolution(res.width, res.height)
 		.setRefreshRate(res.frameRate)
 		.setBitrate(bitRate*1000).build();

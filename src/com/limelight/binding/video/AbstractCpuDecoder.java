@@ -9,7 +9,7 @@ import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.nvstream.av.video.VideoDepacketizer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
-public abstract class AbstractCpuDecoder implements VideoDecoderRenderer {
+public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	private Thread decoderThread;
 	protected int width, height, targetFps;
 	protected boolean dying;
@@ -152,9 +152,5 @@ public abstract class AbstractCpuDecoder implements VideoDecoderRenderer {
 			return 0;
 		}
 		return (int)(totalDecoderTimeMs / totalFrames);
-	}
-
-	public int getAverageEndToEndLatency() {
-		return 0;
 	}
 }
