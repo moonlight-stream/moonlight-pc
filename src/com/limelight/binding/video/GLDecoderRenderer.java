@@ -33,6 +33,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 	private IntBuffer bufferRGB;
 	private int[] imageBuffer;
 	private float viewportX, viewportY;
+	private float arDifference, pixelZoom;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -112,6 +113,9 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 
         viewportX = width;
         viewportY = height;
+        pixelZoom = viewportX / this.width;
+        // This is the difference of aspect ratio between the screen and the video stream
+        arDifference =  Math.abs((viewportX / this.width) - (viewportY / this.height));
         gl.glViewport(x, y, width, height);
     }
 
@@ -148,9 +152,10 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         // Get an updated image if available
         // If not, the image buffer will be left unchanged
         AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-        
-        gl.glRasterPos2i(-1, 1);
-        gl.glPixelZoom(viewportX / width, -(viewportY / height));
+
+        // Center image on screen by pushing it down by half of AR difference
+        gl.glRasterPos2f(-1f, 1.0f - (arDifference / 2));
+        gl.glPixelZoom(pixelZoom, -(pixelZoom));
         gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, bufferRGB);
     }
 
