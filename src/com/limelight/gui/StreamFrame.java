@@ -84,6 +84,7 @@ public class StreamFrame extends JFrame {
 		renderingSurface.setFocusable(true);
 		renderingSurface.setLayout(new BoxLayout(renderingSurface, BoxLayout.Y_AXIS));
 		renderingSurface.setVisible(true);
+		renderingSurface.setFocusTraversalKeysEnabled(false);
 		
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(renderingSurface, "Center");
