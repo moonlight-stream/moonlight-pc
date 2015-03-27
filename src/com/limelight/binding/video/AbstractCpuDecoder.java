@@ -112,7 +112,8 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		if (decodeUnit.getDataLength() <= DECODER_BUFFER_SIZE) {
 			decoderBuffer.clear();
 			
-			for (ByteBufferDescriptor bbd : decodeUnit.getBufferList()) {
+			for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
+					bbd != null; bbd = bbd.nextDescriptor) {
 				decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
 			}
 			
@@ -122,7 +123,8 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 			data = new byte[decodeUnit.getDataLength()+AvcDecoder.getInputPaddingSize()];
 			
 			int offset = 0;
-			for (ByteBufferDescriptor bbd : decodeUnit.getBufferList()) {
+			for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
+					bbd != null; bbd = bbd.nextDescriptor) {
 				System.arraycopy(bbd.data, bbd.offset, data, offset, bbd.length);
 				offset += bbd.length;
 			}
