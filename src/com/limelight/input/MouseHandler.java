@@ -232,7 +232,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener, MouseWh
 	}
 
 	public void mouseWheelMoved(MouseWheelEvent event) {
-		conn.sendMouseScroll((byte) event.getWheelRotation());
+		conn.sendMouseScroll((byte) -event.getWheelRotation());
 		event.consume();
 	}
 
