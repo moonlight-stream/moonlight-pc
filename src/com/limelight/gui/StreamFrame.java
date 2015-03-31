@@ -195,14 +195,14 @@ public class StreamFrame extends JFrame {
 					gd.setDisplayMode(config);
 				}
 			} else {
-				JOptionPane.showMessageDialog(
+				Limelight.displayUiMessage(
 						this,
 						"Unable to change display resolution. \nThis may not be the correct resolution",
 						"Display Resolution",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		} else {
-			JOptionPane.showMessageDialog(
+			Limelight.displayUiMessage(
 					this, 
 					"Your operating system does not support fullscreen.", 
 					"Fullscreen Unsupported",

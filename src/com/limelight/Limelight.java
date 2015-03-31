@@ -44,6 +44,20 @@ public class Limelight implements NvConnectionListener {
 	private static JFrame limeFrame;
 	private GamepadHandler gamepad;
 	private VideoDecoderRenderer decoderRenderer;
+	
+	public static void displayUiMessage(JFrame frame, String message, String title, int type) {
+		if (COMMAND_LINE_LAUNCH) {
+			if (type == JOptionPane.ERROR_MESSAGE) {
+				System.err.println(message);
+			}
+			else {
+				System.out.println(message);
+			}
+		}
+		else {
+			JOptionPane.showMessageDialog(frame, message, title, type);
+		}
+	}
 
 	/**
 	 * Constructs a new instance based on the given host
@@ -88,7 +102,7 @@ public class Limelight implements NvConnectionListener {
 		// Tell the user how to map the gamepad if it's a new install and there's no default for this platform
 		if (!PreferencesManager.hasExistingPreferences() &&
 				!System.getProperty("os.name").contains("Windows")) {
-			JOptionPane.showMessageDialog(null, "Gamepad mapping is not set. If you want to use a gamepad, "+
+			displayUiMessage(null, "Gamepad mapping is not set. If you want to use a gamepad, "+
 					"click the Options menu and choose Gamepad Settings. After mapping your gamepad,"+
 					" it will work while streaming.", "Limelight", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -161,21 +175,16 @@ public class Limelight implements NvConnectionListener {
 
 		String libraryError = loadNativeLibraries();
 
-		// launching with command line arguments
-		if (args.length > 0) {
-			if (libraryError == null) {
-				parseCommandLine(args);
+		if (libraryError == null) {
+			// launching with command line arguments
+			if (args.length > 0) {
+				createFrame();
 			}
 			else {
-				// Print the error to stderr if running from command line
-				System.err.println(libraryError);
+				parseCommandLine(args);
 			}
 		} else {
-			if (libraryError == null) {
-				createFrame();
-			} else {
-				JOptionPane.showMessageDialog(null, libraryError, "Wrong JAR platform", JOptionPane.ERROR_MESSAGE);
-			}
+			displayUiMessage(null, libraryError, "Wrong JAR platform", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -368,7 +377,7 @@ public class Limelight implements NvConnectionListener {
 					// Spin the dialog off in a thread because it blocks
 					new Thread(new Runnable() {
 						public void run() {
-							JOptionPane.showMessageDialog(null, "Please enter the following PIN on the target PC: "+pinStr,
+							Limelight.displayUiMessage(null, "Please enter the following PIN on the target PC: "+pinStr,
 									"Limelight", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}).start();
@@ -400,26 +409,27 @@ public class Limelight implements NvConnectionListener {
 	}
 
 	/**
-	 * Displays a message to the user in the form of an info dialog.
+	 * Displays a message to the user
 	 * @param message the message to show the user
 	 */
 	public void displayMessage(String message) {
 		streamFrame.dispose();
-		JOptionPane.showMessageDialog(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+		displayUiMessage(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/**
-	 * Displays an error to the user in the form of an error dialog
+	 * Displays an error to the user
 	 * @param title the title for the dialog frame
 	 * @param message the message to show the user
 	 */
 	public void displayError(String title, String message) {
 		streamFrame.dispose();
-		JOptionPane.showMessageDialog(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
+		displayUiMessage(limeFrame, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	public void displayTransientMessage(String message) {
-		// FIXME: Implement transient messages
+		// FIXME: Implement transient GUI messages
+		LimeLog.info(message);
 	}
 }
 

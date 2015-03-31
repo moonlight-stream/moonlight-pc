@@ -193,7 +193,7 @@ public class AppsFrame extends JFrame {
         try {
             return httpConnection.getAppList();
         } catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Unable to retreive app list",
+			Limelight.displayUiMessage(null, "Unable to retreive app list",
 					"Limelight", JOptionPane.ERROR_MESSAGE);
 			setVisible(false);
         }
@@ -221,11 +221,11 @@ public class AppsFrame extends JFrame {
     		// Update the app list again
     		fetchAppList();
 
-			JOptionPane.showMessageDialog(null, "Successfully quit app",
+    		Limelight.displayUiMessage(null, "Successfully quit app",
 					"Limelight", JOptionPane.INFORMATION_MESSAGE);
     	}
     	else {
-			JOptionPane.showMessageDialog(null, "Failed to quit app",
+    		Limelight.displayUiMessage(null, "Failed to quit app",
 					"Limelight", JOptionPane.ERROR_MESSAGE);
     	}
     }

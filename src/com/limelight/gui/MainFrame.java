@@ -118,7 +118,7 @@ public class MainFrame {
 						PreferencesManager.writePreferences(prefs);
 						
 						String msg = Limelight.pair(prefs.getUniqueId(), hostField.getText());
-						JOptionPane.showMessageDialog(limeFrame, msg, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+						Limelight.displayUiMessage(limeFrame, msg, "Limelight", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}).start();
 			}
