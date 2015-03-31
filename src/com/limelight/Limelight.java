@@ -177,7 +177,7 @@ public class Limelight implements NvConnectionListener {
 
 		if (libraryError == null) {
 			// launching with command line arguments
-			if (args.length > 0) {
+			if (args.length == 0) {
 				createFrame();
 			}
 			else {
