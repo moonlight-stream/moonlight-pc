@@ -76,7 +76,7 @@ public class PreferencesFrame extends JFrame {
 		fullscreen = new JCheckBox("Fullscreen");
 		fullscreen.setSelected(prefs.getFullscreen());
 		
-		openGlRenderer = new JCheckBox("Use OpenGL Renderer");
+		openGlRenderer = new JCheckBox("Use OpenGL Renderer (Experimental)");
 		openGlRenderer.setSelected(prefs.getUseOpenGlRenderer());
 	
 		Box resolutionBox = Box.createHorizontalBox();

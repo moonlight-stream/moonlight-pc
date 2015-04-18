@@ -128,7 +128,7 @@ public abstract class PreferencesManager {
 			this.res = res;
 			this.bitrate = res.defaultBitrate;
 			this.fullscreen = fullscreen;
-			this.useOpenGlRenderer = true;
+			this.useOpenGlRenderer = false;
 			this.host = "GeForce PC host";
 			this.uniqueId = String.format("%016x", new Random().nextLong());
 		}
