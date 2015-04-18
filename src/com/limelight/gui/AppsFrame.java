@@ -4,6 +4,7 @@ import com.limelight.LimeLog;
 import com.limelight.Limelight;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.nvstream.StreamConfiguration;
+import com.limelight.nvstream.http.GfeHttpResponseException;
 import com.limelight.nvstream.http.NvApp;
 import com.limelight.nvstream.http.NvHTTP;
 import com.limelight.settings.PreferencesManager;
@@ -192,6 +193,16 @@ public class AppsFrame extends JFrame {
         // List out the games that are installed
         try {
             return httpConnection.getAppList();
+        } catch (GfeHttpResponseException e) {
+        	if (e.getErrorCode() == 401) {
+    			Limelight.displayUiMessage(null, "Not paired with computer",
+    					"Limelight", JOptionPane.ERROR_MESSAGE);
+        	}
+        	else {
+    			Limelight.displayUiMessage(null, "GFE error: "+e.getErrorMessage()+" (Error Code: "+e.getErrorCode()+")",
+    					"Limelight", JOptionPane.ERROR_MESSAGE);
+        	}
+			setVisible(false);
         } catch (Exception e) {
 			Limelight.displayUiMessage(null, "Unable to retreive app list",
 					"Limelight", JOptionPane.ERROR_MESSAGE);
