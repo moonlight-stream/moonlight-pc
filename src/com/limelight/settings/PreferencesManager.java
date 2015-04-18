@@ -66,6 +66,7 @@ public abstract class PreferencesManager {
 		public enum Resolution { RES_720_30(1280, 720, 30, 5), RES_720_60(1280, 720, 60, 10), 
 			RES_768_30(1366, 768, 30, 5), RES_768_60(1366, 768, 60, 10),
 			RES_900_30(1600, 900, 30, 10), RES_900_60(1600, 900, 60, 15),
+			RES_1050_30(1680, 1050, 30, 10), RES_1050_60(1680, 1050, 60, 20),
 			RES_1080_30(1920, 1080, 30, 10), RES_1080_60(1920, 1080, 60, 20);
 			public int width;
 			public int height;
