@@ -118,16 +118,8 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     public void init(GLAutoDrawable glautodrawable) {
         GL2 gl = glautodrawable.getGL().getGL2();
     	
-        gl.glDisable(GL2.GL_ALPHA_TEST);
-        gl.glDisable(GL2.GL_BLEND);
-        gl.glDisable(GL2.GL_DEPTH_TEST);
         gl.glDisable(GL2.GL_DITHER);
-        gl.glDisable(GL2.GL_FOG);
-        gl.glDisable(GL2.GL_LIGHTING);
-        gl.glDisable(GL2.GL_LOGIC_OP);
-        gl.glDisable(GL2.GL_STENCIL_TEST);
-        gl.glDisable(GL2.GL_TEXTURE_1D);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glDisable(GL2.GL_MULTISAMPLE);
         gl.glPixelTransferi(GL2.GL_MAP_COLOR, GL2.GL_FALSE);
         gl.glPixelTransferi(GL2.GL_RED_SCALE, 1);
         gl.glPixelTransferi(GL2.GL_RED_BIAS, 0);
@@ -151,7 +143,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         
         gl.glRasterPos2i(-1, 1);
         gl.glPixelZoom(viewportX / width, -(viewportY / height));
-        gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, bufferRGB);
+        gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_BYTE, bufferRGB);
     }
 
     /**
