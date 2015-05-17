@@ -4,9 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.*;
 
 import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
@@ -23,9 +29,9 @@ import com.limelight.nvstream.http.NvApp;
 import com.limelight.nvstream.http.NvHTTP;
 import com.limelight.nvstream.http.PairingManager;
 import com.limelight.settings.PreferencesManager;
-import com.limelight.settings.SettingsManager;
 import com.limelight.settings.PreferencesManager.Preferences;
 import com.limelight.settings.PreferencesManager.Preferences.Resolution;
+import com.limelight.settings.SettingsManager;
 
 /**
  * Main class for Limelight-pc contains methods for starting the application as well
@@ -164,6 +170,7 @@ public class Limelight implements NvConnectionListener {
 			try {
 				LimeLog.setFileHandler(SettingsManager.SETTINGS_DIR + File.separator + "limelight.log");
 			} catch (IOException e) {
+				System.err.println("ERROR! Unable to set log's file handler in Limelight.java's Main function");
 			}
 		}
 
@@ -188,7 +195,7 @@ public class Limelight implements NvConnectionListener {
 		}
 	}
 
-	//TODO: make this less jank
+	//TODO: verify correct number of arguments from each given option
 	private static void parseCommandLine(String[] args) {
 		String host = null;
 		boolean fullscreen = false;
@@ -202,59 +209,84 @@ public class Limelight implements NvConnectionListener {
 		// Save preferences to preserve possibly new unique ID
 		PreferencesManager.writePreferences(prefs);
 
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-pair")) {
-				if (i + 1 < args.length){
-					host = args[i+1];
-					System.out.println("Trying to pair to: " + host);
-					String msg = pair(prefs.getUniqueId(), host);
-					System.out.println("Pairing: " + msg);
-					System.exit(0);
-				} else {
-					System.err.println("Syntax error: hostname or ip address expected after -pair");
+		CommandLine commandLine;//Apache's CLI stuff
+		//for future reference: Option(String switch, does the option have args, String description)
+		Option optionPair = new Option("pair", true, "hostname or IP address to pair to");
+		Option optionHost = new Option("host", true, "hostname or IP address to connect to (required)");
+		Option optionBitrate = new Option("bitrate", true, "stream bit rate, in Megabits per second (Mbps)");
+		Option optionApp = new Option("app", true, "application to run on start, defaulted to 'Steam'");
+		Option optionFS = new Option("fs", false, "run steam in fullscreen");
+		Option option720 = new Option("720", false, "set stream resolution to 720p");
+		Option option768 = new Option("768", false, "set stream resolution to 768p");
+		Option option900 = new Option("900", false, "set stream resolution to 900p");
+		Option option1080 = new Option("1080", false, "set stream resolution to 1080p");
+		Option option30FPS = new Option("30fps", false, "set stream refresh rate to 30 fps");
+		Option option60FPS = new Option("60fps", false, "set stream resolution to 60 fps");
+		
+		Options options = new Options();
+		options.addOption(optionPair).addOption(optionHost).addOption(optionBitrate).addOption(optionApp)
+				.addOption(optionFS).addOption(option720).addOption(option768).addOption(option900)
+				.addOption(option1080).addOption(option1080).addOption(option30FPS).addOption(option60FPS);
+		CommandLineParser parser = new DefaultParser();
+		
+		try{
+			commandLine = parser.parse(options, args, true); 
+			//parse the args into the options, and stop parsing at unrecognized token
+
+			if (commandLine.hasOption(optionPair.getOpt())) {//parse the 'pair' switch.  This will begin pairing, then exit once completed.
+				String result = commandLine.getOptionValue(optionPair.getOpt());
+				if(result == null || result.startsWith("-")){//this is a legal assumption under RFC 952 and 1123 did not change it.
+					System.err.println("Syntax error: -"+optionPair.getOpt()+" requires argument "+ optionPair.getDescription());
 					System.exit(4);
 				}
-			} else if (args[i].equals("-host")) {
-				if (i + 1 < args.length) {
-					host = args[i+1];
-					i++;
-				} else {
-					System.err.println("Syntax error: hostname or ip address expected after -host");
-					System.exit(3);
-				}
-			} else if (args[i].equals("-bitrate")) {
-				if (i + 1 < args.length){
-					bitrate = Integer.parseInt(args[i+1]);
-					i++;
-				} else {
-					System.err.println("Syntax error: bitrate (in Mbps) expected after -bitrate");
-					System.exit(3);
-				}
-			} else if (args[i].equals("-app")) {
-				if (i + 1 < args.length){
-					appName = args[i+1];
-					i++;
-				} else {
-					System.err.println("Syntax error: app name expected after -app");
-					System.exit(3);
-				}
-			} else if (args[i].equals("-fs")) {
-				fullscreen = true;
-			} else if (args[i].equals("-720")) {
-				resolution = 720;
-			} else if (args[i].equals("-768")) {
-			    resolution = 768;
-			} else if (args[i].equals("-900")) {
-			    resolution = 900;
-			} else if (args[i].equals("-1080")) {
-				resolution = 1080;
-			} else if (args[i].equals("-30fps")) {
-				refresh = 30;
-			} else if (args[i].equals("-60fps")) {
-				refresh = 60;
-			} else {
-				System.out.println("Syntax Error: Unrecognized argument: " + args[i]);
+				host = result;
+				System.out.println("Trying to pair to: " + host);
+				String msg = pair(prefs.getUniqueId(), host);
+				System.out.println("Pairing: " + msg);
+				System.exit(0);
 			}
+			
+			if (commandLine.hasOption(optionHost.getOpt())){//parse the 'host' switch.  This is the hostname or IP to connect to
+				String result = commandLine.getOptionValue(optionHost.getOpt());
+				if(result == null || result.startsWith("-")){//this is a legal assumption under RFC 952 and 1123 did not change it.
+					System.err.println("Syntax error: -"+optionHost.getOpt()+" requires argument "+ optionHost.getDescription());
+					System.exit(3);
+				}
+				host = result;
+			}
+			
+			if(commandLine.hasOption(optionBitrate.getOpt())){
+				String result = commandLine.getOptionValue(optionBitrate.getOpt());
+				if(result == null || result.startsWith("-")){//parse the 'bitrate' switch.
+					System.err.println("Syntax error: -"+optionBitrate.getOpt()+" requires argument "+ optionBitrate.getDescription());
+					System.exit(3);
+				}
+				bitrate = Integer.parseInt(commandLine.getOptionValue(optionBitrate.getOpt()));
+			}
+			
+			if(commandLine.hasOption(optionApp.getOpt())){
+				String result = commandLine.getOptionValue(optionHost.getOpt());
+				if(result == null || result.startsWith("-")){//parse the 'app' switch.  
+					//I make the assumption that an 'app' doesn't begin with a hyphen, because that makes everything nice.
+					System.err.println("Syntax error: -"+optionApp.getOpt()+" requires argument "+ optionApp.getDescription());
+					System.exit(3);
+				}
+				appName = commandLine.getOptionValue(optionApp.getOpt());
+			}
+			
+			fullscreen = commandLine.hasOption(optionFS.getOpt());
+			if(commandLine.hasOption(option720.getOpt())) resolution = 720;
+			if(commandLine.hasOption(option768.getOpt())) resolution = 768;
+			if(commandLine.hasOption(option900.getOpt())) resolution = 900;
+			if(commandLine.hasOption(option1080.getOpt())) resolution = 1080;
+			if(commandLine.hasOption(option30FPS.getOpt())) refresh = 30;
+			if(commandLine.hasOption(option60FPS.getOpt())) refresh = 60;
+			
+		} catch (org.apache.commons.cli.ParseException exception){
+			System.err.println(exception.toString());
+		} catch (NumberFormatException exception) {
+			System.err.println("ERROR! Bad bitrate given!");
+			bitrate = null;
 		}
 
 		if (host == null) {
