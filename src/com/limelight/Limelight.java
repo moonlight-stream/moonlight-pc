@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.ParseException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -12,7 +11,8 @@ import javax.swing.JOptionPane;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.CommandLine;
 
 import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
@@ -195,7 +195,6 @@ public class Limelight implements NvConnectionListener {
 		}
 	}
 
-	//TODO: verify correct number of arguments from each given option
 	private static void parseCommandLine(String[] args) {
 		String host = null;
 		boolean fullscreen = false;
@@ -223,8 +222,7 @@ public class Limelight implements NvConnectionListener {
 		Option option30FPS = new Option("30fps", false, "set stream refresh rate to 30 fps");
 		Option option60FPS = new Option("60fps", false, "set stream resolution to 60 fps");
 		
-		Options options = new Options();
-		options.addOption(optionPair).addOption(optionHost).addOption(optionBitrate).addOption(optionApp)
+		Options options = new Options().addOption(optionPair).addOption(optionHost).addOption(optionBitrate).addOption(optionApp)
 				.addOption(optionFS).addOption(option720).addOption(option768).addOption(option900)
 				.addOption(option1080).addOption(option1080).addOption(option30FPS).addOption(option60FPS);
 		CommandLineParser parser = new DefaultParser();
@@ -250,7 +248,7 @@ public class Limelight implements NvConnectionListener {
 				String result = commandLine.getOptionValue(optionHost.getOpt());
 				if(result == null || result.startsWith("-")){//this is a legal assumption under RFC 952 and 1123 did not change it.
 					System.err.println("Syntax error: -"+optionHost.getOpt()+" requires argument "+ optionHost.getDescription());
-					System.exit(3);
+					System.exit(5);
 				}
 				host = result;
 			}
@@ -261,17 +259,17 @@ public class Limelight implements NvConnectionListener {
 					System.err.println("Syntax error: -"+optionBitrate.getOpt()+" requires argument "+ optionBitrate.getDescription());
 					System.exit(3);
 				}
-				bitrate = Integer.parseInt(commandLine.getOptionValue(optionBitrate.getOpt()));
+				bitrate = Integer.parseInt(result);
 			}
 			
 			if(commandLine.hasOption(optionApp.getOpt())){
-				String result = commandLine.getOptionValue(optionHost.getOpt());
+				String result = commandLine.getOptionValue(optionApp.getOpt());
 				if(result == null || result.startsWith("-")){//parse the 'app' switch.  
 					//I make the assumption that an 'app' doesn't begin with a hyphen, because that makes everything nice.
 					System.err.println("Syntax error: -"+optionApp.getOpt()+" requires argument "+ optionApp.getDescription());
 					System.exit(3);
 				}
-				appName = commandLine.getOptionValue(optionApp.getOpt());
+				appName = result;
 			}
 			
 			fullscreen = commandLine.hasOption(optionFS.getOpt());
@@ -287,11 +285,6 @@ public class Limelight implements NvConnectionListener {
 		} catch (NumberFormatException exception) {
 			System.err.println("ERROR! Bad bitrate given!");
 			bitrate = null;
-		}
-
-		if (host == null) {
-			System.out.println("Syntax Error: You must include a host. Use -host to specifiy a hostname or ip address.");
-			System.exit(5);
 		}
 
 		Resolution streamRes = Resolution.findRes(resolution, refresh);
