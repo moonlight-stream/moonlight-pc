@@ -368,8 +368,12 @@ public class Limelight implements NvConnectionListener {
 			httpConn = new NvHTTP(InetAddress.getByName(host),
 					uniqueId, PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
 			try {
-				if (httpConn.getPairState() == PairingManager.PairState.PAIRED) {
+				String serverInfo = httpConn.getServerInfo(uniqueId);
+				if (httpConn.getPairState(serverInfo) == PairingManager.PairState.PAIRED) {
 					message = "Already paired";
+				}
+				else if (httpConn.getCurrentGame(serverInfo) != 0) {
+					message = "Computer is currently in a game. You must close the game before pairing.";
 				}
 				else {
 					final String pinStr = PairingManager.generatePinString();
