@@ -104,7 +104,7 @@ public class Limelight implements NvConnectionListener {
 				!System.getProperty("os.name").contains("Windows")) {
 			displayUiMessage(null, "Gamepad mapping is not set. If you want to use a gamepad, "+
 					"click the Options menu and choose Gamepad Settings. After mapping your gamepad,"+
-					" it will work while streaming.", "Limelight", JOptionPane.INFORMATION_MESSAGE);
+					" it will work while streaming.", "Moonlight", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 		MainFrame main = new MainFrame();
@@ -170,7 +170,7 @@ public class Limelight implements NvConnectionListener {
 		//fix the menu bar if we are running in osx
 		if (System.getProperty("os.name").contains("Mac OS X")) {
 			// set the name of the application menu item
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Limelight");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Moonlight");
 		}
 
 		String libraryError = loadNativeLibraries();
@@ -382,7 +382,7 @@ public class Limelight implements NvConnectionListener {
 					new Thread(new Runnable() {
 						public void run() {
 							Limelight.displayUiMessage(null, "Please enter the following PIN on the target PC: "+pinStr,
-									"Limelight", JOptionPane.INFORMATION_MESSAGE);
+									"Moonlight", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}).start();
 					
@@ -418,7 +418,7 @@ public class Limelight implements NvConnectionListener {
 	 */
 	public void displayMessage(String message) {
 		streamFrame.dispose();
-		displayUiMessage(limeFrame, message, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+		displayUiMessage(limeFrame, message, "Moonlight", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/**

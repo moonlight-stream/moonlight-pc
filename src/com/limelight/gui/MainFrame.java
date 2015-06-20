@@ -34,7 +34,7 @@ import java.net.InetAddress;
 import java.util.HashMap;
 
 /**
- * The main frame of Limelight that allows the user to specify the host and begin the stream.
+ * The main frame of Moonlight that allows the user to specify the host and begin the stream.
  *
  * @author Diego Waxemberg
  *         <br>Cameron Gutman
@@ -118,7 +118,7 @@ public class MainFrame {
 						PreferencesManager.writePreferences(prefs);
 						
 						String msg = Limelight.pair(prefs.getUniqueId(), hostField.getText());
-						Limelight.displayUiMessage(limeFrame, msg, "Limelight", JOptionPane.INFORMATION_MESSAGE);
+						Limelight.displayUiMessage(limeFrame, msg, "Moonlight", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}).start();
 			}
@@ -129,7 +129,7 @@ public class MainFrame {
      * Builds all components of the frame, including the frame itself and displays it to the user.
      */
     public void build() {
-        limeFrame = new JFrame("Limelight");
+        limeFrame = new JFrame("Moonlight");
         limeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Container mainPane = limeFrame.getContentPane();
 

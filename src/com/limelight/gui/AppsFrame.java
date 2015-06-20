@@ -108,7 +108,7 @@ public class AppsFrame extends JFrame {
 					PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
 		} catch (UnknownHostException e) {
 			JOptionPane.showMessageDialog(null, "Unable to resolve machine address",
-					"Limelight", JOptionPane.ERROR_MESSAGE);
+					"Moonlight", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
     	
@@ -196,16 +196,16 @@ public class AppsFrame extends JFrame {
         } catch (GfeHttpResponseException e) {
         	if (e.getErrorCode() == 401) {
     			Limelight.displayUiMessage(null, "Not paired with computer",
-    					"Limelight", JOptionPane.ERROR_MESSAGE);
+    					"Moonlight", JOptionPane.ERROR_MESSAGE);
         	}
         	else {
     			Limelight.displayUiMessage(null, "GFE error: "+e.getErrorMessage()+" (Error Code: "+e.getErrorCode()+")",
-    					"Limelight", JOptionPane.ERROR_MESSAGE);
+    					"Moonlight", JOptionPane.ERROR_MESSAGE);
         	}
 			setVisible(false);
         } catch (Exception e) {
 			Limelight.displayUiMessage(null, "Unable to retreive app list",
-					"Limelight", JOptionPane.ERROR_MESSAGE);
+					"Moonlight", JOptionPane.ERROR_MESSAGE);
 			setVisible(false);
         }
         
@@ -233,11 +233,11 @@ public class AppsFrame extends JFrame {
     		fetchAppList();
 
     		Limelight.displayUiMessage(null, "Successfully quit app",
-					"Limelight", JOptionPane.INFORMATION_MESSAGE);
+					"Moonlight", JOptionPane.INFORMATION_MESSAGE);
     	}
     	else {
     		Limelight.displayUiMessage(null, "Failed to quit app",
-					"Limelight", JOptionPane.ERROR_MESSAGE);
+					"Moonlight", JOptionPane.ERROR_MESSAGE);
     	}
     }
 }
