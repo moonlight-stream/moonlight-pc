@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="all" name="Limelight-PC">
+<project default="all" name="Moonlight-PC">
   <property name="one-jar.dist.dir" value="${basedir}"/>
 
   <property name="src.dir" location="${basedir}/src"/>
@@ -22,7 +22,7 @@
     <mkdir dir="${build.dir}"/>
   </target>
   
-  <target name="limelight-java" depends="init">
+  <target name="moonlight-java" depends="init">
     <javac srcdir="${src.dir}"
            destdir="${classes.dir}/src"
            includeantruntime="false"
@@ -42,17 +42,17 @@
     <delete dir="${classes.dir}"/>
   </target>
 
-  <target name="all" depends="clean,limelight-osx,limelight-lin32,limelight-lin64,limelight-win32,limelight-win64"/>
+  <target name="all" depends="clean,moonlight-osx,moonlight-lin32,moonlight-lin64,moonlight-win32,moonlight-win64"/>
 
-  <target name="limelight-osx" depends="limelight-java">
+  <target name="moonlight-osx" depends="moonlight-java">
     <!-- construct one-jar file -->
-    <one-jar destfile="${build.dir}/limelight-osx64.jar">
+    <one-jar destfile="${build.dir}/moonlight-osx64.jar">
       <manifest>
         <attribute name="One-Jar-Main-Class" value="com.limelight.Limelight"/>
       </manifest>
 
       <main>
-        <!-- construct limelight.jar -->
+        <!-- construct moonlight.jar -->
         <fileset dir="${classes.dir}/src"/>
       </main>
 
@@ -65,15 +65,15 @@
       </binlib>
     </one-jar>
   </target>
-  <target name="limelight-lin32" depends="limelight-java">
+  <target name="moonlight-lin32" depends="moonlight-java">
     <!-- construct one-jar file -->
-    <one-jar destfile="${build.dir}/limelight-lin32.jar">
+    <one-jar destfile="${build.dir}/moonlight-lin32.jar">
       <manifest>
         <attribute name="One-Jar-Main-Class" value="com.limelight.Limelight"/>
       </manifest>
 
       <main>
-        <!-- construct limelight.jar -->
+        <!-- construct moonlight.jar -->
         <fileset dir="${classes.dir}/src"/>
       </main>
 
@@ -87,15 +87,15 @@
     </one-jar>
   </target>
 
-  <target name="limelight-lin64" depends="limelight-java">
+  <target name="moonlight-lin64" depends="moonlight-java">
     <!-- construct one-jar file -->
-    <one-jar destfile="${build.dir}/limelight-lin64.jar">
+    <one-jar destfile="${build.dir}/moonlight-lin64.jar">
       <manifest>
         <attribute name="One-Jar-Main-Class" value="com.limelight.Limelight"/>
       </manifest>
 
       <main>
-        <!-- construct limelight.jar -->
+        <!-- construct moonlight.jar -->
         <fileset dir="${classes.dir}/src"/>
       </main>
 
@@ -109,15 +109,15 @@
     </one-jar>
   </target>
 
-  <target name="limelight-win32" depends="limelight-java">
+  <target name="moonlight-win32" depends="moonlight-java">
     <!-- construct one-jar file -->
-    <one-jar destfile="${build.dir}/limelight-win32.jar">
+    <one-jar destfile="${build.dir}/moonlight-win32.jar">
       <manifest>
         <attribute name="One-Jar-Main-Class" value="com.limelight.Limelight"/>
       </manifest>
 
       <main>
-        <!-- construct limelight.jar -->
+        <!-- construct moonlight.jar -->
         <fileset dir="${classes.dir}/src"/>
       </main>
 
@@ -131,15 +131,15 @@
     </one-jar>
   </target>
 
-  <target name="limelight-win64" depends="limelight-java">
+  <target name="moonlight-win64" depends="moonlight-java">
     <!-- construct one-jar file -->
-    <one-jar destfile="${build.dir}/limelight-win64.jar">
+    <one-jar destfile="${build.dir}/moonlight-win64.jar">
       <manifest>
         <attribute name="One-Jar-Main-Class" value="com.limelight.Limelight"/>
       </manifest>
 
       <main>
-        <!-- construct limelight.jar -->
+        <!-- construct moonlight.jar -->
         <fileset dir="${classes.dir}/src"/>
       </main>
 
