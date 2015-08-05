@@ -11,17 +11,17 @@ Moonlight also has an [Android implementation](https://github.com/moonlight-stre
 * Streams Steam and all of your games from your PC to your Linux/OS X/Windows machine
 * Keyboard and Mouse support
 * Full support for Xbox 360 controllers, PS3 and PS4 controllers, and other HID gamepads
-* Full Windows, OS X, and Linux Support
-
-##Features to come
-
+* Full Windows, OS X, and Linux Support* 
 * Use mDNS to scan for compatible GeForce Experience (GFE) machines on the network
 * Choose from your list of available games instead of just launching Steam
+
+##Features to come
+* Hardware accelerated video decoding
 
 ##Installation
 
 * Download [GeForce Experience](http://www.geforce.com/geforce-experience) and install on your Windows PC
-* Download the appropriate jar from the [GitHub releases page](https://github.com/limelight-stream/limelight-pc/releases)
+* Download the appropriate jar from the [GitHub releases page](https://github.com/moonlight-stream/moonlight-pc/releases)
 
 ##Requirements
 
