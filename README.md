@@ -39,7 +39,7 @@ Moonlight also has an [Android implementation](https://github.com/moonlight-stre
 * Play games!
 
 To launch Moonlight from a command line:
-* `java -jar limelight-[os].jar -host address [options]`
+* `java -jar moonlight-[os].jar -host address [options]`
 * `-host` [address] the address to connect to. This can be a hostname or ip
   address.
 * `-pair` [address] the address to pair to. This can be a hostname or ip address.
@@ -49,6 +49,7 @@ To launch Moonlight from a command line:
 * `-30fps` use 30 fps stream (default)
 * `-60fps` use 60 fps stream
 
+For example, to launch a game from your gaming rig that has the address 192.168.0.100 on your home network in full screen, 720p, and 30fps on a 64-bit Windows computer, your command would look like to `java -jar moonlight-win64.jar -host 192.168.0.100 -fs -720 -30fps`
 
 ##Contribute
 
