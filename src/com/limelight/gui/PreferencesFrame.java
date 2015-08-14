@@ -20,7 +20,7 @@ import java.awt.event.WindowEvent;
  */
 public class PreferencesFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private JComboBox resolution;
+	private JComboBox<Resolution> resolution;
 	private JSlider bitrate;
 	private JCheckBox fullscreen, openGlRenderer;
 	private Preferences prefs;
@@ -44,7 +44,7 @@ public class PreferencesFrame extends JFrame {
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		
-		resolution = new JComboBox();
+		resolution = new JComboBox<Resolution>();
 		for (Resolution res : Resolution.values()) {
 			resolution.addItem(res);
 		}

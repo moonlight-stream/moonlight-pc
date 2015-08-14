@@ -3,7 +3,6 @@ package com.limelight.gui;
 import com.limelight.LimeLog;
 import com.limelight.Limelight;
 import com.limelight.binding.PlatformBinding;
-import com.limelight.nvstream.StreamConfiguration;
 import com.limelight.nvstream.http.GfeHttpResponseException;
 import com.limelight.nvstream.http.NvApp;
 import com.limelight.nvstream.http.NvHTTP;
@@ -21,7 +20,6 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,14 +33,15 @@ import java.util.concurrent.ExecutionException;
  * Time: 3:02 PM.
  */
 public class AppsFrame extends JFrame {
-    // Connection to the host
+	private static final long serialVersionUID = 1L;	
+	// Connection to the host
     private NvHTTP httpConnection;
     private String host;
 
     private Map<String, NvApp> apps;
 
     // UI Elements
-    private JComboBox appSelector;
+    private JComboBox<String> appSelector;
     private JButton launchButton;
     private JButton quitButton;
     
@@ -115,7 +114,7 @@ public class AppsFrame extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        appSelector = new JComboBox();
+        appSelector = new JComboBox<String>();
         appSelector.addItem("Loading apps...");
         
         appSelector.addItemListener(new ItemListener() {

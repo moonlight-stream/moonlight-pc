@@ -44,7 +44,7 @@ public class MainFrame {
 	private JButton pair;
 	private JButton stream;
 	private JFrame limeFrame;
-	private JComboBox mdnsHostList;
+	private JComboBox<String> mdnsHostList;
 
     private HashMap<String, InetAddress> mdnsHosts;
     private MdnsDiscoveryAgent mdnsAgent;
@@ -155,7 +155,7 @@ public class MainFrame {
         pair.setToolTipText("Send pair request to GeForce PC");
 
         mdnsHosts = new HashMap<String, InetAddress>();
-        mdnsHostList = new JComboBox();
+        mdnsHostList = new JComboBox<String>();
         mdnsHostList.addItem("Choose a local PC...");
         
         mdnsAgent = new MdnsDiscoveryAgent(new MdnsDiscoveryListener() {
