@@ -132,7 +132,7 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		
 		boolean success = (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
 		if (success) {
-			long timeAfterDecode = System.currentTimeMillis();
+			long timeAfterDecode = System.nanoTime() / 1000000L;
 			
 		    // Add delta time to the totals (excluding probable outliers)
 		    long delta = timeAfterDecode - decodeUnit.getReceiveTimestamp();
