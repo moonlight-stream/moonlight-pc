@@ -21,8 +21,9 @@ import java.awt.event.WindowEvent;
 public class PreferencesFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JComboBox<Resolution> resolution;
+	private JLabel bitrateLabel;
 	private JSlider bitrate;
-	private JCheckBox fullscreen, openGlRenderer;
+	private JCheckBox fullscreen, openGlRenderer, localAudio;
 	private Preferences prefs;
 	
 	/**
@@ -31,7 +32,7 @@ public class PreferencesFrame extends JFrame {
 	 */
 	public PreferencesFrame() {
 		super("Preferences");
-		this.setSize(275, 200);
+		this.setSize(275, 250);
 		this.setResizable(false);
 		prefs = PreferencesManager.getPreferences();
 	}
@@ -51,7 +52,7 @@ public class PreferencesFrame extends JFrame {
 		
 		resolution.setSelectedItem(prefs.getResolution());
 		
-        JLabel bitrateLabel = new JLabel("Maximum Bitrate", JLabel.CENTER);
+		bitrateLabel = new JLabel("Maximum Bitrate = " + prefs.getBitrate() + " Mbps", JLabel.CENTER);
 		bitrate = new JSlider(JSlider.HORIZONTAL, 0, 100, prefs.getBitrate());
 		bitrate.setMajorTickSpacing(20);
 		bitrate.setMinorTickSpacing(1);
@@ -62,6 +63,7 @@ public class PreferencesFrame extends JFrame {
 		bitrate.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
 				bitrate.setToolTipText(Integer.toString(bitrate.getValue()) + " Mbps");
+				bitrateLabel.setText("Maximum Bitrate = " + bitrate.getValue() + " Mbps");
 			}
 		});
 
@@ -78,6 +80,9 @@ public class PreferencesFrame extends JFrame {
 		
 		openGlRenderer = new JCheckBox("Use OpenGL Renderer (Experimental)");
 		openGlRenderer.setSelected(prefs.getUseOpenGlRenderer());
+		
+		localAudio = new JCheckBox("Play audio on host PC");
+		localAudio.setSelected(prefs.getLocalAudio());
 	
 		Box resolutionBox = Box.createHorizontalBox();
 		resolutionBox.add(Box.createHorizontalGlue());
@@ -104,6 +109,11 @@ public class PreferencesFrame extends JFrame {
 		openGlRendererBox.add(openGlRenderer);
 		openGlRendererBox.add(Box.createHorizontalGlue());
 		
+		Box localAudioBox = Box.createHorizontalBox();
+		localAudioBox.add(Box.createHorizontalGlue());
+		localAudioBox.add(localAudio);
+		localAudioBox.add(Box.createHorizontalGlue());
+		
 		mainPanel.add(Box.createVerticalStrut(10));
 		mainPanel.add(resolutionBox);
 		mainPanel.add(Box.createVerticalStrut(5));
@@ -114,6 +124,8 @@ public class PreferencesFrame extends JFrame {
 		mainPanel.add(fullscreenBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(openGlRendererBox);
+		mainPanel.add(Box.createVerticalStrut(5));
+		mainPanel.add(localAudioBox);
 		mainPanel.add(Box.createVerticalGlue());
 		
 		this.addWindowListener(new WindowAdapter() {
@@ -142,7 +154,8 @@ public class PreferencesFrame extends JFrame {
 		return (prefs.getResolution() != resolution.getSelectedItem()) ||
 				(prefs.getFullscreen() != fullscreen.isSelected()) ||
 				(prefs.getBitrate() != bitrate.getValue()) ||
-				(prefs.getUseOpenGlRenderer() != openGlRenderer.isSelected());
+				(prefs.getUseOpenGlRenderer() != openGlRenderer.isSelected()) ||
+				(prefs.getLocalAudio() != localAudio.isSelected());
 	}
 	
 	/*
@@ -153,6 +166,7 @@ public class PreferencesFrame extends JFrame {
 		prefs.setBitrate(bitrate.getValue());
 		prefs.setResolution((Resolution)resolution.getSelectedItem());
 		prefs.setUseOpenGlRenderer(openGlRenderer.isSelected());
+		prefs.setLocalAudio(localAudio.isSelected());
 		PreferencesManager.writePreferences(prefs);
 	}
 	

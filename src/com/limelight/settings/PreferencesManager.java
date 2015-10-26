@@ -108,6 +108,7 @@ public abstract class PreferencesManager {
 		private String host;
 		private String uniqueId;
 		private boolean useOpenGlRenderer;
+		private boolean localAudio;
 
 		/**
 		 * constructs default preferences: 720p 60Hz
@@ -131,6 +132,7 @@ public abstract class PreferencesManager {
 			this.useOpenGlRenderer = false;
 			this.host = "GeForce PC host";
 			this.uniqueId = String.format("%016x", new Random().nextLong());
+			this.localAudio = false;
 		}
 
 		/**
@@ -180,6 +182,14 @@ public abstract class PreferencesManager {
 		public boolean getUseOpenGlRenderer() {
 			return useOpenGlRenderer;
 		}
+		
+		/**
+		 * Gets whether to use local audio
+		 * @return the stored localAudio
+		 */
+		public boolean getLocalAudio() {
+			return localAudio;
+		}
 
 		/**
 		 * Sets the resolution in this preference
@@ -219,6 +229,14 @@ public abstract class PreferencesManager {
 		 */
 		public void setUseOpenGlRenderer(boolean useOpenGlRenderer) {
 			this.useOpenGlRenderer = useOpenGlRenderer;
+		}
+		
+		/**
+		 * Sets the local audio use of this preference
+		 * @param localAudio whether to use localAudio
+		 */
+		public void setLocalAudio(boolean localAudio) {
+			this.localAudio = localAudio;
 		}
 	}
 }

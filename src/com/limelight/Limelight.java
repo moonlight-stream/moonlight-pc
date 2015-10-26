@@ -87,12 +87,14 @@ public class Limelight implements NvConnectionListener {
 	 * Creates a StreamConfiguration given a Resolution. 
 	 * Used to specify what kind of stream will be used.
 	 */
-	public static StreamConfiguration createConfiguration(Resolution res, Integer bitRate, String appName) {
+	public static StreamConfiguration createConfiguration(Resolution res, Integer bitRate, String appName, boolean localAudio) {
 		return new StreamConfiguration.Builder()
 		.setApp(new NvApp(appName))
 		.setResolution(res.width, res.height)
 		.setRefreshRate(res.frameRate)
-		.setBitrate(bitRate*1000).build();
+		.setBitrate(bitRate*1000)
+		.enableLocalAudioPlayback(localAudio)
+		.build();
 	}
 
 	/*
@@ -148,7 +150,7 @@ public class Limelight implements NvConnectionListener {
 		Limelight limelight = new Limelight(host);
 
 		Preferences prefs = PreferencesManager.getPreferences();
-		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution(), prefs.getBitrate(), appName);
+		StreamConfiguration streamConfig = createConfiguration(prefs.getResolution(), prefs.getBitrate(), appName, prefs.getLocalAudio());
 
 		limelight.startUp(streamConfig, prefs);
 	}
@@ -192,6 +194,7 @@ public class Limelight implements NvConnectionListener {
 	private static void parseCommandLine(String[] args) {
 		String host = null;
 		boolean fullscreen = false;
+		boolean localAudio = false;
 		int resolution = 720;
 		int refresh = 60;
 		Integer bitrate = null;
@@ -240,6 +243,8 @@ public class Limelight implements NvConnectionListener {
 				}
 			} else if (args[i].equals("-fs")) {
 				fullscreen = true;
+			} else if (args[i].equals("-la")) {
+				localAudio = true;
 			} else if (args[i].equals("-720")) {
 				resolution = 720;
 			} else if (args[i].equals("-768")) {
@@ -268,11 +273,12 @@ public class Limelight implements NvConnectionListener {
 			bitrate = streamRes.defaultBitrate;
 		}
 
-		StreamConfiguration streamConfig = createConfiguration(streamRes, bitrate, appName);
+		StreamConfiguration streamConfig = createConfiguration(streamRes, bitrate, appName, localAudio);
 		
 		prefs.setResolution(streamRes);
 		prefs.setBitrate(bitrate);
 		prefs.setFullscreen(fullscreen);
+		prefs.setLocalAudio(localAudio);
 		
 		Limelight limelight = new Limelight(host);
 		limelight.startUp(streamConfig, prefs);
