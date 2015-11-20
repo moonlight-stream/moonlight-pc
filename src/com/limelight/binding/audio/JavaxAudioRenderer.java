@@ -115,9 +115,11 @@ public class JavaxAudioRenderer implements AudioRenderer {
 	/**
 	 * The callback for the audio stream being initialized and starting to receive.
 	 * @param channelCount the number of channels in the audio
+	 * @param channelMask the enabled channels in the audio
+	 * @param samplesPerFrame the number of 16-bit samples per audio frame
 	 * @param sampleRate the sample rate for the audio.
 	 */
-	public boolean streamInitialized(int channelCount, int sampleRate) {
+	public boolean streamInitialized(int channelCount, int channelMask, int samplesPerFrame, int sampleRate) {
 		this.channelCount = channelCount;
 		this.sampleRate = sampleRate;
 		
