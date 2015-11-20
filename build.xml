@@ -5,7 +5,6 @@
   <property name="src.dir" location="${basedir}/src"/>
   <property name="libs.dir" location="${basedir}/libs"/>
   <property name="libs.osx64.dir" location="${libs.dir}/osx"/>
-  <property name="libs.lin32.dir" location="${libs.dir}/lin32"/>
   <property name="libs.lin64.dir" location="${libs.dir}/lin64"/>
   <property name="libs.win32.dir" location="${libs.dir}/win32"/>
   <property name="libs.win64.dir" location="${libs.dir}/win64"/>
@@ -42,7 +41,7 @@
     <delete dir="${classes.dir}"/>
   </target>
 
-  <target name="all" depends="clean,moonlight-osx,moonlight-lin32,moonlight-lin64,moonlight-win32,moonlight-win64"/>
+  <target name="all" depends="clean,moonlight-osx,moonlight-lin64,moonlight-win32,moonlight-win64"/>
 
   <target name="moonlight-osx" depends="moonlight-java">
     <!-- construct one-jar file -->
@@ -65,28 +64,7 @@
       </binlib>
     </one-jar>
   </target>
-  <target name="moonlight-lin32" depends="moonlight-java">
-    <!-- construct one-jar file -->
-    <one-jar destfile="${build.dir}/moonlight-lin32.jar">
-      <manifest>
-        <attribute name="One-Jar-Main-Class" value="com.limelight.Limelight"/>
-      </manifest>
-
-      <main>
-        <!-- construct moonlight.jar -->
-        <fileset dir="${classes.dir}/src"/>
-      </main>
-
-      <lib>
-        <fileset dir="${libs.dir}" includes="*.jar"/>
-      </lib>
-
-      <binlib>
-        <fileset dir="${libs.lin32.dir}" includes="*"/>
-      </binlib>
-    </one-jar>
-  </target>
-
+  
   <target name="moonlight-lin64" depends="moonlight-java">
     <!-- construct one-jar file -->
     <one-jar destfile="${build.dir}/moonlight-lin64.jar">
