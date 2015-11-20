@@ -91,7 +91,7 @@ public class AppsFrame extends JFrame {
     }
     
     public AppsFrame(String host) {
-        super("Apps");
+        super("Apps on "+host);
         this.host = host;
 
         apps = new HashMap<String, NvApp>();
