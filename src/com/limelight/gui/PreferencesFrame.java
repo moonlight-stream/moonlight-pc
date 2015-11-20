@@ -32,7 +32,7 @@ public class PreferencesFrame extends JFrame {
 	 */
 	public PreferencesFrame() {
 		super("Preferences");
-		this.setSize(275, 250);
+		this.setSize(350, 250);
 		this.setResizable(false);
 		prefs = PreferencesManager.getPreferences();
 	}

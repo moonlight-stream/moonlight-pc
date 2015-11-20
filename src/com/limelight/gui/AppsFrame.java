@@ -95,6 +95,9 @@ public class AppsFrame extends JFrame {
         this.host = host;
 
         apps = new HashMap<String, NvApp>();
+        
+        this.setSize(400, 115);
+        this.setResizable(false);
     }
 
     /**
@@ -184,8 +187,6 @@ public class AppsFrame extends JFrame {
                          (int) dim.getHeight() / 2 - this.getHeight() / 2);
 
         this.setVisible(true);
-        this.setSize(300, 115);
-        this.setResizable(false);
     }
 
     private LinkedList<NvApp> fetchApps() {
