@@ -57,6 +57,11 @@ public class KeyboardHandler implements KeyListener {
             (modifiers & KeyEvent.CTRL_DOWN_MASK) != 0 &&
             event.getKeyCode() == KeyEvent.VK_Q) {
             LimeLog.info("quitting");
+            
+            // Free mouse before closing to avoid the mouse code
+            // trying to interact with the now closed streaming window.
+            parent.freeMouse();
+            
             parent.close();
             return;
         } else if (
