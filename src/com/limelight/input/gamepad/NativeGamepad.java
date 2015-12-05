@@ -99,16 +99,30 @@ public class NativeGamepad {
 				}
 				
 				while (!isInterrupted()) {
-					if ((iterations++ % devicePollingIterations) == 0) {
+					// If we have no devices, we don't bother with the event
+					// polling interval. We just run the device polling interval.
+					if (getDeviceCount() == 0) {
 						NativeGamepad.detectDevices();
+						NativeGamepad.processEvents();
+						
+						try {
+							Thread.sleep(pollingIntervalMs * devicePollingIterations);
+						} catch (InterruptedException e) {
+							return;
+						}
 					}
-					
-					NativeGamepad.processEvents();
-					
-					try {
-						Thread.sleep(pollingIntervalMs);
-					} catch (InterruptedException e) {
-						return;
+					else {
+						if ((iterations++ % devicePollingIterations) == 0) {
+							NativeGamepad.detectDevices();
+						}
+						
+						NativeGamepad.processEvents();
+						
+						try {
+							Thread.sleep(pollingIntervalMs);
+						} catch (InterruptedException e) {
+							return;
+						}
 					}
 				}
 			}
