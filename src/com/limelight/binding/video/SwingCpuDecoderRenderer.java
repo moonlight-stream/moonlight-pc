@@ -145,10 +145,7 @@ public class SwingCpuDecoderRenderer extends AbstractCpuDecoder implements Rende
 		
 		// make any remaining space black
 		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, dx1, renderPanel.getHeight());
-		g.fillRect(0, 0, renderPanel.getWidth(), dy1);
-		g.fillRect(0, dy1+newHeight, renderPanel.getWidth(), renderPanel.getHeight());
-		g.fillRect(dx1+newWidth, 0, renderPanel.getWidth(), renderPanel.getHeight());
+		g.fillRect(0, 0, renderPanel.getWidth(), renderPanel.getHeight());
 		
 		// draw the frame
 		g.drawImage(image, dx1, dy1, dx1+newWidth, dy1+newHeight, 0, 0, width, height, null);
