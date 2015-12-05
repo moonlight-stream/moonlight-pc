@@ -14,7 +14,7 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	protected int width, height, targetFps;
 	protected boolean dying;
 	
-	private static final int DECODER_BUFFER_SIZE = 92*1024;
+	private static final int DECODER_BUFFER_SIZE = 256*1024;
 	private ByteBuffer decoderBuffer;
 	
 	private int totalFrames;
