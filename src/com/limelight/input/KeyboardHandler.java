@@ -14,7 +14,7 @@ import java.awt.event.KeyListener;
  */
 public class KeyboardHandler implements KeyListener {
 
-    private static KeyboardTranslator translator;
+    private KeyboardTranslator translator;
     private StreamFrame parent;
     private boolean mouseCaptured = true;
 
@@ -25,7 +25,7 @@ public class KeyboardHandler implements KeyListener {
      * @param parent the frame that owns this handler
      */
     public KeyboardHandler(NvConnection conn, StreamFrame parent) {
-        translator = new KeyboardTranslator(conn);
+        this.translator = new KeyboardTranslator(conn);
         this.parent = parent;
     }
 
