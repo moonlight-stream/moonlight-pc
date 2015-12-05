@@ -127,7 +127,8 @@ public class StreamFrame extends JFrame {
 		ArrayList<DisplayMode> matchingConfigs = new ArrayList<DisplayMode>();
 		
 		for (DisplayMode config : configs) {
-			if ((double)config.getWidth()/(double)config.getHeight() == aspectRatio) {
+			double configAspectRatio = (double)config.getWidth()/(double)config.getHeight();
+			if (Math.abs(configAspectRatio - aspectRatio) < 0.01) {
 				matchingConfigs.add(config);
 			}
 		}
