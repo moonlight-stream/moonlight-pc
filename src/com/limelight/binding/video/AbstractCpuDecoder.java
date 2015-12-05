@@ -132,6 +132,9 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		
 		boolean success = (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
 		if (success) {
+			// Notify anyone waiting on a frame
+			onFrameDecoded();
+			
 			long timeAfterDecode = System.nanoTime() / 1000000L;
 			
 		    // Add delta time to the totals (excluding probable outliers)
@@ -143,6 +146,10 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		}
 		
 		return true;
+	}
+	
+	protected void onFrameDecoded() {
+		// Do nothing
 	}
 
 	public int getCapabilities() {

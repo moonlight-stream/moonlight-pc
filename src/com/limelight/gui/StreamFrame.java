@@ -10,6 +10,8 @@ import com.limelight.nvstream.StreamConfiguration;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -37,7 +39,7 @@ public class StreamFrame extends JFrame {
 	private JLabel spinnerLabel;
 	private Cursor noCursor;
 	private Limelight limelight;
-	private JPanel renderingSurface;
+	private RenderPanel renderingSurface;
 
 	/**
 	 * Frees the mouse ie. makes it visible and allowed to move outside the frame.
@@ -74,17 +76,29 @@ public class StreamFrame extends JFrame {
 		
 		Container contentPane = this.getContentPane();
 		
-		renderingSurface = new JPanel(false);
+		renderingSurface = new RenderPanel();
 		renderingSurface.addKeyListener(keyboard);
 		renderingSurface.addMouseListener(mouse);
 		renderingSurface.addMouseMotionListener(mouse);
 		renderingSurface.addMouseWheelListener(mouse);
 		renderingSurface.setBackground(Color.BLACK);
-		renderingSurface.setIgnoreRepaint(true);
 		renderingSurface.setFocusable(true);
 		renderingSurface.setLayout(new BoxLayout(renderingSurface, BoxLayout.Y_AXIS));
 		renderingSurface.setVisible(true);
 		renderingSurface.setFocusTraversalKeysEnabled(false);
+		
+        addComponentListener(new ComponentListener() {
+			@Override
+			public void componentHidden(ComponentEvent arg0) {}
+			@Override
+			public void componentMoved(ComponentEvent arg0) {}
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+				renderingSurface.setSize(getContentPane().getSize());
+			}
+			@Override
+			public void componentShown(ComponentEvent arg0) {}
+        });
 		
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(renderingSurface, "Center");
@@ -119,6 +133,8 @@ public class StreamFrame extends JFrame {
 				setExtendedState(JFrame.MAXIMIZED_BOTH);
 			}
 		}
+		
+		renderingSurface.setSize(getContentPane().getSize());
 
 		hideCursor();
 	}
@@ -307,7 +323,7 @@ public class StreamFrame extends JFrame {
 		}
 	}
     
-    public JPanel getRenderingSurface() {
+    public RenderPanel getRenderingSurface() {
         return renderingSurface;
     }
 }

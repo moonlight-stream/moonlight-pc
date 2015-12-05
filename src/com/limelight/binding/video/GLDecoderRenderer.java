@@ -3,13 +3,13 @@ package com.limelight.binding.video;
 
 import com.jogamp.opengl.util.FPSAnimator;
 import com.limelight.LimeLog;
+import com.limelight.gui.RenderPanel;
 import com.limelight.gui.StreamFrame;
 import com.limelight.nvstream.av.video.VideoDepacketizer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
-import javax.swing.*;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -50,7 +50,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     @Override
     public boolean setupInternal(Object renderTarget, int drFlags) {
         final StreamFrame frame = (StreamFrame) renderTarget;
-        final JPanel renderingSurface = frame.getRenderingSurface();
+        final RenderPanel renderingSurface = frame.getRenderingSurface();
 
         imageBuffer = new int[width * height];
         bufferRGB = IntBuffer.wrap(imageBuffer);
@@ -62,7 +62,6 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 			public void componentMoved(ComponentEvent arg0) {}
 			@Override
 			public void componentResized(ComponentEvent arg0) {
-				renderingSurface.setSize(frame.getContentPane().getSize());
 				glcanvas.setSize(renderingSurface.getSize());
 			}
 			@Override
