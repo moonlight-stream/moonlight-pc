@@ -171,8 +171,10 @@ public class Limelight implements NvConnectionListener {
 
 		//fix the menu bar if we are running in osx
 		if (System.getProperty("os.name").contains("Mac OS X")) {
-			// set the name of the application menu item
+			// set the name of the application menu item (doesn't work on newer Oracle JDK)
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Moonlight");
+			// enables the osx-style menu bar
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 
 		String libraryError = loadNativeLibraries();
