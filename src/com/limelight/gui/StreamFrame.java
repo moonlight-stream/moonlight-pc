@@ -63,7 +63,7 @@ public class StreamFrame extends JFrame {
 	 * @param streamConfig the configurations for this frame
 	 * @param fullscreen if the frame should be made fullscreen
 	 */
-	public void build(Limelight limelight, NvConnection conn, StreamConfiguration streamConfig, boolean fullscreen) {
+	public void build(Limelight limelight, NvConnection conn, StreamConfiguration streamConfig, boolean fullscreen, boolean allowResolutionChange) {
 		this.limelight = limelight;
 		
 		keyboard = new KeyboardHandler(conn, this);
@@ -104,7 +104,7 @@ public class StreamFrame extends JFrame {
 		contentPane.add(renderingSurface, "Center");
 		
 		if (fullscreen) {
-			makeFullScreen(streamConfig);
+			makeFullScreen(streamConfig, allowResolutionChange);
 			
 			// OS X hack for full-screen losing focus
 			if (System.getProperty("os.name").contains("Mac OS X")) {
@@ -199,14 +199,14 @@ public class StreamFrame extends JFrame {
 		return bestConfig;
 	}
 	
-	private void makeFullScreen(StreamConfiguration streamConfig) {
+	private void makeFullScreen(StreamConfiguration streamConfig, boolean allowResolutionChange) {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		if (gd.isFullScreenSupported()) {
 			this.setResizable(false);
 			this.setUndecorated(true);
 			gd.setFullScreenWindow(this);
 
-			if (gd.isDisplayChangeSupported()) {
+			if (allowResolutionChange && gd.isDisplayChangeSupported()) {
 				DisplayMode config = getBestDisplay(streamConfig, gd.getDisplayModes());
 				if (config != null) {
 					gd.setDisplayMode(config);

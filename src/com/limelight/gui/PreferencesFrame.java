@@ -23,8 +23,7 @@ public class PreferencesFrame extends JFrame {
 	private JComboBox<Resolution> resolution;
 	private JLabel bitrateLabel;
 	private JSlider bitrate;
-	private JCheckBox fullscreen, openGlRenderer, localAudio;
-	private Preferences prefs;
+	private JCheckBox fullscreen, allowResolutionChange, openGlRenderer, localAudio;
 	
 	/**
 	 * Construcs a new frame and loads the saved preferences.
@@ -32,15 +31,15 @@ public class PreferencesFrame extends JFrame {
 	 */
 	public PreferencesFrame() {
 		super("Preferences");
-		this.setSize(350, 250);
+		this.setSize(350, 300);
 		this.setResizable(false);
-		prefs = PreferencesManager.getPreferences();
 	}
 	
 	/**
 	 * Constructs all components of the frame and makes the frame visible to the user.
 	 */
 	public void build() {
+		final Preferences prefs = PreferencesManager.getPreferences();
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -73,10 +72,13 @@ public class PreferencesFrame extends JFrame {
 				bitrate.setValue(newRes.defaultBitrate);
 			}
 		});
-		
+
 		
 		fullscreen = new JCheckBox("Fullscreen");
 		fullscreen.setSelected(prefs.getFullscreen());
+		
+		allowResolutionChange = new JCheckBox("Adapt display resolution in fullscreen");
+		allowResolutionChange.setSelected(prefs.getAllowResolutionChange());
 		
 		openGlRenderer = new JCheckBox("Use OpenGL Renderer (Experimental)");
 		openGlRenderer.setSelected(prefs.getUseOpenGlRenderer());
@@ -104,6 +106,11 @@ public class PreferencesFrame extends JFrame {
 		fullscreenBox.add(fullscreen);
 		fullscreenBox.add(Box.createHorizontalGlue());
 		
+		Box allowResolutionChangeBox = Box.createHorizontalBox();
+		allowResolutionChangeBox.add(Box.createHorizontalGlue());
+		allowResolutionChangeBox.add(allowResolutionChange);
+		allowResolutionChangeBox.add(Box.createHorizontalGlue());
+		
 		Box openGlRendererBox = Box.createHorizontalBox();
 		openGlRendererBox.add(Box.createHorizontalGlue());
 		openGlRendererBox.add(openGlRenderer);
@@ -123,6 +130,8 @@ public class PreferencesFrame extends JFrame {
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(fullscreenBox);
 		mainPanel.add(Box.createVerticalStrut(5));
+		mainPanel.add(allowResolutionChangeBox);
+		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(openGlRendererBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(localAudioBox);
@@ -132,9 +141,7 @@ public class PreferencesFrame extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
-				if (prefsChanged()) {
-					writePreferences();
-				}
+				writePreferences(prefs);
 			}
 		});
 		
@@ -148,21 +155,11 @@ public class PreferencesFrame extends JFrame {
 	}
 	
 	/*
-	 * Checks if the preferences have changed from the cached preferences.
-	 */
-	private boolean prefsChanged() {
-		return (prefs.getResolution() != resolution.getSelectedItem()) ||
-				(prefs.getFullscreen() != fullscreen.isSelected()) ||
-				(prefs.getBitrate() != bitrate.getValue()) ||
-				(prefs.getUseOpenGlRenderer() != openGlRenderer.isSelected()) ||
-				(prefs.getLocalAudio() != localAudio.isSelected());
-	}
-	
-	/*
 	 * Writes the preferences to the disk.
 	 */
-	private void writePreferences() {
+	private void writePreferences(Preferences prefs) {
 		prefs.setFullscreen(fullscreen.isSelected());
+		prefs.setAllowResolutionChange(allowResolutionChange.isSelected());
 		prefs.setBitrate(bitrate.getValue());
 		prefs.setResolution((Resolution)resolution.getSelectedItem());
 		prefs.setUseOpenGlRenderer(openGlRenderer.isSelected());

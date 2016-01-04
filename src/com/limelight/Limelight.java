@@ -76,7 +76,7 @@ public class Limelight implements NvConnectionListener {
 		decoderRenderer = PlatformBinding.getVideoDecoderRenderer();
 		
 		conn = new NvConnection(host, prefs.getUniqueId(), this, streamConfig, PlatformBinding.getCryptoProvider());
-		streamFrame.build(this, conn, streamConfig, prefs.getFullscreen());
+		streamFrame.build(this, conn, streamConfig, prefs.getFullscreen(), prefs.getAllowResolutionChange());
 		conn.start(PlatformBinding.getDeviceName(), streamFrame,
 				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
 				PlatformBinding.getAudioRenderer(),

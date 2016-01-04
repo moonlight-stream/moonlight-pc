@@ -58,7 +58,7 @@ public abstract class PreferencesManager {
 	 * @author Diego Waxemberg
 	 */
 	public static class Preferences implements Serializable {
-		private static final long serialVersionUID = -5575445156215348048L;
+		private static final long serialVersionUID = -5575445156207845705L;
 
 		/**
 		 * The possible resolutions for the stream
@@ -106,6 +106,7 @@ public abstract class PreferencesManager {
 		private String uniqueId;
 		private boolean useOpenGlRenderer;
 		private boolean localAudio;
+		private boolean allowResolutionChange;
 
 		/**
 		 * constructs default preferences: 720p 60Hz
@@ -130,6 +131,7 @@ public abstract class PreferencesManager {
 			this.host = "GeForce PC host";
 			this.uniqueId = String.format("%016x", new Random().nextLong());
 			this.localAudio = false;
+			this.setAllowResolutionChange(false);
 		}
 
 		/**
@@ -192,6 +194,10 @@ public abstract class PreferencesManager {
 		public boolean getLocalAudio() {
 			return localAudio;
 		}
+		
+		public boolean getAllowResolutionChange() {
+			return allowResolutionChange;
+		}
 
 		/**
 		 * Sets the resolution in this preference
@@ -240,5 +246,11 @@ public abstract class PreferencesManager {
 		public void setLocalAudio(boolean localAudio) {
 			this.localAudio = localAudio;
 		}
+
+		public void setAllowResolutionChange(boolean allowResolutionChange) {
+			this.allowResolutionChange = allowResolutionChange;
+		}
+		
+		
 	}
 }
