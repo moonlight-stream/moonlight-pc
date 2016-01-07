@@ -1,4 +1,4 @@
-package com.limelight;
+package com.limelight.utils;
 
 public class BenchmarkTimer {
 
