@@ -12,7 +12,7 @@ import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	private Thread decoderThread;
 	protected int width, height, targetFps;
-	protected boolean dying;
+	volatile protected boolean dying;
 	
 	private static final int DECODER_BUFFER_SIZE = 256*1024;
 	private ByteBuffer decoderBuffer;
@@ -24,6 +24,8 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	
 	public abstract int getColorMode();
 	
+	
+	// VideoDecoderRenderer abstract method @Overrides
 	/**
 	 * Sets up the decoder and renderer to render video at the specified dimensions
 	 * @param width the width of the video to render
@@ -99,6 +101,9 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	public void release() {
 		AvcDecoder.destroy();
 	}
+	// End of VideoDecoderRenderer @Overrides
+	
+	
 
 	/**
 	 * Give a unit to be decoded to the decoder.

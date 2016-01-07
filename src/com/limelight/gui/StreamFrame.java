@@ -206,17 +206,19 @@ public class StreamFrame extends JFrame {
 			this.setUndecorated(true);
 			gd.setFullScreenWindow(this);
 
-			if (allowResolutionChange && gd.isDisplayChangeSupported()) {
-				DisplayMode config = getBestDisplay(streamConfig, gd.getDisplayModes());
-				if (config != null) {
-					gd.setDisplayMode(config);
+			if (allowResolutionChange) {
+				if (gd.isDisplayChangeSupported()) {
+					DisplayMode config = getBestDisplay(streamConfig, gd.getDisplayModes());
+					if (config != null) {
+						gd.setDisplayMode(config);
+					}
+				} else {
+					Limelight.displayUiMessage(
+							this,
+							"Unable to change display resolution. \nThis may not be the correct resolution",
+							"Display Resolution",
+							JOptionPane.ERROR_MESSAGE);
 				}
-			} else {
-				Limelight.displayUiMessage(
-						this,
-						"Unable to change display resolution. \nThis may not be the correct resolution",
-						"Display Resolution",
-						JOptionPane.ERROR_MESSAGE);
 			}
 		} else {
 			Limelight.displayUiMessage(
