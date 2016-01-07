@@ -1,5 +1,7 @@
 package com.limelight.nvstream.av.video.cpu;
 
+import java.nio.Buffer;
+
 import com.limelight.binding.LibraryHelper;
 
 public class AvcDecoder {
@@ -47,6 +49,7 @@ public class AvcDecoder {
 	
 	// Rendering API when NO_COLOR_CONVERSION == 0
 	public static native boolean setRenderTarget(Object androidSurface);
+	public static native boolean getRgbFrameBuffer(Buffer outDirectBuffer, int capacity);
 	public static native boolean getRgbFrameInt(int[] rgbFrame, int bufferSize);
 	public static native boolean getRgbFrame(byte[] rgbFrame, int bufferSize);
 	public static native boolean redraw();

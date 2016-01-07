@@ -9,10 +9,15 @@ You shouldn't need anything special to build this.
 ### NV AVC Decoder
 
 To build the NV AVC Decoder you'll need ffmpeg, which will bring along libavcodec and its friends.
+Can be installed from brew repository (http://brew.sh):
+> brew install ffmpeg
+After that libraries will be available at /usr/local/lib/ (symlinked)
 
 ### NV Opus Decoder
 
-To build the NV Opus Decoder you'll need opus (libopus). 
+To build the NV Opus Decoder you'll need opus (libopus).
+Same as ffmpeg. Brew install command:
+> brew install opus
 
 ## Building Natively
 

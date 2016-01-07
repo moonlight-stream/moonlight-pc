@@ -1,23 +1,29 @@
 package com.limelight.binding.video;
 
 
-import com.jogamp.opengl.util.FPSAnimator;
-import com.limelight.LimeLog;
-import com.limelight.gui.RenderPanel;
-import com.limelight.gui.StreamFrame;
-import com.limelight.nvstream.av.video.VideoDepacketizer;
-import com.limelight.nvstream.av.video.cpu.AvcDecoder;
-
-import javax.media.opengl.*;
-import javax.media.opengl.awt.GLCanvas;
-
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.awt.GLCanvas;
+
+import com.jogamp.opengl.util.FPSAnimator;
+import com.limelight.BenchmarkTimer;
+import com.limelight.LimeLog;
+import com.limelight.gui.RenderPanel;
+import com.limelight.gui.StreamFrame;
+import com.limelight.nvstream.av.video.VideoDepacketizer;
+import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 
 /**
@@ -31,6 +37,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 	private final GLCanvas glcanvas;
 	private FPSAnimator animator;
 	private IntBuffer bufferRGB;
+	private ByteBuffer directBufferRGB;
 	private int[] imageBuffer;
 	private float viewportX, viewportY;
 
@@ -52,8 +59,11 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         final StreamFrame frame = (StreamFrame) renderTarget;
         final RenderPanel renderingSurface = frame.getRenderingSurface();
 
+        // array-backed buffer with multiple copying
         imageBuffer = new int[width * height];
         bufferRGB = IntBuffer.wrap(imageBuffer);
+        // direct buffer
+        directBufferRGB = ByteBuffer.allocateDirect(4 * width * height);
         
         frame.addComponentListener(new ComponentListener() {
 			@Override
@@ -106,6 +116,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         return true;
     }
 
+    
     public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
         GL2 gl = glautodrawable.getGL().getGL2();
 
@@ -129,23 +140,54 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         gl.glPixelTransferi(GL2.GL_ALPHA_SCALE, 1);
         gl.glPixelTransferi(GL2.GL_ALPHA_BIAS, 0);
     }
-
+    
     public void dispose(GLAutoDrawable glautodrawable) {
     }
 
-    public void display(GLAutoDrawable glautodrawable) {
-        GL2 gl = glautodrawable.getGL().getGL2();
+    private BenchmarkTimer renderBench = new BenchmarkTimer();
 
-        // Get an updated image if available
-        // If not, the image buffer will be left unchanged
-        AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
-        
+	public void display(GLAutoDrawable glautodrawable) {
+    	renderBench.startTimer();
+    	
+    	// for easy switching while testing performance
+    	final int useDirectBuffers = 1;
+    	if (useDirectBuffers == 1) {
+    		renderViaDirectBuffer(glautodrawable);
+    	} else {
+    		renderViaCopyingArrays(glautodrawable);
+    	}
+
+		renderBench.stopTimer();
+		if (renderBench.getTimersCount() == targetFps) {
+			System.out.printf("avg frame render time per " + targetFps + " frames: %d ms\n", renderBench.getAverageTime());
+			System.out.printf("total frame render time per " + targetFps + " frames: %d ms\n",
+					renderBench.getTotalTime());
+			renderBench.clear();
+		}
+    }
+
+
+    private void renderViaCopyingArrays(GLAutoDrawable glautodrawable) {
+    	GL2 gl = glautodrawable.getGL().getGL2();
+
+    	AvcDecoder.getRgbFrameInt(imageBuffer, imageBuffer.length);
+
         gl.glRasterPos2i(-1, 1);
         gl.glPixelZoom(viewportX / width, -(viewportY / height));
         gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_BYTE, bufferRGB);
     }
+    
+    private void renderViaDirectBuffer(GLAutoDrawable glautodrawable) {
+        GL2 gl = glautodrawable.getGL().getGL2();
 
-    /**
+        AvcDecoder.getRgbFrameBuffer(directBufferRGB, directBufferRGB.capacity());        
+        
+        gl.glRasterPos2i(-1, 1);
+        gl.glPixelZoom(viewportX / width, -(viewportY / height));
+        gl.glDrawPixels(width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_BYTE, directBufferRGB);
+	}
+    
+	/**
      * Stops the decoding and rendering of the video stream.
      */
     @Override
