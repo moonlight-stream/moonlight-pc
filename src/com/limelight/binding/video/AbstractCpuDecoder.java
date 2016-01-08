@@ -19,6 +19,7 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	
 	private int totalFrames;
 	private long totalDecoderTimeMs;
+	private int inputPaddingSize;
 	
 	public abstract boolean setupInternal(Object renderTarget, int drFlags);
 	
@@ -37,8 +38,9 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		this.width = width;
 		this.height = height;
 		this.targetFps = redrawRate;
+		this.inputPaddingSize = AvcDecoder.getInputPaddingSize();
 		
-		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
+		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + inputPaddingSize);
 		LimeLog.info("Using software decoding");
 		
 		// Use 2 decoding threads
@@ -111,31 +113,19 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	 * @return true if the unit was decoded successfully, false otherwise
 	 */
 	public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
-		byte[] data;
-				
-		// Use the reserved decoder buffer if this decode unit will fit
-		if (decodeUnit.getDataLength() <= DECODER_BUFFER_SIZE) {
-			decoderBuffer.clear();
-			
-			for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
-					bbd != null; bbd = bbd.nextDescriptor) {
-				decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
-			}
-			
-			data = decoderBuffer.array();
-		}
-		else {
-			data = new byte[decodeUnit.getDataLength()+AvcDecoder.getInputPaddingSize()];
-			
-			int offset = 0;
-			for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
-					bbd != null; bbd = bbd.nextDescriptor) {
-				System.arraycopy(bbd.data, bbd.offset, data, offset, bbd.length);
-				offset += bbd.length;
-			}
+		
+		if (decoderBuffer.capacity() < decodeUnit.getDataLength() + inputPaddingSize) {
+			decoderBuffer = ByteBuffer.allocate((int)(1.15f * decodeUnit.getDataLength()) + inputPaddingSize);
 		}
 		
-		boolean success = (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
+		decoderBuffer.clear();
+		
+		for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
+				bbd != null; bbd = bbd.nextDescriptor) {
+			decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
+		}
+		
+		boolean success = (AvcDecoder.decode(decoderBuffer.array(), 0, decodeUnit.getDataLength()) == 0);
 		if (success) {
 			// Notify anyone waiting on a frame
 			onFrameDecoded();
