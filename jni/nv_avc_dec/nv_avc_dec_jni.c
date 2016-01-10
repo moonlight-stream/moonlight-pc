@@ -106,12 +106,14 @@ Java_com_limelight_nvstream_av_video_cpu_AvcDecoder_decode(
 	jbyte* jni_input_data;
 
     //jvm tries to avoid copies
-	jni_input_data = (*env)->GetPrimitiveArrayCritical(env, indata, 0);
+	// jni_input_data = (*env)->GetPrimitiveArrayCritical(env, indata, 0);
+	jni_input_data = (*env)->GetByteArrayElements(env, indata, 0);
     
 	ret = nv_avc_decode(&jni_input_data[inoff], inlen);
 
 	// The input data isn't changed so it can be safely aborted
-	(*env)->ReleasePrimitiveArrayCritical(env, indata, jni_input_data, JNI_ABORT);
+	// (*env)->ReleasePrimitiveArrayCritical(env, indata, jni_input_data, JNI_ABORT);
+	(*env)->ReleaseByteArrayElements(env, indata, jni_input_data, JNI_ABORT);
 
 	return ret;
 }
