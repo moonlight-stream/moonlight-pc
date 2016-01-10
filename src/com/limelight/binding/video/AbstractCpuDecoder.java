@@ -10,12 +10,16 @@ import com.limelight.nvstream.av.video.VideoDepacketizer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
-	private Thread decoderThread;
-	protected int width, height, targetFps;
-	volatile protected boolean dying;
 	
 	private static final int DECODER_BUFFER_SIZE = 256*1024;
+	
+	protected int width, height, targetFps;
+	
+	private Thread decoderThread;
+	volatile protected boolean dying;
+	
 	private ByteBuffer decoderBuffer;
+	private boolean useDirectBuffer = false;
 	
 	private int totalFrames;
 	private long totalDecoderTimeMs;
@@ -40,7 +44,11 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		this.targetFps = redrawRate;
 		this.inputPaddingSize = AvcDecoder.getInputPaddingSize();
 		
-		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + inputPaddingSize);
+		if (useDirectBuffer) {
+			decoderBuffer = ByteBuffer.allocateDirect(DECODER_BUFFER_SIZE + inputPaddingSize);
+		} else {
+			decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + inputPaddingSize);
+		}
 		LimeLog.info("Using software decoding");
 		
 		// Use 2 decoding threads
@@ -115,7 +123,14 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
 		
 		if (decoderBuffer.capacity() < decodeUnit.getDataLength() + inputPaddingSize) {
-			decoderBuffer = ByteBuffer.allocate((int)(1.15f * decodeUnit.getDataLength()) + inputPaddingSize);
+			int newCapacity = (int)(1.15f * decodeUnit.getDataLength()) + inputPaddingSize;
+			LimeLog.info("Reallocating decoder buffer from " + decoderBuffer.capacity() + " to " + newCapacity + " bytes");
+			
+			if (useDirectBuffer) {
+				decoderBuffer = ByteBuffer.allocateDirect(newCapacity);
+			} else {
+				decoderBuffer = ByteBuffer.allocate(newCapacity);
+			}
 		}
 		
 		decoderBuffer.clear();
@@ -125,7 +140,13 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 			decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
 		}
 		
-		boolean success = (AvcDecoder.decode(decoderBuffer.array(), 0, decodeUnit.getDataLength()) == 0);
+		boolean success;
+		if (useDirectBuffer) {
+			success = (AvcDecoder.decodeBuffer(decoderBuffer, decodeUnit.getDataLength()) == 0);
+		} else {
+			success = (AvcDecoder.decode(decoderBuffer.array(), 0, decodeUnit.getDataLength()) == 0);
+		}
+		
 		if (success) {
 			// Notify anyone waiting on a frame
 			onFrameDecoded();

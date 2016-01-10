@@ -59,4 +59,5 @@ public class AvcDecoder {
 	
 	public static native int getInputPaddingSize();
 	public static native int decode(byte[] indata, int inoff, int inlen);
+	public static native int decodeBuffer(Buffer inBuffer, int inBufferLen);
 }

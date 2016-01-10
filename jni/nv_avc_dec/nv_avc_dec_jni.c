@@ -118,6 +118,21 @@ Java_com_limelight_nvstream_av_video_cpu_AvcDecoder_decode(
 	return ret;
 }
 
+// Same as decode(), but uses direct buffers.
+JNIEXPORT jint JNICALL
+Java_com_limelight_nvstream_av_video_cpu_AvcDecoder_decodeBuffer(
+	JNIEnv *env, jclass this,
+    jobject directByteBuf, jint len)
+{
+	jint ret;
+    jbyte* buf;
+    
+    buf = (*env)->GetDirectBufferAddress(env, directByteBuf);
+    ret = nv_avc_decode(buf, len);
+
+	return ret;
+}
+
 // Same as getRgbFrame, but takes direct buffer for data output.
 // This avoids slow array copying by JNI.
 JNIEXPORT jboolean JNICALL
@@ -126,7 +141,7 @@ Java_com_limelight_nvstream_av_video_cpu_AvcDecoder_getRgbFrameBuffer(
     jobject directByteBuf, jint len)
 {
 	jint ret;
-    char* buf;
+    jbyte* buf;
     
     buf = (*env)->GetDirectBufferAddress(env, directByteBuf);
 	ret = nv_avc_get_rgb_frame(buf, len);
