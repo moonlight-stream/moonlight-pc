@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="all" name="Moonlight-PC">
+  <property name="app.name" value="Moonlight"/>
+  <property name="app.version" value="0.7-SNAPSHOT"/>
+  <property name="app.java.version" value="1.7"/>
+
   <property name="one-jar.dist.dir" value="${basedir}"/>
 
   <property name="src.dir" location="${basedir}/src"/>
@@ -14,6 +18,8 @@
   <property name="build.dir" location="${basedir}/build"/>
 
   <property name="classes.dir" location="${basedir}/classes"/>
+  
+  <property environment="env"/>
 
   <target name="init" depends="clean">
     <mkdir dir="${classes.dir}"/>
@@ -26,8 +32,9 @@
     <javac srcdir="${src.dir}"
            destdir="${classes.dir}/src"
            includeantruntime="false"
-           source="1.7"
-           target="1.7"
+           source="${app.java.version}"
+           target="${app.java.version}"
+    	   debug="off"
            classpath="${build.dir}">
       <classpath>
         <fileset dir="${libs.dir}" includes="*.jar"/>
@@ -43,7 +50,52 @@
   </target>
 
   <target name="all" depends="clean,moonlight-osx,moonlight-lin32,moonlight-lin64,moonlight-win32,moonlight-win64"/>
+	
+  <target name="moonlight-osx-app" depends="moonlight-osx">
+    <!--
+      This is a fork of Oracle's Mac OS X bundler.
+	  See https://bitbucket.org/infinitekind/appbundler for detailed reference 
+    -->
+    <taskdef name="bundleapp" 
+      classpath="${basedir}/appbundler-1.0ea.jar"
+      classname="com.oracle.appbundler.AppBundlerTask"/>
 
+  	
+    <bundleapp
+      jvmrequired="${app.java.version}"
+      jrepreferred="true"
+      outputdirectory="${build.dir}"
+      name="${app.name}"
+      displayname="${app.name}"
+      executableName="moonlight-osx64"
+      identifier="com.limelight"
+      shortversion="${app.version}"
+      version="${app.version}"
+      mainclassname="OneJar"
+      applicationCategory="public.app-category.games">
+
+      <classpath file="${build.dir}/moonlight-osx64.jar"/>
+
+      <arch name="x86_64"/>
+      <!--<arch name="i386"/>-->
+
+      <!-- Workaround as com.apple.mrj.application.apple.menu.about.name property may no longer work -->
+      <option value="-Xdock:name=${app.name}"/>
+
+      <option value="-Dapple.laf.useScreenMenuBar=true"/>
+      <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
+      <option value="-Dcom.apple.macos.useScreenMenuBar=true"/>
+      <option value="-Dcom.apple.mrj.application.apple.menu.about.name=${app.name}"/>
+      <option value="-Dcom.apple.smallTabs=true"/>
+      <option value="-Dfile.encoding=UTF-8"/>
+
+      <option value="-Xmx512M" name="Xmx"/>
+      
+      <!-- Use this option to bundle a JRE -->
+      <!-- <runtime dir="${env.JAVA_HOME}" /> -->
+    </bundleapp>
+  </target>
+	
   <target name="moonlight-osx" depends="moonlight-java">
     <!-- construct one-jar file -->
     <one-jar destfile="${build.dir}/moonlight-osx64.jar">
