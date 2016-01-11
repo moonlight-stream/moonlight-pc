@@ -7,6 +7,7 @@ import com.limelight.input.MouseHandler;
 import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.NvConnectionListener.Stage;
 import com.limelight.nvstream.StreamConfiguration;
+import com.limelight.settings.PreferencesManager.Preferences;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +33,7 @@ public class StreamFrame extends JFrame {
 	
 	private static final double DESIRED_ASPECT_RATIO = 16.0/9.0;
 	private static final double ALTERNATE_ASPECT_RATIO = 16.0/10.0;
-
+	
 	private KeyboardHandler keyboard;
 	private MouseHandler mouse;
 	private JProgressBar spinner;
@@ -40,6 +41,7 @@ public class StreamFrame extends JFrame {
 	private Cursor noCursor;
 	private Limelight limelight;
 	private RenderPanel renderingSurface;
+	private Preferences userPreferences;
 
 	/**
 	 * Frees the mouse ie. makes it visible and allowed to move outside the frame.
@@ -63,8 +65,9 @@ public class StreamFrame extends JFrame {
 	 * @param streamConfig the configurations for this frame
 	 * @param fullscreen if the frame should be made fullscreen
 	 */
-	public void build(Limelight limelight, NvConnection conn, StreamConfiguration streamConfig, boolean fullscreen, boolean allowResolutionChange) {
+	public void build(Limelight limelight, NvConnection conn, StreamConfiguration streamConfig, Preferences prefs) {
 		this.limelight = limelight;
+		this.userPreferences = prefs;
 		
 		keyboard = new KeyboardHandler(conn, this);
 		mouse = new MouseHandler(conn, this);
@@ -103,8 +106,8 @@ public class StreamFrame extends JFrame {
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(renderingSurface, "Center");
 		
-		if (fullscreen) {
-			makeFullScreen(streamConfig, allowResolutionChange);
+		if (userPreferences.getFullscreen()) {
+			makeFullScreen(streamConfig, userPreferences.getAllowResolutionChange());
 			
 			// OS X hack for full-screen losing focus
 			if (System.getProperty("os.name").contains("Mac OS X")) {
@@ -327,5 +330,9 @@ public class StreamFrame extends JFrame {
     
     public RenderPanel getRenderingSurface() {
         return renderingSurface;
+    }
+    
+    public Preferences getUserPreferences() {
+    	return this.userPreferences;
     }
 }

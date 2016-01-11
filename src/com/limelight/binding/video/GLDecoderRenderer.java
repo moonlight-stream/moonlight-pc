@@ -36,6 +36,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
 	private FPSAnimator animator;
 	private ByteBuffer directBufferRGB;
 	private float viewportX, viewportY;
+    private boolean keepAspectRatio;
 
     public GLDecoderRenderer() {
         GLProfile.initSingleton();
@@ -54,6 +55,8 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     public boolean setupInternal(Object renderTarget, int drFlags) {
         final StreamFrame frame = (StreamFrame) renderTarget;
         final RenderPanel renderingSurface = frame.getRenderingSurface();
+        
+        keepAspectRatio = frame.getUserPreferences().isKeepAspectRatio();
 
         directBufferRGB = ByteBuffer.allocateDirect(4 * width * height);
         
@@ -105,6 +108,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
     		return false;
     	}
         animator.start();
+        animator.setUpdateFPSFrames(targetFps, System.out);
         return true;
     }
 
@@ -146,7 +150,6 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         float zoomX = viewportX / width;
         float zoomY = viewportY / height;
         
-        boolean keepAspectRatio = true;
         if (keepAspectRatio) {
         	zoomX = zoomY = Math.min(zoomX, zoomY);
         }

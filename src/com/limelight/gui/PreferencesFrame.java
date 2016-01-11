@@ -23,7 +23,7 @@ public class PreferencesFrame extends JFrame {
 	private JComboBox<Resolution> resolution;
 	private JLabel bitrateLabel;
 	private JSlider bitrate;
-	private JCheckBox fullscreen, allowResolutionChange, openGlRenderer, localAudio;
+	private JCheckBox fullscreen, allowResolutionChange, keepAspectRatio, openGlRenderer, localAudio;
 	
 	/**
 	 * Construcs a new frame and loads the saved preferences.
@@ -31,7 +31,7 @@ public class PreferencesFrame extends JFrame {
 	 */
 	public PreferencesFrame() {
 		super("Preferences");
-		this.setSize(350, 300);
+		this.setSize(350, 340);
 		this.setResizable(false);
 	}
 	
@@ -80,6 +80,9 @@ public class PreferencesFrame extends JFrame {
 		allowResolutionChange = new JCheckBox("Adapt display resolution in fullscreen");
 		allowResolutionChange.setSelected(prefs.getAllowResolutionChange());
 		
+		keepAspectRatio = new JCheckBox("Keep stream aspect ratio");
+		keepAspectRatio.setSelected(prefs.isKeepAspectRatio());
+		
 		openGlRenderer = new JCheckBox("Use OpenGL Renderer (Experimental)");
 		openGlRenderer.setSelected(prefs.getUseOpenGlRenderer());
 		
@@ -111,6 +114,11 @@ public class PreferencesFrame extends JFrame {
 		allowResolutionChangeBox.add(allowResolutionChange);
 		allowResolutionChangeBox.add(Box.createHorizontalGlue());
 		
+		Box keepAspectRatioBox = Box.createHorizontalBox();
+		keepAspectRatioBox.add(Box.createHorizontalGlue());
+		keepAspectRatioBox.add(keepAspectRatio);
+		keepAspectRatioBox.add(Box.createHorizontalGlue());
+		
 		Box openGlRendererBox = Box.createHorizontalBox();
 		openGlRendererBox.add(Box.createHorizontalGlue());
 		openGlRendererBox.add(openGlRenderer);
@@ -131,6 +139,8 @@ public class PreferencesFrame extends JFrame {
 		mainPanel.add(fullscreenBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(allowResolutionChangeBox);
+		mainPanel.add(Box.createVerticalStrut(5));
+		mainPanel.add(keepAspectRatioBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(openGlRendererBox);
 		mainPanel.add(Box.createVerticalStrut(5));
@@ -160,6 +170,7 @@ public class PreferencesFrame extends JFrame {
 	private void writePreferences(Preferences prefs) {
 		prefs.setFullscreen(fullscreen.isSelected());
 		prefs.setAllowResolutionChange(allowResolutionChange.isSelected());
+		prefs.setKeepAspectRatio(keepAspectRatio.isSelected());
 		prefs.setBitrate(bitrate.getValue());
 		prefs.setResolution((Resolution)resolution.getSelectedItem());
 		prefs.setUseOpenGlRenderer(openGlRenderer.isSelected());
