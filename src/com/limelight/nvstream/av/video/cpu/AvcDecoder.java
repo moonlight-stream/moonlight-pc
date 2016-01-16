@@ -14,9 +14,9 @@ public class AvcDecoder {
 			LibraryHelper.loadNativeLibrary("swresample-1");
 			LibraryHelper.loadNativeLibrary("swscale-3");
 			LibraryHelper.loadNativeLibrary("avcodec-56");
-			LibraryHelper.loadNativeLibrary("avformat-56");
-			LibraryHelper.loadNativeLibrary("avfilter-5");
-			LibraryHelper.loadNativeLibrary("avdevice-56");
+//			LibraryHelper.loadNativeLibrary("avformat-56");
+//			LibraryHelper.loadNativeLibrary("avfilter-5");
+//			LibraryHelper.loadNativeLibrary("avdevice-56");
 		}
 		
 		LibraryHelper.loadNativeLibrary("nv_avc_dec");

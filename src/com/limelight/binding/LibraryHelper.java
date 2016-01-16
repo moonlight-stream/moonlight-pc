@@ -25,11 +25,11 @@ public class LibraryHelper {
 		if (System.getProperty("os.name").contains("Windows")) {
 			avcDependencies.add("avutil-54");
 			avcDependencies.add("swresample-1");
-			avcDependencies.add("avdevice-56");
+//			avcDependencies.add("avdevice-56");
 			avcDependencies.add("swscale-3");
 			avcDependencies.add("avcodec-56");
-			avcDependencies.add("avfilter-5");
-			avcDependencies.add("avformat-56");
+//			avcDependencies.add("avfilter-5");
+//			avcDependencies.add("avformat-56");
 
 			avcDependencies.add("pthreadVC2");
 		}
