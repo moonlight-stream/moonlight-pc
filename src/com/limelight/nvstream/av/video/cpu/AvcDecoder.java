@@ -1,19 +1,22 @@
 package com.limelight.nvstream.av.video.cpu;
 
+import java.nio.Buffer;
+
 import com.limelight.binding.LibraryHelper;
 
 public class AvcDecoder {
 	static {
 		// Windows uses runtime linking for ffmpeg libraries
 		if (System.getProperty("os.name").contains("Windows")) {
-			LibraryHelper.loadNativeLibrary("avutil-52");
-			LibraryHelper.loadNativeLibrary("postproc-52");
 			LibraryHelper.loadNativeLibrary("pthreadVC2");
-			LibraryHelper.loadNativeLibrary("swresample-0");
-			LibraryHelper.loadNativeLibrary("swscale-2");
-			LibraryHelper.loadNativeLibrary("avcodec-55");
-			LibraryHelper.loadNativeLibrary("avformat-55");
-			LibraryHelper.loadNativeLibrary("avfilter-3");
+
+			LibraryHelper.loadNativeLibrary("avutil-54");
+			LibraryHelper.loadNativeLibrary("swresample-1");
+			LibraryHelper.loadNativeLibrary("swscale-3");
+			LibraryHelper.loadNativeLibrary("avcodec-56");
+//			LibraryHelper.loadNativeLibrary("avformat-56");
+//			LibraryHelper.loadNativeLibrary("avfilter-5");
+//			LibraryHelper.loadNativeLibrary("avdevice-56");
 		}
 		
 		LibraryHelper.loadNativeLibrary("nv_avc_dec");
@@ -47,6 +50,7 @@ public class AvcDecoder {
 	
 	// Rendering API when NO_COLOR_CONVERSION == 0
 	public static native boolean setRenderTarget(Object androidSurface);
+	public static native boolean getRgbFrameBuffer(Buffer outDirectBuffer, int capacity);
 	public static native boolean getRgbFrameInt(int[] rgbFrame, int bufferSize);
 	public static native boolean getRgbFrame(byte[] rgbFrame, int bufferSize);
 	public static native boolean redraw();
@@ -56,4 +60,5 @@ public class AvcDecoder {
 	
 	public static native int getInputPaddingSize();
 	public static native int decode(byte[] indata, int inoff, int inlen);
+	public static native int decodeBuffer(Buffer inBuffer, int inBufferLen);
 }

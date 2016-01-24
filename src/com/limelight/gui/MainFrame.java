@@ -30,6 +30,7 @@ import javax.swing.*;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.net.InetAddress;
 import java.util.HashMap;
 
@@ -65,7 +66,8 @@ public class MainFrame {
 		JMenu optionsMenu = new JMenu("Options");
 		JMenuItem gamepadSettings = new JMenuItem("Gamepad Settings");
 		JMenuItem generalSettings = new JMenuItem("Preferences");
-
+		generalSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())));
+		
 		gamepadSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new GamepadConfigFrame().build();

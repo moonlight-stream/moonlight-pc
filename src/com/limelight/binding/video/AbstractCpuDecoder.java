@@ -10,20 +10,27 @@ import com.limelight.nvstream.av.video.VideoDepacketizer;
 import com.limelight.nvstream.av.video.cpu.AvcDecoder;
 
 public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
-	private Thread decoderThread;
-	protected int width, height, targetFps;
-	protected boolean dying;
 	
 	private static final int DECODER_BUFFER_SIZE = 256*1024;
+	
+	protected int width, height, targetFps;
+	
+	private Thread decoderThread;
+	volatile protected boolean dying;
+	
 	private ByteBuffer decoderBuffer;
+	private boolean useDirectBuffer = false;
 	
 	private int totalFrames;
 	private long totalDecoderTimeMs;
+	private int inputPaddingSize;
 	
 	public abstract boolean setupInternal(Object renderTarget, int drFlags);
 	
 	public abstract int getColorMode();
 	
+	
+	// VideoDecoderRenderer abstract method @Overrides
 	/**
 	 * Sets up the decoder and renderer to render video at the specified dimensions
 	 * @param width the width of the video to render
@@ -35,8 +42,13 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		this.width = width;
 		this.height = height;
 		this.targetFps = redrawRate;
+		this.inputPaddingSize = AvcDecoder.getInputPaddingSize();
 		
-		decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + AvcDecoder.getInputPaddingSize());
+		if (useDirectBuffer) {
+			decoderBuffer = ByteBuffer.allocateDirect(DECODER_BUFFER_SIZE + inputPaddingSize);
+		} else {
+			decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + inputPaddingSize);
+		}
 		LimeLog.info("Using software decoding");
 		
 		// Use 2 decoding threads
@@ -99,6 +111,9 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	public void release() {
 		AvcDecoder.destroy();
 	}
+	// End of VideoDecoderRenderer @Overrides
+	
+	
 
 	/**
 	 * Give a unit to be decoded to the decoder.
@@ -106,31 +121,32 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	 * @return true if the unit was decoded successfully, false otherwise
 	 */
 	public boolean submitDecodeUnit(DecodeUnit decodeUnit) {
-		byte[] data;
-				
-		// Use the reserved decoder buffer if this decode unit will fit
-		if (decodeUnit.getDataLength() <= DECODER_BUFFER_SIZE) {
-			decoderBuffer.clear();
+		
+		if (decoderBuffer.capacity() < decodeUnit.getDataLength() + inputPaddingSize) {
+			int newCapacity = (int)(1.15f * decodeUnit.getDataLength()) + inputPaddingSize;
+			LimeLog.info("Reallocating decoder buffer from " + decoderBuffer.capacity() + " to " + newCapacity + " bytes");
 			
-			for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
-					bbd != null; bbd = bbd.nextDescriptor) {
-				decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
-			}
-			
-			data = decoderBuffer.array();
-		}
-		else {
-			data = new byte[decodeUnit.getDataLength()+AvcDecoder.getInputPaddingSize()];
-			
-			int offset = 0;
-			for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
-					bbd != null; bbd = bbd.nextDescriptor) {
-				System.arraycopy(bbd.data, bbd.offset, data, offset, bbd.length);
-				offset += bbd.length;
+			if (useDirectBuffer) {
+				decoderBuffer = ByteBuffer.allocateDirect(newCapacity);
+			} else {
+				decoderBuffer = ByteBuffer.allocate(newCapacity);
 			}
 		}
 		
-		boolean success = (AvcDecoder.decode(data, 0, decodeUnit.getDataLength()) == 0);
+		decoderBuffer.clear();
+		
+		for (ByteBufferDescriptor bbd = decodeUnit.getBufferHead();
+				bbd != null; bbd = bbd.nextDescriptor) {
+			decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
+		}
+		
+		boolean success;
+		if (useDirectBuffer) {
+			success = (AvcDecoder.decodeBuffer(decoderBuffer, decodeUnit.getDataLength()) == 0);
+		} else {
+			success = (AvcDecoder.decode(decoderBuffer.array(), 0, decodeUnit.getDataLength()) == 0);
+		}
+		
 		if (success) {
 			// Notify anyone waiting on a frame
 			onFrameDecoded();

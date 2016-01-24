@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.limelight.binding.LibraryHelper;
 import com.limelight.binding.PlatformBinding;
@@ -76,7 +78,7 @@ public class Limelight implements NvConnectionListener {
 		decoderRenderer = PlatformBinding.getVideoDecoderRenderer();
 		
 		conn = new NvConnection(host, prefs.getUniqueId(), this, streamConfig, PlatformBinding.getCryptoProvider());
-		streamFrame.build(this, conn, streamConfig, prefs.getFullscreen());
+		streamFrame.build(this, conn, streamConfig, prefs);
 		conn.start(PlatformBinding.getDeviceName(), streamFrame,
 				VideoDecoderRenderer.FLAG_PREFER_QUALITY,
 				PlatformBinding.getAudioRenderer(),
@@ -168,11 +170,20 @@ public class Limelight implements NvConnectionListener {
 			} catch (IOException e) {
 			}
 		}
+		
+		// Native look and feel for all platforms
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+		}
 
 		//fix the menu bar if we are running in osx
 		if (System.getProperty("os.name").contains("Mac OS X")) {
-			// set the name of the application menu item
+			// set the name of the application menu item (doesn't work on newer Oracle JDK)
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Moonlight");
+			// enables the osx-style menu bar
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 
 		String libraryError = loadNativeLibraries();
