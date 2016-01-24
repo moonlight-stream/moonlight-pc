@@ -50,16 +50,7 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		decoderBuffer = ByteBuffer.allocateDirect(DECODER_BUFFER_SIZE + inputPaddingSize);
 
 		int avcFlags = AvcDecoder.FAST_BILINEAR_FILTERING | getColorMode();
-		int threadCount;
-		
-		// Use 2 decoding threads for 1080p and 1 for 720p
-		if (height >= 1080) {
-			threadCount = 2;
-		}
-		else {
-			avcFlags |= AvcDecoder.LOW_LATENCY_DECODE;
-			threadCount = 1;
-		}
+		int threadCount = 2;
 		
 		LimeLog.info("Using software decoding with thread count: "+threadCount);
 
