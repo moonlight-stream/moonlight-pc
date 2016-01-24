@@ -77,7 +77,7 @@ public class PreferencesFrame extends JFrame {
 		fullscreen = new JCheckBox("Fullscreen");
 		fullscreen.setSelected(prefs.getFullscreen());
 		
-		allowResolutionChange = new JCheckBox("Adapt display resolution in fullscreen");
+		allowResolutionChange = new JCheckBox("Change display resolution in fullscreen mode");
 		allowResolutionChange.setSelected(prefs.getAllowResolutionChange());
 		
 		keepAspectRatio = new JCheckBox("Keep stream aspect ratio");
