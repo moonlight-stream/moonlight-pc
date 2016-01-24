@@ -142,8 +142,8 @@ public class GamepadMapping implements Serializable {
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RB, false, false), new SourceComponent(Type.BUTTON, 9, null));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RT, false, false), new SourceComponent(Type.AXIS, 5, Direction.POSITIVE));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_THUMB, false, false), new SourceComponent(Type.BUTTON, 7, null));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_LEFT, false, false), new SourceComponent(Type.AXIS, 2, Direction.POSITIVE));
-		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_RIGHT, false, false), new SourceComponent(Type.AXIS, 2, Direction.NEGATIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_RIGHT, false, false), new SourceComponent(Type.AXIS, 2, Direction.POSITIVE));
+		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_LEFT, false, false), new SourceComponent(Type.AXIS, 2, Direction.NEGATIVE));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_UP, false, false), new SourceComponent(Type.AXIS, 3, Direction.POSITIVE));
 		defaultMap.insertMapping(defaultMap.new Mapping(GamepadComponent.RS_DOWN, false, false), new SourceComponent(Type.AXIS, 3, Direction.NEGATIVE));
 
