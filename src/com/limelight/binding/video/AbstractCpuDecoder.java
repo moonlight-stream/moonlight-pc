@@ -38,11 +38,15 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	 * @param renderTarget what to render the video onto
 	 * @param drFlags flags for the decoder and renderer
 	 */
-	public boolean setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
+	public boolean setup(VideoFormat format, int width, int height, int redrawRate, Object renderTarget, int drFlags) {
 		this.width = width;
 		this.height = height;
 		this.targetFps = redrawRate;
 		this.inputPaddingSize = AvcDecoder.getInputPaddingSize();
+		
+		if (format != VideoFormat.H264) {
+			return false;
+		}
 		
 		if (useDirectBuffer) {
 			decoderBuffer = ByteBuffer.allocateDirect(DECODER_BUFFER_SIZE + inputPaddingSize);
