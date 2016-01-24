@@ -104,7 +104,6 @@ public abstract class PreferencesManager {
 		private boolean fullscreen;
 		private String host;
 		private String uniqueId;
-		private boolean useOpenGlRenderer;
 		private boolean localAudio;
 		private boolean allowResolutionChange;
 		private boolean keepAspectRatio;
@@ -128,7 +127,6 @@ public abstract class PreferencesManager {
 			this.res = res;
 			this.bitrate = res.defaultBitrate;
 			this.fullscreen = fullscreen;
-			this.useOpenGlRenderer = false;
 			this.host = "GeForce PC host";
 			this.uniqueId = String.format("%016x", new Random().nextLong());
 			this.localAudio = false;
@@ -180,14 +178,6 @@ public abstract class PreferencesManager {
 		public boolean getFullscreen() {
 			return fullscreen;
 		}
-
-		/**
-		 * Gets whether to use the OpenGL renderer
-		 * @return the stored fullscreen mode
-		 */
-		public boolean getUseOpenGlRenderer() {
-			return useOpenGlRenderer;
-		}
 		
 		/**
 		 * Gets whether to use local audio
@@ -227,14 +217,6 @@ public abstract class PreferencesManager {
 		 */
 		public String getUniqueId() {
 			return uniqueId;
-		}
-
-		/**
-		 * Sets the OpenGL renderer use of this preference
-		 * @param useOpenGlRenderer whether to use OpenGL rendering
-		 */
-		public void setUseOpenGlRenderer(boolean useOpenGlRenderer) {
-			this.useOpenGlRenderer = useOpenGlRenderer;
 		}
 		
 		/**

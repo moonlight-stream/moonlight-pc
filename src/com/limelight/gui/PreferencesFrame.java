@@ -23,7 +23,7 @@ public class PreferencesFrame extends JFrame {
 	private JComboBox<Resolution> resolution;
 	private JLabel bitrateLabel;
 	private JSlider bitrate;
-	private JCheckBox fullscreen, allowResolutionChange, keepAspectRatio, openGlRenderer, localAudio;
+	private JCheckBox fullscreen, allowResolutionChange, keepAspectRatio, localAudio;
 	
 	/**
 	 * Construcs a new frame and loads the saved preferences.
@@ -83,9 +83,6 @@ public class PreferencesFrame extends JFrame {
 		keepAspectRatio = new JCheckBox("Keep stream aspect ratio");
 		keepAspectRatio.setSelected(prefs.isKeepAspectRatio());
 		
-		openGlRenderer = new JCheckBox("Use OpenGL Renderer (Experimental)");
-		openGlRenderer.setSelected(prefs.getUseOpenGlRenderer());
-		
 		localAudio = new JCheckBox("Play audio on host PC");
 		localAudio.setSelected(prefs.getLocalAudio());
 	
@@ -119,11 +116,6 @@ public class PreferencesFrame extends JFrame {
 		keepAspectRatioBox.add(keepAspectRatio);
 		keepAspectRatioBox.add(Box.createHorizontalGlue());
 		
-		Box openGlRendererBox = Box.createHorizontalBox();
-		openGlRendererBox.add(Box.createHorizontalGlue());
-		openGlRendererBox.add(openGlRenderer);
-		openGlRendererBox.add(Box.createHorizontalGlue());
-		
 		Box localAudioBox = Box.createHorizontalBox();
 		localAudioBox.add(Box.createHorizontalGlue());
 		localAudioBox.add(localAudio);
@@ -141,8 +133,6 @@ public class PreferencesFrame extends JFrame {
 		mainPanel.add(allowResolutionChangeBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(keepAspectRatioBox);
-		mainPanel.add(Box.createVerticalStrut(5));
-		mainPanel.add(openGlRendererBox);
 		mainPanel.add(Box.createVerticalStrut(5));
 		mainPanel.add(localAudioBox);
 		mainPanel.add(Box.createVerticalGlue());
@@ -173,7 +163,6 @@ public class PreferencesFrame extends JFrame {
 		prefs.setKeepAspectRatio(keepAspectRatio.isSelected());
 		prefs.setBitrate(bitrate.getValue());
 		prefs.setResolution((Resolution)resolution.getSelectedItem());
-		prefs.setUseOpenGlRenderer(openGlRenderer.isSelected());
 		prefs.setLocalAudio(localAudio.isSelected());
 		PreferencesManager.writePreferences(prefs);
 	}

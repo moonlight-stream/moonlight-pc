@@ -19,7 +19,6 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 	volatile protected boolean dying;
 	
 	private ByteBuffer decoderBuffer;
-	private boolean useDirectBuffer = false;
 	
 	private int totalFrames;
 	private long totalDecoderTimeMs;
@@ -48,11 +47,7 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 			return false;
 		}
 		
-		if (useDirectBuffer) {
-			decoderBuffer = ByteBuffer.allocateDirect(DECODER_BUFFER_SIZE + inputPaddingSize);
-		} else {
-			decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + inputPaddingSize);
-		}
+		decoderBuffer = ByteBuffer.allocateDirect(DECODER_BUFFER_SIZE + inputPaddingSize);
 
 		int avcFlags = AvcDecoder.FAST_BILINEAR_FILTERING | getColorMode();
 		int threadCount;
@@ -139,11 +134,7 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 			int newCapacity = (int)(1.15f * decodeUnit.getDataLength()) + inputPaddingSize;
 			LimeLog.info("Reallocating decoder buffer from " + decoderBuffer.capacity() + " to " + newCapacity + " bytes");
 			
-			if (useDirectBuffer) {
-				decoderBuffer = ByteBuffer.allocateDirect(newCapacity);
-			} else {
-				decoderBuffer = ByteBuffer.allocate(newCapacity);
-			}
+			decoderBuffer = ByteBuffer.allocateDirect(newCapacity);
 		}
 		
 		decoderBuffer.clear();
@@ -153,17 +144,9 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 			decoderBuffer.put(bbd.data, bbd.offset, bbd.length);
 		}
 		
-		boolean success;
-		if (useDirectBuffer) {
-			success = (AvcDecoder.decodeBuffer(decoderBuffer, decodeUnit.getDataLength()) == 0);
-		} else {
-			success = (AvcDecoder.decode(decoderBuffer.array(), 0, decodeUnit.getDataLength()) == 0);
-		}
+		boolean success = (AvcDecoder.decodeBuffer(decoderBuffer, decodeUnit.getDataLength()) == 0);
 		
 		if (success) {
-			// Notify anyone waiting on a frame
-			onFrameDecoded();
-			
 			long timeAfterDecode = System.nanoTime() / 1000000L;
 			
 		    // Add delta time to the totals (excluding probable outliers)
@@ -175,10 +158,6 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		}
 		
 		return true;
-	}
-	
-	protected void onFrameDecoded() {
-		// Do nothing
 	}
 
 	public int getCapabilities() {
