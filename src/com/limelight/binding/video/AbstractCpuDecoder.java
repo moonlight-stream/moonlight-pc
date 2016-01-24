@@ -53,11 +53,20 @@ public abstract class AbstractCpuDecoder extends VideoDecoderRenderer {
 		} else {
 			decoderBuffer = ByteBuffer.allocate(DECODER_BUFFER_SIZE + inputPaddingSize);
 		}
-		LimeLog.info("Using software decoding");
-		
-		// Use 2 decoding threads
+
 		int avcFlags = AvcDecoder.FAST_BILINEAR_FILTERING | getColorMode();
-		int threadCount = 2;
+		int threadCount;
+		
+		// Use 2 decoding threads for 1080p and 1 for 720p
+		if (height >= 1080) {
+			threadCount = 2;
+		}
+		else {
+			avcFlags |= AvcDecoder.LOW_LATENCY_DECODE;
+			threadCount = 1;
+		}
+		
+		LimeLog.info("Using software decoding with thread count: "+threadCount);
 
 		int err = AvcDecoder.init(width, height, avcFlags, threadCount);
 		if (err != 0) {
