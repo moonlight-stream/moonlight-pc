@@ -132,7 +132,7 @@ public abstract class PreferencesManager {
 			this.host = "GeForce PC host";
 			this.uniqueId = String.format("%016x", new Random().nextLong());
 			this.localAudio = false;
-			this.setAllowResolutionChange(false);
+			this.allowResolutionChange = true;
 			this.keepAspectRatio = true;
 		}
 
