@@ -1,0 +1,1 @@
+./configure --disable-everything --enable-decoder=h264 --disable-avdevice --disable-avformat --disable-postproc --disable-avfilter --enable-pic --extra-cflags=-fPIC --extra-cxxflags=-fPIC --extra-ldflags=-pie
