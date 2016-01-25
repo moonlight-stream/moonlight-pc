@@ -56,8 +56,8 @@ public class NativeGamepad {
 	
 	public static void start() {
 		if (!running) {
-			startPolling();
 			running = true;
+			startPolling();
 		}
 	}
 	
