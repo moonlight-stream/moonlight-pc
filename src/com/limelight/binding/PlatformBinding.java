@@ -6,7 +6,6 @@ import com.limelight.binding.video.GLDecoderRenderer;
 import com.limelight.nvstream.av.audio.AudioRenderer;
 import com.limelight.nvstream.av.video.VideoDecoderRenderer;
 import com.limelight.nvstream.http.LimelightCryptoProvider;
-import com.limelight.settings.PreferencesManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
