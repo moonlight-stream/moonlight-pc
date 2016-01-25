@@ -127,7 +127,7 @@ public class GLDecoderRenderer extends AbstractCpuDecoder implements GLEventList
         }
         
         gl.glViewport(x, y, viewportWidth, viewportHeight);
-        gl.glRasterPos2f(-zoomX*(this.width/viewportX), zoomY*(this.height/viewportY));
+        gl.glRasterPos2f((-zoomX*this.width)/viewportX, (zoomY*this.height)/viewportY);
 		gl.glPixelZoom(zoomX, -zoomY);
     }
 
