@@ -204,7 +204,7 @@ public class AppsFrame extends JFrame {
         	}
 			setVisible(false);
         } catch (Exception e) {
-			Limelight.displayUiMessage(null, "Unable to retreive app list",
+			Limelight.displayUiMessage(null, "Unable to retrieve app list",
 					"Moonlight", JOptionPane.ERROR_MESSAGE);
 			setVisible(false);
         }
