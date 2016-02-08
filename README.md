@@ -4,7 +4,10 @@
 
 Moonlight-pc allows you to stream your full collection of Steam games from your powerful desktop to another PC or laptop running Linux/OS X/Windows.
 
-Moonlight also has an [Android implementation](https://github.com/moonlight-stream/moonlight-android). Versions for [iOS](https://github.com/moonlight-stream/moonlight-ios) and [Windows and Windows Phone](https://github.com/moonlight-stream/moonlight-windows) are currently in development.
+Moonlight also has versions for [Android](https://github.com/moonlight-stream/moonlight-android) and  [iOS](https://github.com/moonlight-stream/moonlight-ios).
+
+#### Note: 
+Moonlight PC is not updated frequently. For a full streaming experience, we recommend the Android or iOS version. We are working on some ideas on how to bring you a better PC to PC streaming experience... stay tuned.
 
 ##Features
 
