@@ -1,6 +1,6 @@
 #Moonlight
 
-[Moonlight](https://github.com/moonlight-stream) is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux/OS X/Windows.
+[Moonlight](http://moonlight-stream.com) is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux/OS X/Windows.
 
 Moonlight-pc allows you to stream your full collection of Steam games from your powerful desktop to another PC or laptop running Linux/OS X/Windows.
 
