@@ -14,7 +14,7 @@ Moonlight PC is not updated frequently. For a full streaming experience, we reco
 * Streams Steam and all of your games from your PC to your Linux/OS X/Windows machine
 * Keyboard and Mouse support
 * Full support for Xbox 360 controllers, PS3 and PS4 controllers, and other HID gamepads
-* Full Windows, OS X, and Linux Support* 
+* Full Windows, OS X, and Linux Support
 * Use mDNS to scan for compatible GeForce Experience (GFE) machines on the network
 * Choose from your list of available games instead of just launching Steam
 
