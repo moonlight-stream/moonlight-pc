@@ -374,7 +374,7 @@ public class Limelight implements NvConnectionListener {
 			httpConn = new NvHTTP(InetAddress.getByName(host),
 					uniqueId, PlatformBinding.getDeviceName(), PlatformBinding.getCryptoProvider());
 			try {
-				String serverInfo = httpConn.getServerInfo(uniqueId);
+				String serverInfo = httpConn.getServerInfo();
 				if (httpConn.getPairState(serverInfo) == PairingManager.PairState.PAIRED) {
 					message = "Already paired";
 				}

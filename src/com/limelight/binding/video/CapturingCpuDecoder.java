@@ -11,7 +11,7 @@ public abstract class CapturingCpuDecoder extends AbstractCpuDecoder {
 	
 	private FileOutputStream fout;
 	
-	public boolean setup(int width, int height, int redrawRate, Object renderTarget, int drFlags) {
+	public boolean setup(VideoFormat format, int width, int height, int redrawRate, Object renderTarget, int drFlags) {
 		try {
 			fout = new FileOutputStream("capture.h264");
 		} catch (FileNotFoundException e) {
@@ -19,7 +19,7 @@ public abstract class CapturingCpuDecoder extends AbstractCpuDecoder {
 			return false;
 		}
 		
-		return super.setup(width, height, redrawRate, renderTarget, drFlags);
+		return super.setup(format, width, height, redrawRate, renderTarget, drFlags);
 	}
 	
 	@Override
