@@ -1,0 +1,3 @@
+[submodule "jni/jnienet/enet"]
+	path = jni/jnienet/enet
+	url = https://github.com/cgutman/enet.git
