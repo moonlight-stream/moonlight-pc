@@ -7,7 +7,7 @@ Moonlight-pc allows you to stream your full collection of Steam games from your 
 Moonlight also has versions for [Android](https://github.com/moonlight-stream/moonlight-android) and  [iOS](https://github.com/moonlight-stream/moonlight-ios).
 
 #### Note: 
-Moonlight PC is not updated frequently. For a full streaming experience, we recommend the Android or iOS version. We are working on some ideas on how to bring you a better PC to PC streaming experience... stay tuned.
+Moonlight PC will be discontinued in the near future. It will replaced by a _significantly_ better client that runs as a Chrome packaged app on the Chrome Web Store. Follow the Chrome port [here](https://github.com/moonlight-stream/moonlight-chrome).
 
 ##Features
 
@@ -17,9 +17,6 @@ Moonlight PC is not updated frequently. For a full streaming experience, we reco
 * Full Windows, OS X, and Linux Support
 * Use mDNS to scan for compatible GeForce Experience (GFE) machines on the network
 * Choose from your list of available games instead of just launching Steam
-
-##Features to come
-* Hardware accelerated video decoding
 
 ##Installation
 
