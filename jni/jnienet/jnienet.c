@@ -5,6 +5,11 @@
 
 #include <jni.h>
 
+#ifdef _WIN32
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "winmm.lib")
+#endif
+
 #define CLIENT_TO_LONG(x) ((intptr_t)(x))
 #define LONG_TO_CLIENT(x) ((ENetHost*)(intptr_t)(x))
 
@@ -45,7 +50,7 @@ Java_com_limelight_nvstream_enet_EnetConnection_connectToPeer(JNIEnv *env, jobje
     // Initialize the ENet address
     addrStr = (*env)->GetStringUTFChars(env, address, 0);    
     err = enet_address_set_host(&enetAddress, addrStr);
-    enet_address_set_port(&enetAddress, port);
+    enet_address_set_port(&enetAddress, (enet_uint16) port);
     (*env)->ReleaseStringUTFChars(env, address, addrStr);
     if (err < 0) {
         return PEER_TO_LONG(NULL);
@@ -88,15 +93,15 @@ Java_com_limelight_nvstream_enet_EnetConnection_readPacket(JNIEnv *env, jobject 
     }
     
     // Check that the packet isn't too large
-    if (event.packet->dataLength > length) {
+    if (event.packet->dataLength > (size_t) length) {
         enet_packet_destroy(event.packet);
-        return event.packet->dataLength;
+        return (jint) event.packet->dataLength;
     }
     
     // Copy the packet data into the caller's buffer
     dataPtr = (*env)->GetByteArrayElements(env, data, 0);
     memcpy(dataPtr, event.packet->data, event.packet->dataLength);
-    err = event.packet->dataLength;
+    err = (jint) event.packet->dataLength;
     (*env)->ReleaseByteArrayElements(env, data, dataPtr, 0);
     
     // Free the packet
