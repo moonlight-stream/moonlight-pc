@@ -392,7 +392,7 @@ public class Limelight implements NvConnectionListener {
 						}
 					}).start();
 					
-					PairingManager.PairState pairState = httpConn.pair(pinStr);
+					PairingManager.PairState pairState = httpConn.pair(serverInfo, pinStr);
 					if (pairState == PairingManager.PairState.PIN_WRONG) {
 						message = "Incorrect PIN";
 					}
