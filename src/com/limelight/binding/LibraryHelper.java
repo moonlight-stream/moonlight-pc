@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.UUID;
 
 public class LibraryHelper {
 	private static final HashSet<String> avcDependencies = new HashSet<String>();
@@ -19,7 +20,7 @@ public class LibraryHelper {
 	
 	static {
 		needsDependencyExtraction = System.getProperty("os.name").contains("Windows");
-		libraryExtractionFolder = System.getProperty("java.io.tmpdir", ".");
+		libraryExtractionFolder = System.getProperty("java.io.tmpdir", ".") + File.separatorChar + UUID.randomUUID().toString();
 		
 		// AVC dependencies
 		if (System.getProperty("os.name").contains("Windows")) {
@@ -48,16 +49,19 @@ public class LibraryHelper {
 	}
 
 	public static void prepareNativeLibraries() {
-		if (!needsDependencyExtraction) {
+		if (!needsDependencyExtraction || !isRunningFromJar()) {
 			return;
 		}
+		
+		// Create the native library folder
+		new File(libraryExtractionFolder).mkdirs();
 		
 		try {
 			for (String dependency : avcDependencies) {
 				extractNativeLibrary(dependency);
 			}
 		} catch (IOException e) {
-			// This is expected if this code is not running from a JAR
+			e.printStackTrace();
 			return;
 		}
 		
