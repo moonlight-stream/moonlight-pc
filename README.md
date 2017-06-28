@@ -1,4 +1,4 @@
-#Moonlight
+# Moonlight
 
 [Moonlight](http://moonlight-stream.com) is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux/OS X/Windows.
 
@@ -9,7 +9,7 @@ Moonlight also has versions for [Android](https://github.com/moonlight-stream/mo
 #### Note: 
 Moonlight PC will be discontinued in the near future. It will replaced by a _significantly_ better client that runs as a Chrome packaged app on the Chrome Web Store. Follow the Chrome port [here](https://github.com/moonlight-stream/moonlight-chrome).
 
-##Features
+## Features
 
 * Streams Steam and all of your games from your PC to your Linux/OS X/Windows machine
 * Keyboard and Mouse support
@@ -18,17 +18,17 @@ Moonlight PC will be discontinued in the near future. It will replaced by a _sig
 * Use mDNS to scan for compatible GeForce Experience (GFE) machines on the network
 * Choose from your list of available games instead of just launching Steam
 
-##Installation
+## Installation
 
 * Download [GeForce Experience](http://www.geforce.com/geforce-experience) and install on your Windows PC
 * Download the appropriate jar from the [GitHub releases page](https://github.com/moonlight-stream/moonlight-pc/releases)
 
-##Requirements
+## Requirements
 
 * [GFE compatible](http://shield.nvidia.com/play-pc-games/) computer with GTX 600/700 series GPU (for the PC from which you're streaming)
 * High-end wireless router (802.11n dual-band recommended) or wired network
 
-##Usage
+## Usage
 
 * Ensure your machines are on the same network
 * Turn on Shield Streaming in the GFE settings
@@ -51,7 +51,7 @@ To launch Moonlight from a command line:
 
 For example, to launch a game from your gaming rig that has the address 192.168.0.100 on your home network in full screen, 720p, and 30fps on a 64-bit Windows computer, your command would look like to `java -jar moonlight-win64.jar -host 192.168.0.100 -fs -720 -30fps`
 
-##Contribute
+## Contribute
 
 This project is being actively developed at [XDA Developers](http://forum.xda-developers.com/showthread.php?t=2505510)
 
@@ -61,7 +61,7 @@ This project is being actively developed at [XDA Developers](http://forum.xda-de
 
 Check out our [website](http://moonlight-stream.com) for project links and information.
 
-##Authors
+## Authors
 
 * [Cameron Gutman](https://github.com/cgutman)  
 * [Diego Waxemberg](https://github.com/dwaxemberg)  
