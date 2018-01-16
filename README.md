@@ -1,13 +1,14 @@
-# Moonlight
+# Discontinued
+The Java-based PC client is discontinued and not compatible with GeForce Experience v3.12 and later. Please use the [Chrome-based client](https://github.com/moonlight-stream/moonlight-chrome) instead for streaming to PCs.
+
+
+## Introduction 
 
 [Moonlight](http://moonlight-stream.com) is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux/OS X/Windows.
 
 Moonlight-pc allows you to stream your full collection of Steam games from your powerful desktop to another PC or laptop running Linux/OS X/Windows.
 
 Moonlight also has versions for [Android](https://github.com/moonlight-stream/moonlight-android) and  [iOS](https://github.com/moonlight-stream/moonlight-ios).
-
-#### Note: 
-Moonlight PC will be discontinued in the near future. It will replaced by a _significantly_ better client that runs as a Chrome packaged app on the Chrome Web Store. Follow the Chrome port [here](https://github.com/moonlight-stream/moonlight-chrome).
 
 ## Features
 
