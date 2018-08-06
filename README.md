@@ -1,5 +1,5 @@
 # Discontinued
-The Java-based PC client is discontinued and not compatible with GeForce Experience v3.12 and later. Please use the [Chrome-based client](https://github.com/moonlight-stream/moonlight-chrome) instead for streaming to PCs.
+The Java-based PC client is discontinued and not compatible with GeForce Experience v3.12 and later. Please use the new native [PC client](https://github.com/moonlight-stream/moonlight-qt) instead for streaming to PCs.
 
 
 ## Introduction 
